@@ -1,1 +1,2 @@
-# Project for management system of ppr
+# PPR management system
+Control workflow of ppr, generate reports.
