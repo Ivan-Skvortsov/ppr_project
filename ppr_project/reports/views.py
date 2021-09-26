@@ -1,6 +1,9 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 
 
 def index(request):
-    return HttpResponse('This is index!')
+    template = 'index.html'
+    context = {
+        'key': '123'
+    }
+    return render(request, template, context)
