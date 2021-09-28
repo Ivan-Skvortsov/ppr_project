@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.deletion import SET_NULL
 
 
 class Employee(models.Model):
@@ -31,6 +32,11 @@ class EquipmentType(models.Model):
 
 
 class Equipment(models.Model):
+    facility = models.ForeignKey(
+        Facility,
+        on_delete=SET_NULL,
+        null=True
+    )
     equipment_type = models.ForeignKey(
         EquipmentType,
         on_delete=models.SET_NULL,
@@ -41,7 +47,7 @@ class Equipment(models.Model):
     quantity = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.equipment_type
+        return self.equipment
 
 class Job(models.Model):
     asu_engineer = models.ForeignKey(
