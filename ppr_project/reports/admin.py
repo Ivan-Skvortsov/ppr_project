@@ -1,3 +1,4 @@
+from typing import DefaultDict
 from django.contrib import admin
 
 from .models import Employee, Equipment, EquipmentType, Facility, Job
@@ -10,8 +11,12 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 @admin.register(Equipment)
 class EquipmentAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'equipment_type', 'equipment', 'quantity')
+    list_display = ('pk', 'get_facility', 'equipment_type', 'equipment', 'quantity')
 
+    def get_facility(self, obj):
+        return obj.equipment_type.facility
+    get_facility.short_description = 'Facility_FK!'
+    get_facility.admin_order_field = 'equipment_type__facility'
 
 @admin.register(EquipmentType)
 class EquipmentTypeAdmin(admin.ModelAdmin):

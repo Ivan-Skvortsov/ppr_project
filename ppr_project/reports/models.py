@@ -32,11 +32,6 @@ class EquipmentType(models.Model):
 
 
 class Equipment(models.Model):
-    facility = models.ForeignKey(
-        Facility,
-        on_delete=SET_NULL,
-        null=True
-    )
     equipment_type = models.ForeignKey(
         EquipmentType,
         on_delete=models.SET_NULL,
