@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models.deletion import SET_NULL
 
 
 class Employee(models.Model):
@@ -17,6 +16,12 @@ class Facility(models.Model):
     def __str__(self):
         return self.facility_name
 
+
+class MaintenanceCategory(models.Model):
+    category_name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.category_name
 
 class EquipmentType(models.Model):
     eq_type_name = models.CharField(max_length=30)
