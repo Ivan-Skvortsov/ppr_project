@@ -64,6 +64,7 @@ class EquipmentMaintenanceRegulation(models.Model):
         related_name='maintenance_regulation'
     )
     regulations = models.TextField()
+    regulation_num = models.CharField(max_length=20)
 
 
 class Schedule(models.Model):
