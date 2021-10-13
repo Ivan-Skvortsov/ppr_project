@@ -58,8 +58,8 @@ class Equipment(models.Model):
 
 
 class EquipmentMaintenanceRegulation(models.Model):
-    equipment_type = models.ForeignKey(
-        EquipmentType,
+    equipment = models.ForeignKey(
+        Equipment,
         on_delete=models.CASCADE,
         related_name='maintenance_regulation'
     )
