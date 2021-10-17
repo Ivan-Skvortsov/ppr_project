@@ -1,3 +1,5 @@
+from docxtpl import DocxTemplate
+
 context = {
     'facility_name': 'ГПА-11',
     'd': 10,
@@ -12,16 +14,19 @@ context = {
     'name3': None,
     'row_contents': [
         {
+            'desc': 'Yokogawa EJA530',
             'q': 10,
             't': 'TO-2',
             'p': '38, 39'
         },
         {
+            'desc': 'Метран-150',
             'q': 15,
             't': 'TO-4',
             'p': '11'
         },
         {
+            'desc': 'Садко-103',
             'q': 3,
             't': 'TO-3',
             'p': '2'
@@ -29,3 +34,11 @@ context = {
 
     ]
 }
+
+target_file = r'E:\Dev\ppr_project\ppr_project\reports\report_template\out.docx'
+template_file = r'E:\Dev\ppr_project\ppr_project\reports\report_template\template.docx'
+
+docx_template = DocxTemplate(template_file)
+
+docx_template.render(context=context)
+docx_template.save(target_file)
