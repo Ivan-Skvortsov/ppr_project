@@ -2,12 +2,14 @@ from django.contrib import admin
 from django.contrib.admin.decorators import display
 
 from .models import (Employee, Equipment, EquipmentType, Facility,
-                     MaintenanceCategory, Schedule, EquipmentMaintenanceRegulation)
+                     MaintenanceCategory, Schedule,
+                     EquipmentMaintenanceRegulation)
 
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('department', 'name', 'position')
+
 
 @admin.register(Equipment)
 class EquipmentAdmin(admin.ModelAdmin):
@@ -25,6 +27,7 @@ class EquipmentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(EquipmentType)
+
 
 @admin.register(Facility)
 class FacilityAdmin(admin.ModelAdmin):
