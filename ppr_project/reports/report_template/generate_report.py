@@ -39,6 +39,6 @@ target_file = r'E:\Dev\ppr_project\ppr_project\reports\report_template\out.docx'
 template_file = r'E:\Dev\ppr_project\ppr_project\reports\report_template\template.docx'
 
 docx_template = DocxTemplate(template_file)
-
+print(target_file)
 docx_template.render(context=context)
 docx_template.save(target_file)

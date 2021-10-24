@@ -15,7 +15,7 @@ class EquipmentMaintenanceRegulation(models.Model):
     regulation_num = models.CharField(max_length=20)
 
     def __str__(self):
-        return f'{self.regulation_num} | {self.regulations[:10]}...'
+        return f'{self.regulation_num} | {self.regulations[:20]}...'
 
 
 class MaintenanceCategory(models.Model):
