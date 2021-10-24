@@ -10,6 +10,14 @@ class Employee(models.Model):
         return self.name
 
 
+class EquipmentMaintenanceRegulation(models.Model):
+    regulations = models.TextField()
+    regulation_num = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f'{self.regulation_num} | {self.regulations[:10]}...'
+
+
 class MaintenanceCategory(models.Model):
     category_name = models.CharField(max_length=25)
 
@@ -21,10 +29,10 @@ class Facility(models.Model):
     facility_name = models.CharField(max_length=20)
     maintenance_category = models.ForeignKey(
         MaintenanceCategory,
-        on_delete=models.CASCADE,
-        related_name='maintenance_category',
-        null=True
-    )
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+        )
 
     def __str__(self):
         return self.facility_name
@@ -34,37 +42,29 @@ class EquipmentType(models.Model):
     eq_type_name = models.CharField(max_length=30)
     facility = models.ForeignKey(
         Facility,
-        on_delete=models.SET_NULL,
-        related_name='equipment_type',
+        on_delete=models.PROTECT,
         null=True
-        )
+    )
 
     def __str__(self):
         return self.eq_type_name
 
 
 class Equipment(models.Model):
-    equipment_type = models.ForeignKey(
-        EquipmentType,
-        on_delete=models.SET_NULL,
-        related_name='equipment',
-        null=True
-    )
     equipment = models.CharField(max_length=20)
     quantity = models.IntegerField(default=0)
+    maintenance_regulation = models.ForeignKey(
+        EquipmentMaintenanceRegulation,
+        on_delete=models.PROTECT,
+    )
+    equipment_type = models.ForeignKey(
+        EquipmentType,
+        on_delete=models.PROTECT,
+        null=True
+    )
 
     def __str__(self):
         return self.equipment
-
-
-class EquipmentMaintenanceRegulation(models.Model):
-    equipment = models.ForeignKey(
-        Equipment,
-        on_delete=models.CASCADE,
-        related_name='maintenance_regulation'
-    )
-    regulations = models.TextField()
-    regulation_num = models.CharField(max_length=20)
 
 
 class Schedule(models.Model):

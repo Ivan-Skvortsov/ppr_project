@@ -1,1 +1,24 @@
 {% extends 'base.html' %}
+{% block content %}
+  {% for m_category in maintenance_category %}
+    <hr>
+    {{ m_category }} <br>
+    {% for f_name in facility %}
+      {% if f_name.maintenance_category == m_category %}
+        ->{{ f_name }} <br>
+        {% for eq_type in eqipment_type %}
+          {% if eq_type.facility == f_name %}
+            -->{{ eq_type }} <br>
+            {% for eq in eqipment %}
+              {% if eq.equipment_type == eq_type %}
+                ---> {{ eq }} <br>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+{% endblock content %}
+
+
