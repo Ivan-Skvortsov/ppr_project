@@ -8,12 +8,20 @@
         ->{{ f_name }} <br>
         {% for eq_type in eqipment_type %}
           {% if eq_type.facility == f_name %}
-            -->{{ eq_type }} <br>
-            {% for eq in eqipment %}
-              {% if eq.equipment_type == eq_type %}
-                ---> {{ eq }} <br>
-              {% endif %}
-            {% endfor %}
+            <p>
+              <a class="btn btn-light" data-bs-toggle="collapse" href="#collapseExample{{ eq_type.pk }}" role="button">
+              -->{{ eq_type }}
+              </a>
+            </p>            
+            <div class="collapse" id="collapseExample{{ eq_type.pk }}">
+              <div class="card card-body">
+                {% for eq in eqipment %}
+                  {% if eq.equipment_type == eq_type %}
+                ---> {{ eq }} | {{ eq.quantity }} <br>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>         
           {% endif %}
         {% endfor %}
       {% endif %}
