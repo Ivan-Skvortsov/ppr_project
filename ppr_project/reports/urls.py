@@ -6,4 +6,5 @@ app_name = 'reports'
 
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
+    path('year/', views.YearScheduleView.as_view(), name='year_schedule')
 ]

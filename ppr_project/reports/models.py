@@ -65,14 +65,14 @@ class EquipmentType(models.Model):
 
 
 class MaintenanceType(models.Model):
-    type = models.CharField(max_length=5)
+    m_type = models.CharField(max_length=5)
 
     class Meta:
         verbose_name = 'Тип ТО'
         verbose_name_plural = 'Типы ТО'
 
     def __str__(self):
-        return self.type
+        return self.m_type
 
 
 class Schedule(models.Model):
@@ -85,24 +85,26 @@ class Schedule(models.Model):
     maintenance_type = models.ForeignKey(
         MaintenanceType,
         on_delete=models.SET_NULL,
-        related_name='maintenace_type_schedule',
+        related_name='maintenance_type',
         null=True
     )
     date_sheduled = models.DateField()
-    date_completed = models.DateField()
+    date_completed = models.DateField(blank=True, null=True)
     access_journal_filled = models.BooleanField(default=False)
     result_journal_filled = models.BooleanField(default=False)
     employee1 = models.ForeignKey(
         Employee,
         on_delete=models.SET_NULL,
         related_name='employee1_schedule',
-        null=True
+        null=True,
+        blank=True
     )
     employee2 = models.ForeignKey(
         Employee,
         on_delete=models.SET_NULL,
         related_name='employee2_schedule',
-        null=True
+        null=True,
+        blank=True
     )
     employee3 = models.ForeignKey(
         Employee,

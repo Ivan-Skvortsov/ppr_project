@@ -22,5 +22,16 @@ class EquipmentTypeAdmin(admin.ModelAdmin):
                     'report_template')
 
 
+@admin.register(Schedule)
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ('equipment_type',
+                    'maintenance_type',
+                    'date_sheduled',
+                    'date_completed',
+                    'employee1',
+                    'employee2',
+                    'employee3')
+    list_filter = ('maintenance_type',)
+
+
 admin.site.register(MaintenanceCategory)
-admin.site.register(Schedule)
