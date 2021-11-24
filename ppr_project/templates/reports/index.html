@@ -1,43 +1,24 @@
 {% extends 'base.html' %}
 {% block content %}
-  {% for m_category in maintenance_category %}
-    <hr>
-    {{ m_category }} <br>
-    {% for f_name in facility %}
-      {% if f_name.maintenance_category == m_category %}
-        ->{{ f_name }} <br>
-        {% for eq_type in eqipment_type %}
-          {% if eq_type.facility == f_name %}
-            <p>
-              <a class="btn btn-light" data-bs-toggle="collapse" href="#collapseExample{{ eq_type.pk }}" role="button">
-              -->{{ eq_type }}
-              </a>
-            </p>            
-            <div class="collapse" id="collapseExample{{ eq_type.pk }}">
-              <div class="card card-body">
-                {% for eq in eqipment %}
-                  {% if eq.equipment_type == eq_type %}
-                ---> {{ eq }} | {{ eq.quantity }} <br>
-                  {% endif %}
-                {% endfor %}
-              </div>
-            </div>         
-          {% endif %}
-        {% endfor %}
-      {% endif %}
+<div>
+  <table class="table table-hover">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Категория</th>
+        <th scope="col">Объект</th>
+        <th scope="col">Тип оборудования</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for item in equipment_type %}
+      <tr>
+        <th scope="row">{{ item.pk }}</th>
+        <td>{{ item.maintenance_category }}</td>
+        <td>{{ item.facility }}</td>
+        <td>{{ item.eqipment_type_name }}</td>
+      </tr>
     {% endfor %}
-  {% endfor %}
-<br>
-<hr>
-<hr>
-<br>
-{% for m_category in maintenance_category %}
-  <hr>
-  {{ m_category }}
-  <br>
-  {% for facil in m_category.facility_set.all %}
-    {{ facil }}
-  {% endfor %}
-
-{% endfor %}
+    </tbody>
+  </table>
 {% endblock content %}

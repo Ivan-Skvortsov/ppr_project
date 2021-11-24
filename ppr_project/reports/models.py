@@ -6,20 +6,20 @@ class Employee(models.Model):
     position = models.CharField(max_length=20)
     department = models.CharField(max_length=25)  # TODO: change to choices
 
+    class Meta:
+        verbose_name = 'Работник'
+        verbose_name_plural = "Работники"
+
     def __str__(self):
         return self.name
 
 
-class EquipmentMaintenanceRegulation(models.Model):
-    regulations = models.TextField()
-    regulation_num = models.CharField(max_length=20)
-
-    def __str__(self):
-        return f'{self.regulation_num} | {self.regulations[:20]}...'
-
-
 class MaintenanceCategory(models.Model):
     category_name = models.CharField(max_length=25)
+
+    class Meta:
+        verbose_name = 'Категория работ'
+        verbose_name_plural = "Категории работ"
 
     def __str__(self):
         return self.category_name
@@ -34,65 +34,84 @@ class Facility(models.Model):
         blank=True
         )
 
+    class Meta:
+        verbose_name = 'Объект'
+        verbose_name_plural = "Объекты"
+
     def __str__(self):
         return self.facility_name
 
 
 class EquipmentType(models.Model):
-    eq_type_name = models.CharField(max_length=30)
+    maintenance_category = models.ForeignKey(
+        MaintenanceCategory,
+        on_delete=models.PROTECT,
+        null=True
+    )
     facility = models.ForeignKey(
         Facility,
         on_delete=models.PROTECT,
         null=True
     )
+    eqipment_type_name = models.CharField(max_length=30)
+    report_template = models.FilePathField(default='/')
+
+    class Meta:
+        verbose_name = 'Тип оборудования'
+        verbose_name_plural = "Типы оборудования"
 
     def __str__(self):
-        return self.eq_type_name
+        return self.eqipment_type_name
 
 
-class Equipment(models.Model):
-    equipment = models.CharField(max_length=20)
-    quantity = models.IntegerField(default=0)
-    maintenance_regulation = models.ForeignKey(
-        EquipmentMaintenanceRegulation,
-        on_delete=models.PROTECT,
-    )
-    equipment_type = models.ForeignKey(
-        EquipmentType,
-        on_delete=models.PROTECT,
-        null=True
-    )
+class MaintenanceType(models.Model):
+    type = models.CharField(max_length=5)
+
+    class Meta:
+        verbose_name = 'Тип ТО'
+        verbose_name_plural = 'Типы ТО'
 
     def __str__(self):
-        return self.equipment
+        return self.type
 
 
 class Schedule(models.Model):
     equipment_type = models.ForeignKey(
         EquipmentType,
         on_delete=models.SET_NULL,
-        related_name='equipment_type',
+        related_name='equipment_type_schedule',
         null=True
     )
-    maintenance_type = models.CharField(max_length=10)
+    maintenance_type = models.ForeignKey(
+        MaintenanceType,
+        on_delete=models.SET_NULL,
+        related_name='maintenace_type_schedule',
+        null=True
+    )
     date_sheduled = models.DateField()
-    date_completed = models.DateField(auto_now_add=True)
+    date_completed = models.DateField()
+    access_journal_filled = models.BooleanField(default=False)
+    result_journal_filled = models.BooleanField(default=False)
     employee1 = models.ForeignKey(
         Employee,
         on_delete=models.SET_NULL,
-        related_name='employee1',
+        related_name='employee1_schedule',
         null=True
     )
     employee2 = models.ForeignKey(
         Employee,
         on_delete=models.SET_NULL,
-        related_name='employee2',
+        related_name='employee2_schedule',
         null=True
     )
     employee3 = models.ForeignKey(
         Employee,
         on_delete=models.SET_NULL,
-        related_name='employee3',
+        related_name='employee3_schedule',
         null=True,
         blank=True
     )
+
+    class Meta:
+        verbose_name = 'Планирование работ'
+        verbose_name_plural = 'Планирование работ'
