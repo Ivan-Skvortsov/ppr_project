@@ -11,8 +11,9 @@ from reports.models import (EquipmentType,
                             Schedule)
 
 
-def import_from_xls(filename):
-    category_name = 'ППР КЦ-1'
+def import_objects_from_xls(filename):
+    """Imports objects from xlsx template."""
+    category_name = 'ППР КЦ-1'  # FIXME
     category = MaintenanceCategory.objects.get_or_create(
         category_name=category_name)[0]
     wb = load_workbook(filename=filename, read_only=True, data_only=True)
@@ -34,10 +35,11 @@ def import_from_xls(filename):
 
 
 def import_schedule_from_xls(filename):
+    """Import schedules from xlsx templates."""
     wb = load_workbook(filename=filename, read_only=True, data_only=True)
     worksheet = wb.active
     for row in tqdm(worksheet.iter_rows(min_row=2), total=100):
-        category = MaintenanceCategory.objects.get(category_name='ППР КЦ-1')
+        category = MaintenanceCategory.objects.get(category_name='ППР КЦ-1')  # FIXME
         facility = Facility.objects.get(facility_name=row[0].value)
         equipment_type = EquipmentType.objects.get(
             facility=facility,

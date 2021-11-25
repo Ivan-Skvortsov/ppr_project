@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'reports.apps.ReportsConfig',
+    'core.apps.CoreConfig',
     'debug_toolbar'
 ]
 

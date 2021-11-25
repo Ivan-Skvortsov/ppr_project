@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from reports.parsers.xls_parser import (import_schedule_from_xls,
-                                        import_from_xls)
+                                        import_objects_from_xls)
 
 
 class Command(BaseCommand):
@@ -15,6 +15,6 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         filepath = kwargs['filepath']
         if kwargs['objects']:
-            import_from_xls(filepath)
+            import_objects_from_xls(filepath)
         if kwargs['schedules']:
             import_schedule_from_xls(filepath)
