@@ -5,11 +5,42 @@
     <h4>{{ facility.grouper }}</h4>
     {% regroup facility.list by equipment_type.eqipment_type_name as eq_list %}
       {% for eq in eq_list %}
-        {{ eq.grouper }}
-        {% for item in eq.list %}
-          <br>{{ item.date_sheduled }} - {{ item.maintenance_type }} - {{ item.date_completed }}
-        {% endfor %}
-        <hr>
+      <p>
+          <a class="btn btn-primary" data-toggle="collapse" href="#collapse{{ forloop.counter }}" role="button">
+            {{ eq.grouper }}
+          </a>
+      </p>
+        <div class="collapse" id="collapse{{ forloop.counter }}">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th style="width: 25%">План</th>
+              <th style="width: 25%">Вид ТО</th>
+              <th style="width: 25%">Факт</th>
+              <th style="width: 25%">Кто проводил</th>
+            </tr>
+          </thead>    
+          <tbody>
+            {% for item in eq.list %}
+              <tr>
+                <td>{{ item.date_sheduled }}</td>
+                <td>{{ item.maintenance_type }}</td>
+                <td>{{ item.date_completed }}</td>
+                <td>{{ item.date_sheduled }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          </table>
+        </div>
+
       {% endfor %}
 {% endfor %}
+
+
+
+
+
+
+
+
 {% endblock content %}

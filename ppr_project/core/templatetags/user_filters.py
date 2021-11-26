@@ -5,5 +5,5 @@ register = template.Library()
 
 
 @register.filter
-def get_dict_item(dictionary, key):
-    return dictionary[key]
+def get_list_item(list_, idx):
+    return list_[idx]
