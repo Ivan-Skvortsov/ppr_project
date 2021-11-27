@@ -5,12 +5,22 @@
     <h4>{{ facility.grouper }}</h4>
     {% regroup facility.list by equipment_type.eqipment_type_name as eq_list %}
       {% for eq in eq_list %}
-      <p>
-          <a class="btn btn-primary" data-toggle="collapse" href="#collapse{{ forloop.counter }}" role="button">
+      {% comment %} <p>
+          <a class="btn btn-primary" data-toggle="collapse" href="#collapse{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="collapseExample">
             {{ eq.grouper }}
           </a>
-      </p>
-        <div class="collapse" id="collapse{{ forloop.counter }}">
+      </p> {% endcomment %}
+
+<div class="panel panel-primary accordion">
+    <div class="panel-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent=".accordion" href="#collapse{{ forloop.counter }}">
+            {{ eq.grouper }}
+        </a>           
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse in">
+        <div class="panel-body">
+
+        {% comment %} <div class="collapse" id="#collapse{{ forloop.counter }}"> {% endcomment %}
         <table class="table table-bordered">
           <thead>
             <tr>
@@ -30,16 +40,32 @@
               </tr>
             {% endfor %}
           </tbody>
-          </table>
+        </table>
         </div>
-
+      </div>
       {% endfor %}
 {% endfor %}
 
 
 
 
-
+      
+<p>
+  <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+    Link with href
+  </a>
+  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    Button with data-bs-target
+  </button>
+</p>
+<div class="collapse" id="collapseExample">
+  <div class="card card-body">
+    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+  </div>
+</div>
+      
+      
+      
 
 
 
