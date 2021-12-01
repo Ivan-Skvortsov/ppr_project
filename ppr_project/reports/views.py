@@ -2,7 +2,8 @@ from datetime import date
 from django.http.response import HttpResponse
 from django.views.generic import ListView
 from django.views.generic.edit import FormMixin, FormView, UpdateView
-from django.urls.base import reverse_lazy
+from django.urls.base import reverse_lazy, resolve
+from django.shortcuts import redirect
 
 from reports.models import EquipmentType, Schedule
 from reports.forms import DateInputForm, EmployeeForm, ScheduleForm
@@ -22,36 +23,21 @@ class ScheduleListView(ListView, FormMixin):
 
     def post(self, request, *args, **kwargs):
         selected_schedules = request.POST.getlist('selected_schedule')
+        if 'date_scheduled_changed' in request.POST:
+            return self._redirect_to_confirmation_page(
+                selected_schedules,
+                'reports:confirm_date_changed'
+                )
+        if 'schedule_completed' in request.POST:
+            return self._redirect_to_confirmation_page(
+                selected_schedules,
+                'reports:confirm_schedule_completed'
+                )
         qs = Schedule.objects.filter(pk__in=selected_schedules)
-
         if 'access_journal_filled' in request.POST:
             qs.update(access_journal_filled=True)
-
         if 'result_journal_filled' in request.POST:
             qs.update(result_journal_filled=True)
-
-        if 'date_scheduled_changed' in request.POST:
-            self.date_input_form = self.get_form(self.form_class)
-            if self.date_input_form.is_valid():
-                date_scheduled = self.date_input_form.cleaned_data[
-                    'input_date'
-                ]
-                qs.update(date_sheduled=date_scheduled)
-
-        if 'schedule_completed' in request.POST:
-            self.employees_form = self.get_form(self.form_class_employees)
-            self.employees_form = EmployeeForm(request.POST)
-            if self.employees_form.is_valid():
-                employee1 = self.employees_form.cleaned_data['employee1']
-                employee2 = self.employees_form.cleaned_data['employee2']
-                employee3 = self.employees_form.cleaned_data['employee3']
-                qs.update(
-                    date_completed=date.today(),
-                    employee1=employee1,
-                    employee2=employee2,
-                    employee3=employee3,
-                )
-
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
@@ -61,6 +47,18 @@ class ScheduleListView(ListView, FormMixin):
         context['date_input_form'] = self.date_input_form
         context['employees_form'] = self.employees_form
         return context
+
+    def _redirect_to_confirmation_page(self, selected_schedules, page_url):
+        resolved_url = resolve(self.request.path_info)
+        current_namespace = resolved_url.namespace
+        current_url_name = resolved_url.url_name
+        return_url = f'{current_namespace}:{current_url_name}'
+        schedule_list = '_'.join(selected_schedules)
+        return redirect(
+            page_url,
+            schedule_list=schedule_list,
+            return_url=return_url
+        )
 
 
 class DayScheduleView(ScheduleListView):
@@ -100,7 +98,7 @@ class IndexView(ListView):
         return super().get_queryset()
 
 
-class ScheduleDetailInfo(UpdateView):
+class ScheduleDetailInfoView(UpdateView):
     template_name = 'reports/schedule_detail.html'
     model = Schedule
     form_class = ScheduleForm
@@ -110,8 +108,20 @@ class ScheduleDetailInfo(UpdateView):
             'reports:schedule_detail', kwargs={'pk': self.kwargs['pk']})
 
 
-class ConfirmScheduleAction(FormView):
+class ConfirmScheduleCompletedView(FormView):
+    form_class = EmployeeForm
+    template_name = 'reports/action_confirmation.html'
+
+    def post(self, request, *args, **kwargs):
+        selected_schedules = kwargs['schedule_list']
+        return self.get(request, *args, **kwargs)
+
+    # def get(self, request, *args, **kwargs):
+    #     return HttpResponse(f'List: {kwargs["schedule_list"]} - page: {kwargs["return_url"]}')
+
+
+class ConfirmScheduleDateChangedView(FormView):
     form_class = DateInputForm
 
     def get(self, request, *args, **kwargs):
-        return HttpResponse(f'List: {kwargs["schedule_list"]} - page: {kwargs["return_page"]}')
+        return HttpResponse(f'List: {kwargs["schedule_list"]} - page: {kwargs["return_url"]}')

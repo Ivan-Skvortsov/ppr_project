@@ -1,12 +1,13 @@
 from django.urls import path
 
-from reports.views import (ConfirmScheduleAction,
+from reports.views import (ConfirmScheduleCompletedView,
+                           ConfirmScheduleDateChangedView,
                            IndexView,
                            YearScheduleView,
                            MonthScheduleView,
                            WeekScheduleView,
                            DayScheduleView,
-                           ScheduleDetailInfo)
+                           ScheduleDetailInfoView)
 
 app_name = 'reports'
 
@@ -18,11 +19,17 @@ urlpatterns = [
     path('day/', DayScheduleView.as_view(), name='day_schedule'),
     path(
         'schedule/<int:pk>/',
-        ScheduleDetailInfo.as_view(),
+        ScheduleDetailInfoView.as_view(),
         name='schedule_detail'
     ),
     path(
-        'schedule/confirm/<slug:schedule_list>/<str:return_page>/',
-        ConfirmScheduleAction.as_view(),
-        name='confirm_schedule_action')
+        'schedule/confirm_completed/<slug:schedule_list>/<str:return_url>/',
+        ConfirmScheduleCompletedView.as_view(),
+        name='confirm_schedule_completed'
+    ),
+    path(
+        'schedule/confirm_date_changed/<slug:schedule_list>/<str:return_url>/',
+        ConfirmScheduleDateChangedView.as_view(),
+        name='confirm_date_changed'
+    ),
 ]
