@@ -9,17 +9,10 @@ from reports.models import EquipmentType, Schedule
 from reports.forms import DateInputForm, EmployeeForm, ScheduleForm
 
 
-class ScheduleListView(ListView, FormMixin):
+class ScheduleListView(ListView):
     model = Schedule
-    form_class = DateInputForm
-    form_class_employees = EmployeeForm
     template_name = 'reports/schedule_list.html'
     context_object_name = 'schedule_plan'
-
-    def get(self, request, *args, **kwargs):
-        self.date_input_form = self.get_form(self.form_class)
-        self.employees_form = self.get_form(self.form_class_employees)
-        return ListView.get(self, request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         selected_schedules = request.POST.getlist('selected_schedule')
@@ -39,14 +32,6 @@ class ScheduleListView(ListView, FormMixin):
         if 'result_journal_filled' in request.POST:
             qs.update(result_journal_filled=True)
         return self.get(request, *args, **kwargs)
-
-    def get_context_data(self, *args, **kwargs):
-        context = super(ScheduleListView, self).get_context_data(
-            *args, **kwargs
-        )
-        context['date_input_form'] = self.date_input_form
-        context['employees_form'] = self.employees_form
-        return context
 
     def _redirect_to_confirmation_page(self, selected_schedules, page_url):
         resolved_url = resolve(self.request.path_info)
