@@ -2,6 +2,13 @@
 {% block content %}
   {% if not schedule_plan %} Отлично! Все работы на СЕГОДНЯ выполнены! <!--поправить текстовку в зависимости от вьюхи-->
   {% else %}
+
+{% if messages %}
+  {% for message in messages %}
+      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
   <form method="post" action="">
     {% csrf_token %}
     {% regroup schedule_plan by equipment_type.facility  as facility_list %}
@@ -47,35 +54,18 @@
 
 <div class="card" style="width: 30rem;">
   <h4 class="card-header">Выберите действие для отмеченных работ:</h4>
-    <div class="card-body">
-   
-    <div class="container-fluid">
-    <button type="submit" class="btn btn-primary" name="access_journal_filled">Журнал допуска заполнен</button>
-   <br>
-   <br>
-    
-    <button type="submit" class="btn btn-primary" name="result_journal_filled">Журнал ТО заполнен</button>
-    </div>
-
-        <div class="input-group mb-3">
-          <button type="submit" class="btn btn-primary" name="date_scheduled_changed">Запланировать выполнение на:</button>
-          {% for field in date_input_form %}
-            {{ field }}
-          {% endfor %}
-        </div>
-
-
-    <br><br>
-    <button type="submit" class="btn btn-primary" name="schedule_completed">Работа проведена исполнителями:</button>
-    <div class="input-group mb-3">
-    {% for field in employees_form %}
-      {{ field }}
-    {% endfor %}
-    </div>
-  
+  <div class="card-body">
+    <select name="selected_action" class="form-select">
+      {% comment %} <option selected>Выберите действие</option> {% endcomment %}
+      <option value="access_journal_filled">Подтвердить заполнение журнала допуска</option>
+      <option value="result_journal_filled">Подтвердить заполнение журнала ТО</option>
+      <option value="date_scheduled_changed">Изменить плановую дату выполнения работ</option>
+      <option value="schedule_completed">Подтвердить, что работа проведена</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Применить</button>
   </div>
 </div>
-  </form>
+</form>
   <br><br><br><br><br><br>
 {% endif %}
 {% endblock content %}
