@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block content %}
+  {% if not schedule_plan %} Отлично! Все работы на СЕГОДНЯ выполнены! <!--поправить текстовку в зависимости от вьюхи-->
+  {% else %}
+  <form method="post" action="">
+    {% csrf_token %}
+    {% regroup schedule_plan by equipment_type.facility  as facility_list %}
+      <!-- Заголовок таблицы -->
+        <table class="table align-middle" >
+          <thead>
+            <tr>
+              <th style="width: 5%" scope="col">#</th>
+              <th style="width: 10%" scope="col">Тип ТО</th>
+              <th style="width: 60%" scope="col">Наименование оборудования</th>
+              <th style="width: 10%" scope="col">Дата по плану</th>
+              <th style="width: 5%" scope="col">Журнал допуска заполнен</th>
+              <th style="width: 5%" scope="col">Журнал ТО заполнен</th>
+              <th style="width: 5%" scope="col">Работа проведена</th>
+            </tr>
+          </thead>
+        <tbody>
+        {% for facility in facility_list %}
+          <!-- Наименование объекта  -->
+          <tr>
+            <td class="text-center" colspan="6"><h3>{{ facility.grouper }}</h3></td>
+          </tr>
+          {% for entry in facility.list %}
+           <!-- Строки таблицы -->
+            <tr {% if entry.date_completed and entry.access_journal_filled and entry.result_journal_filled %}class="table-success"{% endif %}>
+              <td>
+                <div class="form-check form-switch">
+                  <input type="checkbox" name="selected_schedule" value="{{ entry.pk }}" class="form-check-input">
+                </div>
+              </td>
+              <td>{{ entry.maintenance_type }}</td>
+              <td><a class="text-decoration-none text-reset" href="{% url 'reports:schedule_detail' entry.pk %}">{{ entry.equipment_type }}</a></td>
+              <td>{{ entry.date_sheduled|date:"d.m.Y" }}</td>
+              <td><input type="checkbox" class="form-check-input" disabled {% if entry.access_journal_filled %} checked {% endif %}></td>
+              <td><input type="checkbox" class="form-check-input" disabled {% if entry.result_journal_filled %} checked {% endif %}></td>
+              <td><input type="checkbox" class="form-check-input" disabled {% if entry.date_completed %} checked {% endif %}></td>
+            </tr>
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+        </table>
+<br><br><br>
+
+<div class="card" style="width: 30rem;">
+  <h4 class="card-header">Выберите действие для отмеченных работ:</h4>
+    <div class="card-body">
+   
+    <div class="container-fluid">
+    <button type="submit" class="btn btn-primary" name="access_journal_filled">Журнал допуска заполнен</button>
+   <br>
+   <br>
+    
+    <button type="submit" class="btn btn-primary" name="result_journal_filled">Журнал ТО заполнен</button>
+    </div>
+
+        <div class="input-group mb-3">
+          <button type="submit" class="btn btn-primary" name="date_scheduled_changed">Запланировать выполнение на:</button>
+          {% for field in date_input_form %}
+            {{ field }}
+          {% endfor %}
+        </div>
+
+
+    <br><br>
+    <button type="submit" class="btn btn-primary" name="schedule_completed">Работа проведена исполнителями:</button>
+    <div class="input-group mb-3">
+    {% for field in employees_form %}
+      {{ field }}
+    {% endfor %}
+    </div>
+  
+  </div>
+</div>
+  </form>
+  <br><br><br><br><br><br>
+{% endif %}
+{% endblock content %}

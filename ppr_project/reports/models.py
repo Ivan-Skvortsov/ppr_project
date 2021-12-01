@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -118,18 +117,3 @@ class Schedule(models.Model):
     class Meta:
         verbose_name = 'Планирование работ'
         verbose_name_plural = 'Планирование работ'
-
-    # FIXME! Настроить валидацию
-    # (если журналы не заполнены - нельзя закрыть работу!)
-    def _validate_journals_filled_before_completion(self):
-        if (self.date_completed
-           and not (self.access_journal_filled and
-                    self.result_journal_filled)):
-            raise ValidationError(
-                'Перед завершением работ нужно заполнить журналы! Проверьте, '
-                'что отметки о заполнении журналов проставлены!'
-            )
-
-    def save(self, *args, **kwargs):
-        self._validate_journals_filled_before_completion()
-        return super().save(*args, **kwargs)

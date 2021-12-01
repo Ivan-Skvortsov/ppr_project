@@ -7,16 +7,17 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'reports:year_schedule' %}">План на год</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+              Посмотреть план
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'reports:day_schedule' %}">День</a></li>
+              <li><a class="dropdown-item" href="{% url 'reports:week_schedule' %}">Неделя</a></li>
+              <li><a class="dropdown-item" href="{% url 'reports:month_schedule' %}">Месяц</a></li>
+              <li><a class="dropdown-item" href="{% url 'reports:year_schedule' %}">Год</a></li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'reports:month_schedule' %}">План на месяц</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'reports:day_schedule' %}">План на день</a>
-          </li>
-
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
               Имя Пользователя

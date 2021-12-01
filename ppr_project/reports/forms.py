@@ -1,4 +1,6 @@
+from datetime import date
 from django import forms
+from django.core.exceptions import ValidationError
 
 from reports.models import Employee, Schedule
 
@@ -10,8 +12,53 @@ class ScheduleForm(forms.ModelForm):
         fields = '__all__'
 
 
-class EmployeeForm(forms.ModelForm):
+class EmployeeForm(forms.Form):
+    # FIXME: validate not null for empolyees 1 and 2
+    qs = Employee.objects.all()
+    employee1 = forms.ModelChoiceField(
+        queryset=qs,
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'form-control form-select'
+            }
+        ),
+        label='Исполнитель №1'
+    )
+    employee2 = forms.ModelChoiceField(
+        queryset=qs,
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'form-control form-select'
+            }
+        ),
+        label='Исполнитель №2'
 
-    class Meta:
-        model = Employee
-        fields = ('position', 'name')
+    )
+    employee3 = forms.ModelChoiceField(
+        queryset=qs,
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'form-control form-select'
+            }
+        ),
+        label='Исполнитель №3'
+
+    )
+
+
+class DateInputForm(forms.Form):
+    input_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(
+            attrs={'type': 'date', 'class': 'form-control'}
+        ),
+        initial=date.today().isoformat(),
+        label='Дата',
+        help_text='Выберите дату'
+    )
+
+    def clean_input_date(self):
+        data = self.cleaned_data['input_date']
+        if data is None:
+            raise ValidationError('Введите дату!')
+        return data
