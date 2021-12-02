@@ -18,7 +18,7 @@ class ScheduleListView(ListView):
         selected_schedules = request.POST.getlist('selected_schedule')
         selected_action = request.POST['selected_action']
         if not selected_schedules:
-            messages.warning(self.request, 'Выберите хотя бы одну работу!')
+            messages.warning(self.request, 'Не выбрано ни одной работы!')
             return self.get(request, *args, **kwargs)
         if selected_action == 'date_scheduled_changed':
             return self._redirect_to_confirmation_page(
@@ -36,7 +36,7 @@ class ScheduleListView(ListView):
         if selected_action == 'result_journal_filled':
             qs.update(result_journal_filled=True)
 
-        messages.success(self.request, 'Действие выполнено успешно!')
+        messages.success(self.request, 'Заполнение журнала отмечено!')
         return self.get(request, *args, **kwargs)
 
     def _redirect_to_confirmation_page(self, selected_schedules, page_url):

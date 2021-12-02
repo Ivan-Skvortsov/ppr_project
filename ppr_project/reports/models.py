@@ -2,9 +2,9 @@ from django.db import models
 
 
 class Employee(models.Model):
-    name = models.CharField(max_length=30)
-    position = models.CharField(max_length=20)
-    department = models.CharField(max_length=25)  # TODO: change to choices
+    name = models.CharField(max_length=30, verbose_name='Фамилия И.О.')
+    position = models.CharField(max_length=20, verbose_name='Должность')
+    department = models.CharField(max_length=25, verbose_name='Служба')
 
     class Meta:
         verbose_name = 'Работник'
@@ -15,7 +15,10 @@ class Employee(models.Model):
 
 
 class MaintenanceCategory(models.Model):
-    category_name = models.CharField(max_length=25)
+    category_name = models.CharField(
+        max_length=25,
+        verbose_name='Категория работ'
+    )
 
     class Meta:
         verbose_name = 'Категория работ'
@@ -26,12 +29,13 @@ class MaintenanceCategory(models.Model):
 
 
 class Facility(models.Model):
-    facility_name = models.CharField(max_length=20)
+    facility_name = models.CharField(max_length=20, verbose_name='Объект')
     maintenance_category = models.ForeignKey(
         MaintenanceCategory,
         on_delete=models.PROTECT,
         null=True,
-        blank=True
+        blank=True,
+        verbose_name='Категория работ'
         )
 
     class Meta:
@@ -46,15 +50,23 @@ class EquipmentType(models.Model):
     maintenance_category = models.ForeignKey(
         MaintenanceCategory,
         on_delete=models.PROTECT,
-        null=True
+        null=True,
+        verbose_name='Категория работ'
     )
     facility = models.ForeignKey(
         Facility,
         on_delete=models.PROTECT,
-        null=True
+        null=True,
+        verbose_name='Объект'
     )
-    eqipment_type_name = models.CharField(max_length=30)
-    report_template = models.FilePathField(default='/')
+    eqipment_type_name = models.CharField(
+        max_length=30,
+        verbose_name='Тип оборудования'
+    )
+    report_template = models.FilePathField(
+        default='/',
+        verbose_name='Шаблон акта/протокола'
+    )
 
     class Meta:
         verbose_name = 'Тип оборудования'
@@ -65,7 +77,7 @@ class EquipmentType(models.Model):
 
 
 class MaintenanceType(models.Model):
-    m_type = models.CharField(max_length=5)
+    m_type = models.CharField(max_length=5, verbose_name='Тип ТО')
 
     class Meta:
         verbose_name = 'Тип ТО'
@@ -80,38 +92,53 @@ class Schedule(models.Model):
         EquipmentType,
         on_delete=models.SET_NULL,
         related_name='equipment_type_schedule',
-        null=True
+        null=True,
+        verbose_name='Тип оборудования'
     )
     maintenance_type = models.ForeignKey(
         MaintenanceType,
         on_delete=models.SET_NULL,
         related_name='maintenance_type',
-        null=True
+        null=True,
+        verbose_name='Тип ТО'
     )
-    date_sheduled = models.DateField()
-    date_completed = models.DateField(blank=True, null=True)
-    access_journal_filled = models.BooleanField(default=False)
-    result_journal_filled = models.BooleanField(default=False)
+    date_sheduled = models.DateField(verbose_name='Дата по плану')
+    date_completed = models.DateField(
+        blank=True,
+        null=True,
+        verbose_name='Дата выполнения'
+    )
+    access_journal_filled = models.BooleanField(
+        default=False,
+        verbose_name='Журнал допуска заполнен'
+    )
+    result_journal_filled = models.BooleanField(
+        default=False,
+        verbose_name='Журнал ТО заполнен'
+    )
     employee1 = models.ForeignKey(
         Employee,
         on_delete=models.SET_NULL,
         related_name='employee1_schedule',
         null=True,
-        blank=True
+        blank=True,
+        verbose_name='Исполнитель #1'
     )
     employee2 = models.ForeignKey(
         Employee,
         on_delete=models.SET_NULL,
         related_name='employee2_schedule',
         null=True,
-        blank=True
+        blank=True,
+        verbose_name='Исполнитель #2'
     )
     employee3 = models.ForeignKey(
         Employee,
         on_delete=models.SET_NULL,
         related_name='employee3_schedule',
         null=True,
-        blank=True
+        blank=True,
+        verbose_name='Исполнитель #3'
     )
 
     class Meta:

@@ -18,7 +18,7 @@ class EmployeeForm(forms.Form):
             'class': 'form-control form-select'
             }
         ),
-        label='Исполнитель №1'
+        label='Исполнитель #1'
     )
     employee2 = forms.ModelChoiceField(
         queryset=qs,
@@ -26,7 +26,7 @@ class EmployeeForm(forms.Form):
             'class': 'form-control form-select'
             }
         ),
-        label='Исполнитель №2'
+        label='Исполнитель #2'
 
     )
     employee3 = forms.ModelChoiceField(
@@ -36,7 +36,7 @@ class EmployeeForm(forms.Form):
             'class': 'form-control form-select'
             }
         ),
-        label='Исполнитель №3'
+        label='Исполнитель #3'
 
     )
 

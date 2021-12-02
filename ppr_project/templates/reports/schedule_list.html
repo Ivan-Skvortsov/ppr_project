@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
+
   {% if not schedule_plan %} Отлично! Все работы на СЕГОДНЯ выполнены! <!--поправить текстовку в зависимости от вьюхи-->
   {% else %}
-
+<!-- messages -->
 {% if messages %}
   {% for message in messages %}
       <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
@@ -29,7 +30,7 @@
         {% for facility in facility_list %}
           <!-- Наименование объекта  -->
           <tr>
-            <td class="text-center" colspan="6"><h3>{{ facility.grouper }}</h3></td>
+            <td class="text-center" colspan="7"><h3>{{ facility.grouper }}</h3></td>
           </tr>
           {% for entry in facility.list %}
            <!-- Строки таблицы -->
@@ -52,17 +53,18 @@
         </table>
 <br><br><br>
 
-<div class="card" style="width: 30rem;">
+<div class="card" style="width: 50rem;">
   <h4 class="card-header">Выберите действие для отмеченных работ:</h4>
   <div class="card-body">
-    <select name="selected_action" class="form-select">
-      {% comment %} <option selected>Выберите действие</option> {% endcomment %}
-      <option value="access_journal_filled">Подтвердить заполнение журнала допуска</option>
-      <option value="result_journal_filled">Подтвердить заполнение журнала ТО</option>
-      <option value="date_scheduled_changed">Изменить плановую дату выполнения работ</option>
-      <option value="schedule_completed">Подтвердить, что работа проведена</option>
-    </select>
-    <button type="submit" class="btn btn-primary">Применить</button>
+    <div class="input-group mb-3">
+      <select name="selected_action" class="form-select">
+        <option value="access_journal_filled">Подтвердить заполнение журнала допуска</option>
+        <option value="result_journal_filled">Подтвердить заполнение журнала ТО</option>
+        <option value="date_scheduled_changed">Изменить плановую дату выполнения работ</option>
+        <option value="schedule_completed">Подтвердить, что работа проведена</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Применить</button>
+    </div>
   </div>
 </div>
 </form>
