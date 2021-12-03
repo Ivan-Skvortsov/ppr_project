@@ -1,60 +1,65 @@
 {% extends 'base.html' %}
 {% block content %}
-{# Check form for errors, render html-form #}
+{% load user_filters %}
 <div class="row justify-content-center">
-    <div class="col-md-8 p-5">
-      <div class="card">
-        <div class="card-header">ХЕДЕР</div>
-          <div class="card-body">
-          {% load user_filters %}
-              {% if form.errors %}
-                  {% for field in form %} 
-                    {% for error in field.errors %}            
-                      <div class="alert alert-danger">
-                        {{ error|escape }}
-                      </div>
-                    {% endfor %}
-                  {% endfor %}
-                  {% for error in form.non_field_errors %}
-                    <div class="alert alert-danger">
-                      {{ error|escape }}
-                    </div>
-                  {% endfor %}
-              {% endif %}
-              <form method="post" enctype="multipart/form-data"
-              {% if action_url %}
-                action="{{ action_url }}"
-              {% endif %}
-              >
-              {% csrf_token %}
-              {% for field in form %} 
-                <div class="form-group row my-3">
+  <div class="col-md-6 p-5">
+    <div class="card border-primary">
+      <div class="card-header bg-primary text-white"><strong>Редактирование работы</strong></div>
+        <div class="card-body">
+          <!-- form erros -->
+          {% if form.errors %}
+            {% for field in form %} 
+              {% for error in field.errors %}            
+                <div class="alert alert-danger">
+                  {{ error|escape }}
+                </div>
+              {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ error|escape }}
+              </div>
+            {% endfor %}
+          {% endif %}
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h2 class="text-muted">{{ schedule_entry.equipment_type.maintenance_category.category_name }}</h2>
+            <h5 class="text-muted">{{ schedule_entry.equipment_type.facility.facility_name }}</h5>
+            <h6 class="text-muted">{{ schedule_entry.equipment_type.eqipment_type_name }}</h6>
+            <h6 class="text-muted">{{ schedule_entry.maintenance_type.m_type }}</h6>
+            <!-- form fields -->
+            {% for field in form %} 
+              <div class="row my-2 align-items-center">
+                <hr>
+                <div class="col">
                   <label for="{{ field.id_for_label }}">
                     {{ field.label }}
                       {% if field.field.required %}
                         <span class="required text-danger">*</span>
                       {% endif %}
                   </label>
-                  {{ field }} 
-                    {% if field.help_text %}
-                      <small 
-                         id="{{ field.id_for_label }}-help"
-                         class="form-text text-muted"
-                      >
-                        {{ field.help_text|safe }}
-                      </small>
-                    {% endif %}
                 </div>
-              {% endfor %}
-              <div class="col-md-6 offset-md-4">
-                <button type="submit" class="btn btn-primary">
-                  СОХРАНИТЬ
-                </button>
-                </a>
+                <div class="col">
+                  {{ field }} 
+                </div>
               </div>
-            </form>
-          </div>
+            {% endfor %}
+            <!-- buttons -->
+            <div class="container-lg mt-3">
+              <div class="row justify-content-center">
+                <div class="col py-2">
+                    <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+                </div>
+                <div class="col py-2">
+                    <a class="btn btn-primary w-100" href="{{request.META.HTTP_REFERER}}" role="button">Отмена</a>
+                </div>
+              </div>
+            </div>
+          {% comment %} to return to previous page {% endcomment %}
+          <input type="hidden" name="next_page" value="{{request.META.HTTP_REFERER}}">
+          </form>
         </div>
-      </div>
+    </div>
   </div>
+</div>
 {% endblock content %}

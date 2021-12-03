@@ -93,10 +93,10 @@ class ScheduleDetailInfoView(UpdateView):
     template_name = 'reports/schedule_detail.html'
     model = Schedule
     form_class = ScheduleForm
+    context_object_name = 'schedule_entry'
 
     def get_success_url(self):
-        return reverse_lazy(
-            'reports:schedule_detail', kwargs={'pk': self.kwargs['pk']})
+        return self.request.POST.get('next_page', '/')
 
 
 class ConfirmScheduleCompletedView(FormView):
