@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
+{% block title %}Просмотр перечня работ{% endblock title %}
   <div class="container mt-2 mb-5">
-    <!--поправить текстовку в зависимости от вьюхи-->
     {% if not schedule_plan %}
-      Отлично! Все работы на СЕГОДНЯ выполнены!
+      <div class="display-6 text-center">Запланированных работ за выбранный период не найдено!</div>
     {% else %}
       <!-- messages -->
       {% if messages %}
@@ -14,27 +14,27 @@
       <form method="post" action="">
         {% csrf_token %}
         {% regroup schedule_plan by equipment_type.facility  as facility_list %}
-        <!-- Заголовок таблицы -->
+        <!--table header-->
           <table class="table align-middle" >
             <thead>
               <tr>
-                <th style="width: 5%" scope="col">#</th>
-                <th style="width: 10%" scope="col">Тип ТО</th>
-                <th style="width: 60%" scope="col">Наименование оборудования</th>
-                <th style="width: 10%" scope="col">Дата по плану</th>
-                <th style="width: 5%" scope="col">Журнал допуска заполнен</th>
-                <th style="width: 5%" scope="col">Журнал ТО заполнен</th>
-                <th style="width: 5%" scope="col">Работа проведена</th>
+                <th class="text-muted" style="width: 5%" scope="col">#</th>
+                <th class="text-muted" style="width: 5%" scope="col">Тип ТО</th>
+                <th class="text-muted" style="width: 65%" scope="col">Наименование оборудования</th>
+                <th class="text-muted" style="width: 10%" scope="col">Дата по плану</th>
+                <th class="text-muted" style="width: 5%" scope="col"><small>Журнал допуска заполнен</small></th>
+                <th class="text-muted" style="width: 5%" scope="col"><small>Журнал ТО заполнен</small</th>
+                <th class="text-muted" style="width: 5%" scope="col"><small>Работа проведена</small</th>
               </tr>
             </thead>
             <tbody>
               {% for facility in facility_list %}
-              <!-- Наименование объекта  -->
+              <!--facility name-->
                 <tr>
-                  <td class="text-center" colspan="7"><h3>{{ facility.grouper }}</h3></td>
+                  <td class="text-center" colspan="7"><h5>{{ facility.grouper }}</h5></td>
                 </tr>
                 {% for entry in facility.list %}
-                <!-- Строки таблицы -->
+                <!--table rows-->
                   <tr {% if entry.date_completed and entry.access_journal_filled and entry.result_journal_filled %}class="table-success"{% endif %}>
                     <td>
                       <div class="form-check form-switch">
@@ -52,9 +52,9 @@
               {% endfor %}
             </tbody>
           </table>
-          <!-- блок меню -->
-          <div class="card my-5" style="width: 50rem;">
-            <h4 class="card-header">Выберите действие для отмеченных работ:</h4>
+          <!--menu block-->
+          <div class="card my-5 border-primary">
+            <div class="card-header bg-primary text-white">Выберите действие для отмеченных работ:</div>
             <div class="card-body">
               <div class="input-group mb-3">
                 <select name="selected_action" class="form-select">

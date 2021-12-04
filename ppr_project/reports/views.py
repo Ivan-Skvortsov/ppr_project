@@ -1,7 +1,7 @@
 from datetime import date
 from django.views.generic import ListView
 from django.views.generic.edit import FormView, UpdateView
-from django.urls.base import reverse_lazy, resolve
+from django.urls.base import resolve
 from django.shortcuts import redirect
 from django.contrib import messages
 
@@ -36,7 +36,6 @@ class ScheduleListView(ListView):
         if selected_action == 'result_journal_filled':
             qs.update(result_journal_filled=True)
 
-        messages.success(self.request, 'Заполнение журнала отмечено!')
         return self.get(request, *args, **kwargs)
 
     def _redirect_to_confirmation_page(self, selected_schedules, page_url):
@@ -116,9 +115,13 @@ class ConfirmScheduleCompletedView(FormView):
                 employee3=self.form.cleaned_data['employee3']
 
             )
-            messages.success(self.request, 'Проведение работ отмечено!')
             return redirect(self.return_url)
         return self.get(request, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action_to_confirm'] = 'Выберите исполнителей работ'
+        return context
 
 
 class ConfirmScheduleDateChangedView(FormView):
@@ -132,9 +135,10 @@ class ConfirmScheduleDateChangedView(FormView):
         if self.form.is_valid():
             qs = Schedule.objects.filter(pk__in=self.schedule_list)
             qs.update(date_sheduled=self.form.cleaned_data['input_date'])
-            messages.success(
-                self.request,
-                'Плановая дата проведения работ изменена!'
-            )
             return redirect(self.return_url)
         return self.get(request, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action_to_confirm'] = 'Выберите дату переноса работ'
+        return context

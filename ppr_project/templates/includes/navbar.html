@@ -1,6 +1,10 @@
+{% load static %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-xxl">
-    <a class="navbar-brand" href="{% url 'reports:index' %}"><span class="fw-bold">ППР КС-45</span></a>
+    <a class="navbar-brand" href="{% url 'reports:index' %}">
+      <img src="{% static 'img/navbar_logo.png' %}" alt="" width="50" height="50">
+      <span class="text-muted">Выполнение ППР КС-45</span>
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -19,13 +23,13 @@
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-            Имя Пользователя
+            {{ user.get_full_name }}
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="#">Посмотреть профиль</a></li>
             <li><a class="dropdown-item" href="#">Изменить пароль?</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Выйти</a></li>
+            <li><a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a></li>
           </ul>
         </li>
       </ul>
