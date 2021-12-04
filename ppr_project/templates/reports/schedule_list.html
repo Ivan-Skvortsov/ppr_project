@@ -1,73 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}Просмотр перечня работ{% endblock title %}
 {% block content %}
-  <div class="container mt-2 mb-5">
-    {% if not schedule_plan %}
-      <div class="display-6 text-center">Работ за выбранный период не найдено!</div>
-    {% else %}
-      <!-- messages -->
-      {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-      <form method="post" action="">
-        {% csrf_token %}
-        {% regroup schedule_plan by equipment_type.facility  as facility_list %}
-        <!--table header-->
-          <table class="table align-middle" >
-            <thead>
-              <tr>
-                <th class="text-muted" style="width: 5%" scope="col">#</th>
-                <th class="text-muted" style="width: 5%" scope="col">Тип ТО</th>
-                <th class="text-muted" style="width: 65%" scope="col">Наименование оборудования</th>
-                <th class="text-muted" style="width: 10%" scope="col">Дата по плану</th>
-                <th class="text-muted" style="width: 5%" scope="col"><small>Журнал допуска заполнен</small></th>
-                <th class="text-muted" style="width: 5%" scope="col"><small>Журнал ТО заполнен</small</th>
-                <th class="text-muted" style="width: 5%" scope="col"><small>Работа проведена</small</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for facility in facility_list %}
-              <!--facility name-->
-                <tr>
-                  <td class="text-center" colspan="7"><h5>{{ facility.grouper }}</h5></td>
-                </tr>
-                {% for entry in facility.list %}
-                <!--table rows-->
-                  <tr {% if entry.date_completed and entry.access_journal_filled and entry.result_journal_filled %}class="table-success"{% endif %}>
-                    <td>
-                      <div class="form-check form-switch">
-                        <input type="checkbox" name="selected_schedule" value="{{ entry.pk }}" class="form-check-input">
-                      </div>
-                    </td>
-                    <td>{{ entry.maintenance_type }}</td>
-                    <td><a class="text-decoration-none text-reset" href="{% url 'reports:schedule_detail' entry.pk %}">{{ entry.equipment_type }}</a></td>
-                    <td>{{ entry.date_sheduled|date:"d.m.Y" }}</td>
-                    <td><input type="checkbox" class="form-check-input" disabled {% if entry.access_journal_filled %} checked {% endif %}></td>
-                    <td><input type="checkbox" class="form-check-input" disabled {% if entry.result_journal_filled %} checked {% endif %}></td>
-                    <td><input type="checkbox" class="form-check-input" disabled {% if entry.date_completed %} checked {% endif %}></td>
-                  </tr>
-                {% endfor %}
-              {% endfor %}
-            </tbody>
-          </table>
-          <!--menu block-->
-          <div class="card my-5 border-primary">
-            <div class="card-header bg-primary text-white">Выберите действие для отмеченных работ:</div>
-            <div class="card-body">
-              <div class="input-group mb-3">
-                <select name="selected_action" class="form-select">
-                  <option value="access_journal_filled">Подтвердить заполнение журнала допуска</option>
-                  <option value="result_journal_filled">Подтвердить заполнение журнала ТО</option>
-                  <option value="date_scheduled_changed">Изменить плановую дату выполнения работ</option>
-                  <option value="schedule_completed">Подтвердить, что работа проведена</option>
-                </select>
-                <button type="submit" class="btn btn-primary">Применить</button>
-              </div>
-            </div>
-          </div>
-      </form>
-    {% endif %}
+  <div class="card my-2">
+    <div class="card-header">
+      Просмотр работ за дата - неделя - месяц
+    </div>
+    <div class="card-body">
+      {% include 'reports/includes/schedule_table.html' %}
+  </div>
   </div>
 {% endblock content %}

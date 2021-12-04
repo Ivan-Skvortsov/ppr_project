@@ -1,6 +1,7 @@
 from datetime import date
 from django.views.generic import ListView
 from django.views.generic.edit import FormView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls.base import resolve
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -9,7 +10,7 @@ from reports.models import EquipmentType, Schedule
 from reports.forms import DateInputForm, EmployeeForm, ScheduleForm
 
 
-class ScheduleListView(ListView):
+class ScheduleListView(LoginRequiredMixin, ListView):
     model = Schedule
     template_name = 'reports/schedule_list.html'
     context_object_name = 'schedule_plan'
@@ -79,7 +80,7 @@ class YearScheduleView(ScheduleListView):
         return Schedule.objects.filter(date_sheduled__year=year)
 
 
-class IndexView(ListView):
+class IndexView(LoginRequiredMixin, ListView):
     template_name = 'reports/index.html'
     model = EquipmentType
     context_object_name = 'equipment_type'
@@ -88,7 +89,7 @@ class IndexView(ListView):
         return super().get_queryset()
 
 
-class ScheduleDetailInfoView(UpdateView):
+class ScheduleDetailInfoView(LoginRequiredMixin, UpdateView):
     template_name = 'reports/schedule_detail.html'
     model = Schedule
     form_class = ScheduleForm
@@ -98,7 +99,7 @@ class ScheduleDetailInfoView(UpdateView):
         return self.request.POST.get('next_page', '/')
 
 
-class ConfirmScheduleCompletedView(FormView):
+class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
     form_class = EmployeeForm
     template_name = 'reports/action_confirmation.html'
 
@@ -124,7 +125,7 @@ class ConfirmScheduleCompletedView(FormView):
         return context
 
 
-class ConfirmScheduleDateChangedView(FormView):
+class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
     form_class = DateInputForm
     template_name = 'reports/action_confirmation.html'
 
