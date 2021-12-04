@@ -26,8 +26,7 @@
             {{ user.get_full_name }}
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Посмотреть профиль</a></li>
-            <li><a class="dropdown-item" href="#">Изменить пароль?</a></li>
+            <li><a class="dropdown-item" href="{% url 'users:password_change' %}">Изменить пароль</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a></li>
           </ul>

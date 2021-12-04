@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% block content %}
 {% block title %}Просмотр перечня работ{% endblock title %}
+{% block content %}
   <div class="container mt-2 mb-5">
     {% if not schedule_plan %}
-      <div class="display-6 text-center">Запланированных работ за выбранный период не найдено!</div>
+      <div class="display-6 text-center">Работ за выбранный период не найдено!</div>
     {% else %}
       <!-- messages -->
       {% if messages %}
