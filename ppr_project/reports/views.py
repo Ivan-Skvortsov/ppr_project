@@ -141,5 +141,5 @@ class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['action_to_confirm'] = 'Выберите дату переноса работ'
+        context['action_to_confirm'] = 'Выберите дату'
         return context
