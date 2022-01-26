@@ -1,8 +1,31 @@
-{% extends 'base.html' %}
-{% block content %}
-    <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary w-100">Войти</button>
-    </form>
-{% endblock content %}
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% include 'includes/styles_and_fonts.html' %}
+<title>Вход в систему</title>
+</head>
+<body>
+  <div class="row justify-content-center">
+    <div class="col-md-6 p-5">
+      <div class="card">
+        <div class="card-header h4"><strong>Войти в систему</strong></div>
+          <div class="card-body">
+            {% include 'users/includes/render_form.html' %}
+            {# BUTTONS #}
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-primary">Войти</button>
+                <a class="text-decoration-none m-2" href="{% url 'users:signup'%}" role="button">Регистрация</a>
+                
+            </div>
+        </form>
+    </div>
+</div>
+<div class="text-center">
+  <p><a class="text-decoration-none" href="{% url 'users:password_reset'%}" role="button">Забыл пароль?</a></p>
+</div>
+</div>
+</div>
+  {% include 'includes/scripts.html' %}
+</body>
+</html>

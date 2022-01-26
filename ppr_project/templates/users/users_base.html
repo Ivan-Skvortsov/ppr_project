@@ -3,18 +3,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% include 'includes/styles_and_fonts.html' %}
-<title>Регистрация</title>
+<title>{% block title %}Заголовок{% endblock title %}</title>
 </head>
 <body>
   <div class="row justify-content-center">
     <div class="col-md-6 p-5">
       <div class="card">
-        <div class="card-header h4"><strong>Регистрация в системе</strong></div>
+        <div class="card-header h4"><strong>{% block card_header %}Заголовок карточки{% endblock card_header %}</strong></div>
           <div class="card-body">
             {% include 'users/includes/render_form.html' %}
             {# BUTTONS #}
             <div class="col-md-12 text-center">
-              <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+              <button type="submit" class="btn btn-primary">{% block button_text %}Текст кнопки{% endblock button_text %}</button>
               <a class="btn btn-secondary" href="{% url 'reports:index'%}" role="button">Отмена</a>
             </div>
           </form>

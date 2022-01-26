@@ -1,4 +1,8 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
 
 
 class Employee(models.Model):
@@ -63,10 +67,6 @@ class EquipmentType(models.Model):
         max_length=30,
         verbose_name='Тип оборудования'
     )
-    report_template = models.FilePathField(
-        default='/',
-        verbose_name='Шаблон акта/протокола'
-    )
 
     class Meta:
         verbose_name = 'Тип оборудования'
@@ -85,6 +85,33 @@ class MaintenanceType(models.Model):
 
     def __str__(self):
         return self.m_type
+
+
+class ReportTemplate(models.Model):
+    template_name = models.CharField(
+        max_length=100,
+        verbose_name='Имя шаблона'
+    )
+    equipment_type = models.ForeignKey(
+        EquipmentType,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='Тип оборудования'
+    )
+    maintenance_type = models.ForeignKey(
+        MaintenanceType,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='Тип ТО'
+    )
+    template = models.FilePathField()
+
+    class Meta:
+        verbose_name = 'Шаблон акта/протокола'
+        verbose_name_plural = 'Шаблоны актов/протоколов'
+
+    def __str__(self):
+        return self.template_name
 
 
 class Schedule(models.Model):
@@ -139,6 +166,14 @@ class Schedule(models.Model):
         null=True,
         blank=True,
         verbose_name='Исполнитель #3'
+    )
+    report = models.ForeignKey(
+        ReportTemplate,
+        on_delete=models.SET_NULL,
+        related_name='report_template',
+        null=True,
+        blank=True,
+        verbose_name='Шаблон акта/протокола'
     )
 
     class Meta:

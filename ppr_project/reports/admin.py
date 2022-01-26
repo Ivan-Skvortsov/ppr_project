@@ -18,8 +18,7 @@ class FacilityAdmin(admin.ModelAdmin):
 class EquipmentTypeAdmin(admin.ModelAdmin):
     list_display = ('maintenance_category',
                     'facility',
-                    'eqipment_type_name',
-                    'report_template')
+                    'eqipment_type_name')
 
 
 @admin.register(Schedule)
@@ -30,7 +29,8 @@ class ScheduleAdmin(admin.ModelAdmin):
                     'date_completed',
                     'employee1',
                     'employee2',
-                    'employee3')
+                    'employee3',
+                    'report')
     list_filter = ('maintenance_type',)
 
 

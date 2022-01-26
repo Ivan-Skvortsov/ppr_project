@@ -114,7 +114,6 @@ class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
                 employee1=self.form.cleaned_data['employee1'],
                 employee2=self.form.cleaned_data['employee2'],
                 employee3=self.form.cleaned_data['employee3']
-
             )
             return redirect(self.return_url)
         return self.get(request, **kwargs)

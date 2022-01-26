@@ -10,7 +10,8 @@ class ScheduleForm(forms.ModelForm):
         model = Schedule
         exclude = [
             'equipment_type',
-            'maintenance_type'
+            'maintenance_type',
+            'report'
         ]
         widgets = {
             'date_sheduled': DateInput(
