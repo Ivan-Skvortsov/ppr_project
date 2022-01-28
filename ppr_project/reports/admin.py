@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from reports.models import (Employee, EquipmentType, Facility,
-                            MaintenanceCategory, Schedule)
+                            MaintenanceCategory, ReportTemplate, Schedule)
 
 
 @admin.register(Employee)
@@ -32,6 +32,11 @@ class ScheduleAdmin(admin.ModelAdmin):
                     'employee3',
                     'report')
     list_filter = ('maintenance_type',)
+
+
+@admin.register(ReportTemplate)
+class ReportTemplateAdmin(admin.ModelAdmin):
+    pass
 
 
 admin.site.register(MaintenanceCategory)

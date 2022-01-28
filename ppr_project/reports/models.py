@@ -1,6 +1,5 @@
-from django.db import models
 from django.contrib.auth import get_user_model
-
+from django.db import models
 
 User = get_user_model()
 
@@ -104,7 +103,7 @@ class ReportTemplate(models.Model):
         null=True,
         verbose_name='Тип ТО'
     )
-    template = models.FilePathField()
+    template = models.FileField()
 
     class Meta:
         verbose_name = 'Шаблон акта/протокола'

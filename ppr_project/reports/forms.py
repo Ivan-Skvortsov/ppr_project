@@ -1,5 +1,5 @@
 from django import forms
-from django.forms.widgets import DateInput, Select, CheckboxInput
+from django.forms.widgets import CheckboxInput, DateInput, Select
 
 from reports.models import Employee, Schedule
 

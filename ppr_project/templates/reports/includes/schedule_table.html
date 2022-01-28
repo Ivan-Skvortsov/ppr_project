@@ -17,18 +17,19 @@
             <tr>
               <th class="text-muted" style="width: 5%" scope="col">#</th>
               <th class="text-muted" style="width: 5%" scope="col">Тип ТО</th>
-              <th class="text-muted" style="width: 65%" scope="col">Наименование оборудования</th>
+              <th class="text-muted" style="width: 63%" scope="col">Наименование оборудования</th>
               <th class="text-muted" style="width: 10%" scope="col">Дата по плану</th>
               <th class="text-muted" style="width: 5%" scope="col"><small>Журнал допуска заполнен</small></th>
               <th class="text-muted" style="width: 5%" scope="col"><small>Журнал ТО заполнен</small</th>
               <th class="text-muted" style="width: 5%" scope="col"><small>Работа проведена</small</th>
+              <th class="text-muted" style="width: 2%" scope="col"><i class="fas fa-file-alt"></i></th>
             </tr>
           </thead>
           <tbody>
             {% for facility in facility_list %}
             <!--facility name-->
               <tr>
-                <td class="text-center" colspan="7"><h5 class="p-1">{{ facility.grouper }} <i class="fas fa-file-alt"></i></h5></td>
+                <td class="text-center" colspan="8"><h5 class="p-1">{{ facility.grouper }}</h5></td>
               </tr>
               {% for entry in facility.list %}
               <!--table rows-->
@@ -44,6 +45,7 @@
                   <td><input type="checkbox" class="form-check-input" disabled {% if entry.access_journal_filled %} checked {% endif %}></td>
                   <td><input type="checkbox" class="form-check-input" disabled {% if entry.result_journal_filled %} checked {% endif %}></td>
                   <td><input type="checkbox" class="form-check-input" disabled {% if entry.date_completed %} checked {% endif %}></td>
+                  <td>{% if entry.report and entry.date_completed %}<a href="{% url 'reports:docx_report' entry.pk %}" class="text-decoration-none text-muted" download><i class="fas fa-file-alt"></a>{% endif %}</td>
                 </tr>
               {% endfor %}
             {% endfor %}

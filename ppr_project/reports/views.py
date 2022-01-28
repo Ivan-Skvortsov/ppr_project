@@ -1,13 +1,18 @@
 from datetime import date
+
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404, HttpResponse
+from django.shortcuts import redirect
+from django.urls.base import resolve
+from django.views import View
 from django.views.generic import ListView
 from django.views.generic.edit import FormView, UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls.base import resolve
-from django.shortcuts import redirect
-from django.contrib import messages
 
-from reports.models import EquipmentType, Schedule
 from reports.forms import DateInputForm, EmployeeForm, ScheduleForm
+from reports.models import EquipmentType, Schedule
+from reports.services import DocxReportGenerator
 
 
 class ScheduleListView(LoginRequiredMixin, ListView):
@@ -81,6 +86,11 @@ class YearScheduleView(ScheduleListView):
 
 
 class IndexView(LoginRequiredMixin, ListView):
+
+    #  ВРЕМЕННАЯ ЗАГЛУШКА
+    def get(self, request, *args, **kwargs):
+        return redirect('reports:week_schedule')
+
     template_name = 'reports/index.html'
     model = EquipmentType
     context_object_name = 'equipment_type'
@@ -142,3 +152,23 @@ class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
         context = super().get_context_data(**kwargs)
         context['action_to_confirm'] = 'Выберите дату'
         return context
+
+
+class DocxReportDownloadView(View):
+
+    def get(self, request, schedule_id):
+
+        try:
+            report_generator = DocxReportGenerator(schedule_id)
+            docx_file = report_generator.render_docx_report()
+            docx_filename = report_generator.get_docx_report_filename()
+            with open(docx_file, 'rb') as f:
+                response = HttpResponse(
+                    f.read(),
+                    content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                )
+            response['Content-Disposition'] = 'inline; filename=' + docx_filename
+            return response
+        except Exception as e:
+            print(f'Error rendering docx: {e}')  # FIXME: logging!
+            raise Http404

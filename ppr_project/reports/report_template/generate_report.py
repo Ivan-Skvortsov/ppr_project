@@ -2,10 +2,10 @@ from docxtpl import DocxTemplate
 
 context = {
     'facility_name': 'ГПА-11',
-    'd': 10,
-    'month': 'Июль',
+    'day': 10,
+    'month': 'Июля',
     'year': 2021,
-    'remarks': 'Сюда пишем замечания!',
+    # 'remarks': 'Сюда пишем замечания!',
     'employee1': 'Инженер АСУ, А и ТМ',
     'name1': 'Сидоров Т.П.',
     'employee2': 'Приборист',
@@ -35,8 +35,8 @@ context = {
     ]
 }
 
-target_file = r'E:\Dev\ppr_project\ppr_project\reports\report_template\out.docx'
-template_file = r'E:\Dev\ppr_project\ppr_project\reports\report_template\template.docx'
+target_file = r'/mnt/d/Dev/ppr_project/output/gpa_vse_vzo.docx'
+template_file = r'/mnt/d/Dev/ppr_project/templates/gpa_vse_vzo.docx'
 
 docx_template = DocxTemplate(template_file)
 print(target_file)

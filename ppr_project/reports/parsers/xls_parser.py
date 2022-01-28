@@ -1,14 +1,9 @@
-from tqdm import tqdm
-
 from datetime import date
+
 from openpyxl import load_workbook
-
-
-from reports.models import (EquipmentType,
-                            Facility,
-                            MaintenanceCategory,
-                            MaintenanceType,
-                            Schedule)
+from reports.models import (EquipmentType, Facility, MaintenanceCategory,
+                            MaintenanceType, Schedule)
+from tqdm import tqdm
 
 
 def import_objects_from_xls(filename):

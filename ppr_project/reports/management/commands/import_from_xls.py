@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
-from reports.parsers.xls_parser import (import_schedule_from_xls,
-                                        import_objects_from_xls)
+from reports.parsers.xls_parser import (import_objects_from_xls,
+                                        import_schedule_from_xls)
 
 
 class Command(BaseCommand):

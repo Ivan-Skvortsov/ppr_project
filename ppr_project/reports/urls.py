@@ -1,13 +1,10 @@
 from django.urls import path
 
 from reports.views import (ConfirmScheduleCompletedView,
-                           ConfirmScheduleDateChangedView,
-                           IndexView,
-                           YearScheduleView,
-                           MonthScheduleView,
-                           WeekScheduleView,
-                           DayScheduleView,
-                           ScheduleDetailInfoView)
+                           ConfirmScheduleDateChangedView, DayScheduleView,
+                           DocxReportDownloadView, IndexView,
+                           MonthScheduleView, ScheduleDetailInfoView,
+                           WeekScheduleView, YearScheduleView)
 
 app_name = 'reports'
 
@@ -31,5 +28,10 @@ urlpatterns = [
         'schedule/confirm_date_changed/<slug:schedule_list>/<str:return_url>/',
         ConfirmScheduleDateChangedView.as_view(),
         name='confirm_date_changed'
+    ),
+    path(
+        'docx_report/<int:schedule_id>/',
+        DocxReportDownloadView.as_view(),
+        name='docx_report'
     ),
 ]
