@@ -13,6 +13,7 @@ app_name = 'users'
 
 urlpatterns = [
     path('signup/', views.SignUp.as_view(), name='signup'),
+    path('signup/done/', views.SignUpDone.as_view(), name='signup_done'),
     path('login/',
          LoginView.as_view(template_name='users/login.html'),
          name='login'

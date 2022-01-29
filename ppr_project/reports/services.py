@@ -1,11 +1,11 @@
 from datetime import datetime
+from docxtpl import DocxTemplate
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import date as _date
 
 import reports.constants as constants
-from docxtpl import DocxTemplate
 from reports.models import Schedule
 
 

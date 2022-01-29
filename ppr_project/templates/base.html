@@ -9,14 +9,14 @@
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
     <title>{% block title %}Система управления техническим обслуживанием{% endblock title %}</title>
   </head>
-  <body>
+  <body class="d-flex flex-column min-vh-100">
     {% include 'includes/navbar.html' %}
     <main>
       <div class="container"> {# перенести сюда основной контейнер? #}
         {% block content %}Контент{% endblock content %}
       </div>
     </main>
-    {% include 'includes/footer.html' %}
     {% include 'includes/scripts.html' %}
   </body>
+  {% include 'includes/footer.html' %}
 </html>

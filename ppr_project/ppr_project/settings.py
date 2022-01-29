@@ -116,6 +116,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'Cистема управления ППР КС-45 <ks45.ppr.system@gmail.com>'
 
+ADMINS = [('Ivan Skvortsov', 'pprofcheg@gmail.com')]
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 DOCX_REPORTS_DIR = MEDIA_ROOT / 'tmp'
