@@ -4,10 +4,5 @@ register = template.Library()
 
 
 @register.filter
-def get_list_item(list_, idx):
-    return list_[idx]
-
-
-@register.filter
 def addclass(field, css):
     return field.as_widget(attrs={'class': css})
