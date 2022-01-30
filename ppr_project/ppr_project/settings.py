@@ -20,8 +20,14 @@ INSTALLED_APPS = [
     'reports.apps.ReportsConfig',
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',
-    'debug_toolbar'
+    'debug_toolbar',
+    'django.forms'  # to render django widgets
 ]
+
+# maybe, I should change the stucture of template folders?
+# thus I can avoid overriding FORM_RENDERER
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'  # to render custom widgets
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

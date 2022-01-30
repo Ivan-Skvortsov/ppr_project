@@ -174,6 +174,11 @@ class Schedule(models.Model):
         blank=True,
         verbose_name='Шаблон акта/протокола'
     )
+    photo = models.ImageField(
+        upload_to='photo_approvals/%Y/%m/%d',
+        blank=True,
+        verbose_name='Подтверждающее фото'
+    )
 
     class Meta:
         verbose_name = 'Планирование работ'
