@@ -132,3 +132,4 @@ dmypy.json
 
 #docx reports
 tmp/
+photo_approvals/
