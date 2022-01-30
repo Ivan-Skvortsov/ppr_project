@@ -120,4 +120,3 @@ ADMINS = [('Ivan Skvortsov', 'pprofcheg@gmail.com')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-DOCX_REPORTS_DIR = MEDIA_ROOT / 'tmp'

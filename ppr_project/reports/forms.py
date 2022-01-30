@@ -1,10 +1,24 @@
 from django import forms
 from django.forms.widgets import CheckboxInput, DateInput, Select
+from django.core.validators import MinValueValidator
+from datetime import date
 
 from reports.models import Employee, Schedule
 
 
 class ScheduleForm(forms.ModelForm):
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date_completed = cleaned_data.get("date_completed")
+        employee1 = cleaned_data.get("employee1")
+        employee2 = cleaned_data.get("employee2")
+        if date_completed and not(employee1 and employee2):
+            raise forms.ValidationError(
+                    'Нельзя указать, что работа завершена без исполнителей! '
+                    'Выберите как минимум двух исполнителей работы!'
+                )
+        return cleaned_data
 
     class Meta:
         model = Schedule
@@ -74,8 +88,13 @@ class EmployeeForm(forms.Form):
 class DateInputForm(forms.Form):
     input_date = forms.DateField(
         widget=forms.DateInput(
-            attrs={'type': 'date', 'class': 'form-control'}
+            attrs={
+                'type': 'date',
+                'class': 'form-control',
+                'min': date.today
+            }
         ),
         label='Дата',
-        help_text='Выберите дату'
+        help_text='Выберите дату',
+        validators=[MinValueValidator(date.today)]
     )

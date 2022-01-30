@@ -35,21 +35,21 @@
               <!--table rows-->
                 <tr
                 {% now "Y-m-d" as today_date %}
-                {% if today_date > entry.date_sheduled|date:"Y-m-d" %}class="table-danger"{% endif %}
+                {% if today_date > entry.date_sheduled|date:"Y-m-d" and not entry.date_completed %}class="table-danger"{% endif %}
                 {% if entry.date_completed and entry.access_journal_filled and entry.result_journal_filled %}class="table-success"{% endif %}
                 >
                   <td>
                     <div class="form-check form-switch">
-                      <input type="checkbox" name="selected_schedule" value="{{ entry.pk }}" class="form-check-input">
+                      <input type="checkbox" name="selected_schedule" value="{{ entry.pk }}" class="form-check-input" title="Выбрать работу">
                     </div>
                   </td>
                   <td>{{ entry.maintenance_type }}</td>
-                  <td><a class="text-decoration-none text-reset" href="{% url 'reports:schedule_detail' entry.pk %}">{{ entry.equipment_type }}</a></td>
+                  <td><a class="text-decoration-none text-reset" href="{% url 'reports:schedule_detail' entry.pk %}" title="Редактировать работу">{{ entry.equipment_type }}</a></td>
                   <td>{{ entry.date_sheduled|date:"d.m.Y" }}</td>
                   <td><input type="checkbox" class="form-check-input" disabled {% if entry.access_journal_filled %} checked {% endif %}></td>
                   <td><input type="checkbox" class="form-check-input" disabled {% if entry.result_journal_filled %} checked {% endif %}></td>
                   <td><input type="checkbox" class="form-check-input" disabled {% if entry.date_completed %} checked {% endif %}></td>
-                  <td>{% if entry.report and entry.date_completed %}<a href="{% url 'reports:docx_report' entry.pk %}" class="text-decoration-none text-muted" download><i class="fas fa-file-alt"></a>{% endif %}</td>
+                  <td>{% if entry.report and entry.date_completed %}<a href="{% url 'reports:docx_report' entry.pk %}" class="text-decoration-none text-muted" title="Скачать акт/протокол" download><i class="fas fa-file-alt"></a>{% endif %}</td>
                 </tr>
               {% endfor %}
             {% endfor %}

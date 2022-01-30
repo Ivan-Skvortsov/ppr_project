@@ -13,10 +13,12 @@
           <div class="card-body">
             {% include 'users/includes/render_form.html' %}
             {# BUTTONS #}
+            {% block buttons %}
             <div class="col-md-12 text-center">
               <button type="submit" class="btn btn-primary">{% block button_text %}Текст кнопки{% endblock button_text %}</button>
               <a class="btn btn-secondary" href="{% url 'reports:index'%}" role="button">Отмена</a>
             </div>
+            {% endblock buttons %}
           </form>
         </div>
       </div>

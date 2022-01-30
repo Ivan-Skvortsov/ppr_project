@@ -1,5 +1,6 @@
 from datetime import datetime
 from docxtpl import DocxTemplate
+from pathlib import Path
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -43,11 +44,12 @@ class DocxReportGenerator:
     def get_docx_report_filename(self):
         """Generate filename based on docx template name and current time."""
         suffix = datetime.now().strftime("%y%m%d%H%M%S")
-        return f'{str(self.schedule.report.template)[:-5]}_{suffix}.docx'
+        filename = Path(str(self.schedule.report.template)).stem
+        return f'{filename}_{suffix}.docx'
 
     def _get_docx_report_output_file(self):
         """Generate filepath."""
-        return settings.DOCX_REPORTS_DIR / self.get_docx_report_filename()
+        return settings.MEDIA_ROOT / 'tmp' / self.get_docx_report_filename()
 
     def render_docx_report(self):
         """Remders docx report."""

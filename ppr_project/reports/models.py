@@ -103,7 +103,7 @@ class ReportTemplate(models.Model):
         null=True,
         verbose_name='Тип ТО'
     )
-    template = models.FileField()
+    template = models.FileField(upload_to='templates/')
 
     class Meta:
         verbose_name = 'Шаблон акта/протокола'
