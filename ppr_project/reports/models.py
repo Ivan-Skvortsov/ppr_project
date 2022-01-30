@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from simple_history.models import HistoricalRecords
+
 User = get_user_model()
 
 
@@ -179,7 +181,14 @@ class Schedule(models.Model):
         blank=True,
         verbose_name='Подтверждающее фото'
     )
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = 'Планирование работ'
         verbose_name_plural = 'Планирование работ'
+
+    def __str__(self):
+        return (
+            f'{self.equipment_type.maintenance_category} - '
+            f'{self.maintenance_type} {self.equipment_type}'
+        )
