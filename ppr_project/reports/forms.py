@@ -1,9 +1,13 @@
 from django import forms
-from django.forms.widgets import CheckboxInput, DateInput, Select
+from django.forms.widgets import CheckboxInput, DateInput, Select, ClearableFileInput
 from django.core.validators import MinValueValidator
 from datetime import date
 
 from reports.models import Employee, Schedule
+
+
+class CustomFileInput(ClearableFileInput):
+    template_name = 'reports/widgets/custom_file_input.html'
 
 
 class ScheduleForm(forms.ModelForm):
@@ -50,6 +54,9 @@ class ScheduleForm(forms.ModelForm):
             ),
             'result_journal_filled': CheckboxInput(
                 attrs={'class': 'form-check-input'}
+            ),
+            'photo': CustomFileInput(
+                attrs={'class': 'form-control'}
             )
         }
 
