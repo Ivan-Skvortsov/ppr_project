@@ -21,7 +21,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',
     'debug_toolbar',
-    'django.forms'  # to render django widgets
+    'django.forms',  # to render django widgets
+    'simple_history'
 ]
 
 # maybe, I should change the stucture of template folders?
@@ -38,6 +39,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware'
 ]
 
 ROOT_URLCONF = 'ppr_project.urls'
