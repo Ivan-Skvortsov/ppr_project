@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'reports.apps.ReportsConfig',
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',
+    'bugtracker.apps.BugtrackerConfig',
     'debug_toolbar',
     'django.forms',  # to render django widgets
     'simple_history'
