@@ -1,4 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-{{ form.as_p }}
+{% for item in bug %}
+{{ item.pub_date }} - {{ item.get_type_display }} - {{ item.bug_description }} - {{ item.author }}
+<br>
+{% endfor %}
+<br>
+<br>
+
+<a class="btn btn-primary" href="{% url 'bugtracker:create'%}" role="button">Добавить замечание/предложение</a>
 {% endblock content %}
