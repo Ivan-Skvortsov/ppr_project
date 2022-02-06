@@ -1,9 +1,14 @@
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-hw=#o#6(*%d&h8l8xt$_ioao89%5wd-^^756d80cgvn+qe!zum'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -29,7 +34,6 @@ INSTALLED_APPS = [
 # maybe, I should change the stucture of template folders?
 # thus I can avoid overriding FORM_RENDERER
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'  # to render custom widgets
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -118,14 +122,13 @@ LOGIN_REDIRECT_URL = 'reports:index'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'ks45.ppr.system@gmail.com'
-# HIDE KEYS!
-EMAIL_HOST_PASSWORD = 'bkyjtfgglemdbxpc'  # FIXME!
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'Cистема управления ППР КС-45 <ks45.ppr.system@gmail.com>'
+DEFAULT_FROM_EMAIL = f'Cистема управления ППР КС-45 <{EMAIL_HOST_USER}>'
 
-ADMINS = [('Ivan Skvortsov', 'pprofcheg@gmail.com')]
+ADMINS = [('Ivan Skvortsov', os.getenv('ADMIN_MAIL'))]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
