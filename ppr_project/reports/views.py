@@ -167,9 +167,9 @@ class DocxReportDownloadView(View):
             with open(docx_file, 'rb') as f:
                 response = HttpResponse(
                     f.read(),
-                    content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'  # noqa: E501
                 )
-            response['Content-Disposition'] = 'inline; filename=' + docx_filename
+            response['Content-Disposition'] = 'inline; filename=' + docx_filename  # noqa: E501
             return response
         except Exception as e:
             print(f'Error rendering docx: {e}')  # FIXME: logging!
