@@ -1,26 +1,9 @@
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  {% include 'includes/styles_and_fonts.html' %}
-<title>Выход из системы</title>
-</head>
-<body>
-  <div class="row justify-content-center">
-    <div class="col-md-6 p-5">
-      <div class="card">
-        <div class="card-header h4"><strong>Выход из системы</strong></div>
-          <div class="card-body">
-            <div class="col-md-12 text-center">
-              <p class="display-6">Вы вышли из системы</p>
-            </div>
-          </div>
-        </div>
-        <div class="text-center">
-          <p><a class="text-decoration-none" href="{% url 'users:login'%}" role="button">Войти в систему</a></p>
-        </div>
-  </div>
+{% extends 'includes/card_with_notification_no_navbar.html' %}
+{% block title %}Выход из системы{% endblock title %}
+{% block header_text %}Выход из системы{% endblock header_text %}
+{% block card_text %}Вы вышли из системы{% endblock card_text %}
+{% block additional_link %}
+<div class="text-center">
+  <p><a class="text-decoration-none" href="{% url 'users:login'%}" role="button">Войти в систему</a></p>
 </div>
-  {% include 'includes/scripts.html' %}
-</body>
-</html>
+{% endblock additional_link %}

@@ -8,10 +8,8 @@
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
     <title>{% block title %}Система управления техническим обслуживанием{% endblock title %}</title>
   </head>
-  <body class="d-flex flex-column min-vh-100">
-    <main>
+  <body>
       {% block content %}Контент{% endblock content %}
-    </main>
     {% include 'includes/scripts.html' %}
   </body>
 </html>
