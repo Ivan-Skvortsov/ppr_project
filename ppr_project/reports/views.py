@@ -49,6 +49,9 @@ class ScheduleListView(LoginRequiredMixin, ListView):
         current_url_name = resolved_url.url_name
         return_url = f'{current_namespace}:{current_url_name}'
         schedule_list = '_'.join(selected_schedules)
+        print()
+        print(resolved_url.route)
+        print()
         return redirect(
             page_url,
             schedule_list=schedule_list,
