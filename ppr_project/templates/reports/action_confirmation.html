@@ -5,7 +5,7 @@
     <div class="card border-primary">
       <div class="card-header bg-primary text-white"><strong>{{ action_to_confirm }}</strong></div>
         <div class="card-body">
-          <!-- form erros -->
+          {% comment %} form erros {% endcomment %}
           {% if form.errors %}
             {% for field in form %} 
               {% for error in field.errors %}            
@@ -22,10 +22,9 @@
           {% endif %}
           <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <!-- form fields -->
+            {% comment %} form fields {% endcomment %}
             {% for field in form %} 
               <div class="row my-2 align-items-center">
-                {% comment %} <hr> {% endcomment %}
                 <div class="col">
                   <label for="{{ field.id_for_label }}">
                     {{ field.label }}
@@ -39,19 +38,18 @@
                 </div>
               </div>
             {% endfor %}
-            <!-- buttons -->
+            {% comment %} buttons {% endcomment %}
             <div class="container-lg mt-3">
               <div class="row justify-content-center">
                 <div class="col py-2">
                     <button type="submit" class="btn btn-primary w-100">Сохранить</button>
                 </div>
                 <div class="col py-2">
-                    <a class="btn btn-secondary w-100" href="{{request.META.HTTP_REFERER}}" role="button">Отмена</a>
+                    <a class="btn btn-secondary w-100" href="{{ return_url }}" role="button">Отмена</a>
+
                 </div>
               </div>
             </div>
-          {% comment %} to return to previous page {% endcomment %}
-          <input type="hidden" name="next_page" value="{{request.META.HTTP_REFERER}}">
           </form>
         </div>
     </div>

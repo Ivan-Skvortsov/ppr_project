@@ -15,7 +15,7 @@ urlpatterns = [
     path('week/', WeekScheduleView.as_view(), name='week_schedule'),
     path('day/', DayScheduleView.as_view(), name='day_schedule'),
     path(
-        'schedule/<int:pk>/',
+        'schedule/<int:pk>/<str:return_url>/',
         ScheduleDetailInfoView.as_view(),
         name='schedule_detail'
     ),

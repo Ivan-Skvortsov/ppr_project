@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django.urls.base import resolve
 from django.views import View
 from django.views.generic import ListView
@@ -44,14 +45,8 @@ class ScheduleListView(LoginRequiredMixin, ListView):
         return self.get(request, *args, **kwargs)
 
     def _redirect_to_confirmation_page(self, selected_schedules, page_url):
-        resolved_url = resolve(self.request.path_info)
-        current_namespace = resolved_url.namespace
-        current_url_name = resolved_url.url_name
-        return_url = f'{current_namespace}:{current_url_name}'
+        return_url = resolve(self.request.path_info).url_name
         schedule_list = '_'.join(selected_schedules)
-        print()
-        print(resolved_url.route)
-        print()
         return redirect(
             page_url,
             schedule_list=schedule_list,
@@ -108,7 +103,14 @@ class ScheduleDetailInfoView(LoginRequiredMixin, UpdateView):
     context_object_name = 'schedule_entry'
 
     def get_success_url(self):
-        return self.request.POST.get('next_page', '/')
+        return_url = f'reports:{self.kwargs["return_url"]}'
+        return reverse_lazy(return_url)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return_url = f'reports:{self.kwargs["return_url"]}'
+        context['return_url'] = reverse_lazy(return_url)
+        return context
 
 
 class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
@@ -117,7 +119,7 @@ class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
 
     def post(self, request, **kwargs):
         self.schedule_list = kwargs['schedule_list'].split('_')
-        self.return_url = kwargs['return_url']
+        self.return_url = f'reports:{kwargs["return_url"]}'
         self.form = self.get_form(self.form_class)
         if self.form.is_valid():
             qs = Schedule.objects.filter(pk__in=self.schedule_list)
@@ -132,6 +134,8 @@ class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        return_url = f'reports:{self.kwargs["return_url"]}'
+        context['return_url'] = reverse_lazy(return_url)
         context['action_to_confirm'] = 'Выберите исполнителей работ'
         return context
 
@@ -142,7 +146,7 @@ class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
 
     def post(self, request, **kwargs):
         self.schedule_list = kwargs['schedule_list'].split('_')
-        self.return_url = kwargs['return_url']
+        self.return_url = f'reports:{kwargs["return_url"]}'
         self.form = self.get_form(self.form_class)
         if self.form.is_valid():
             qs = Schedule.objects.filter(pk__in=self.schedule_list)
@@ -152,6 +156,8 @@ class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        return_url = f'reports:{self.kwargs["return_url"]}'
+        context['return_url'] = reverse_lazy(return_url)
         context['action_to_confirm'] = 'Выберите дату'
         return context
 
