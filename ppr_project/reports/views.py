@@ -3,7 +3,7 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.urls.base import resolve
 from django.views import View
@@ -11,7 +11,7 @@ from django.views.generic import ListView
 from django.views.generic.edit import FormView, UpdateView
 
 from reports.forms import DateInputForm, EmployeeForm, ScheduleForm
-from reports.models import EquipmentType, Schedule
+from reports.models import EquipmentType, MaintenanceCategory, Schedule
 from reports.services import DocxReportGenerator
 
 
@@ -57,29 +57,93 @@ class ScheduleListView(LoginRequiredMixin, ListView):
 class DayScheduleView(ScheduleListView):
 
     def get_queryset(self):
+        category_id = self.kwargs.get('category_id', None)
+        if category_id:
+            maintenance_category = get_object_or_404(
+                MaintenanceCategory,
+                pk=category_id
+            )
+            return Schedule.objects.filter(
+                date_sheduled=date.today(),
+                equipment_type__maintenance_category=maintenance_category
+            )
         return Schedule.objects.filter(date_sheduled=date.today())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['plan_period'] = 'План на день'
+        context['plan_url'] = reverse_lazy('reports:day_schedule')
+        return context
 
 
 class MonthScheduleView(ScheduleListView):
 
     def get_queryset(self):
+        category_id = self.kwargs.get('category_id', None)
         month = date.today().month
+        if category_id:
+            maintenance_category = get_object_or_404(
+                MaintenanceCategory,
+                pk=category_id
+            )
+            return Schedule.objects.filter(
+                date_sheduled__month=month,
+                equipment_type__maintenance_category=maintenance_category
+            )
         return Schedule.objects.filter(date_sheduled__month=month)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['plan_period'] = 'План на месяц'
+        context['plan_url'] = reverse_lazy('reports:month_schedule')
+
+        return context
 
 
 class WeekScheduleView(ScheduleListView):
 
     def get_queryset(self):
+        category_id = self.kwargs.get('category_id', None)
         week = date.today().isocalendar()[1]  # Get week number
-        print(week)
+        if category_id:
+            maintenance_category = get_object_or_404(
+                MaintenanceCategory,
+                pk=category_id
+            )
+            return Schedule.objects.filter(
+                date_sheduled__week=week,
+                equipment_type__maintenance_category=maintenance_category
+            )
         return Schedule.objects.filter(date_sheduled__week=week)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['plan_period'] = 'План на неделю'
+        context['plan_url'] = reverse_lazy('reports:week_schedule')
+        return context
 
 
 class YearScheduleView(ScheduleListView):
 
     def get_queryset(self):
+        category_id = self.kwargs.get('category_id', None)
         year = date.today().year
+        if category_id:
+            maintenance_category = get_object_or_404(
+                MaintenanceCategory,
+                pk=category_id
+            )
+            return Schedule.objects.filter(
+                date_sheduled__year=year,
+                equipment_type__maintenance_category=maintenance_category
+            )
         return Schedule.objects.filter(date_sheduled__year=year)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['plan_period'] = 'План на год'
+        context['plan_url'] = reverse_lazy('reports:year_schedule')
+        return context
 
 
 class IndexView(LoginRequiredMixin, ListView):

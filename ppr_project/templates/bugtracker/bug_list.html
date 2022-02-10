@@ -25,7 +25,7 @@
             <td>{{ bug.bug_description }}</td>
             <td>{{ bug.author }}</td>
             <td> {% if bug.close_date %}{{ bug.close_date }} {% else %} - {% endif %}</td>
-            <td>{% if bug.screenshot %}<a href="{{ bug.screenshot.url }}" class="text-decoration-none text-muted"><i class="fas fa-file-alt"></a>{% endif %}</td>
+            <td>{% if bug.screenshot %}<a href="{{ bug.screenshot.url }}" class="text-decoration-none text-muted" title="Скриншот или фото" target="_blank"><i class="fas fa-file-image"></a>{% endif %}</td>
         </tr>
     {% endfor %}
     </tbody>
