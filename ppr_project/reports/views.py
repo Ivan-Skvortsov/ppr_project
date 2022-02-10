@@ -96,7 +96,6 @@ class MonthScheduleView(ScheduleListView):
         context = super().get_context_data(**kwargs)
         context['plan_period'] = 'План на месяц'
         context['plan_url'] = reverse_lazy('reports:month_schedule')
-
         return context
 
 
