@@ -6,15 +6,16 @@ from reports.models import (EquipmentType, Facility, MaintenanceCategory,
 from tqdm import tqdm
 
 
-def import_objects_from_xls(filename):
+def import_objects_from_xls(filename, category_name):
     """Imports objects from xlsx template."""
-    category_name = 'ППР КЦ-1'  # FIXME
     category = MaintenanceCategory.objects.get_or_create(
         category_name=category_name)[0]
     wb = load_workbook(filename=filename, read_only=True, data_only=True)
     worksheet = wb.active
     for row in tqdm(worksheet.iter_rows(min_row=2), total=100):
         facility_name = row[0].value
+        if not facility_name:
+            return
         eqipment_type_name = row[1].value
 
         facility = Facility.objects.get_or_create(
@@ -29,13 +30,19 @@ def import_objects_from_xls(filename):
         )
 
 
-def import_schedule_from_xls(filename):
+def import_schedule_from_xls(filename, category_name):
     """Import schedules from xlsx templates."""
     wb = load_workbook(filename=filename, read_only=True, data_only=True)
     worksheet = wb.active
     for row in tqdm(worksheet.iter_rows(min_row=2), total=100):
-        category = MaintenanceCategory.objects.get(category_name='ППР КЦ-1')  # FIXME
-        facility = Facility.objects.get(facility_name=row[0].value)
+        category = MaintenanceCategory.objects.get(category_name=category_name)
+        facility_name = row[0].value
+        if not facility_name:
+            return
+        facility = Facility.objects.get(
+            facility_name=facility_name,
+            maintenance_category=category
+        )
         equipment_type = EquipmentType.objects.get(
             facility=facility,
             maintenance_category=category,
@@ -52,3 +59,12 @@ def import_schedule_from_xls(filename):
                     maintenance_type=m_type,
                     date_sheduled=date_scheduled
                 )
+
+
+def execute_import_from_xls(filename):
+    category_name = input('Введите категорию: ')
+    print('Creating objects: \n')
+    import_objects_from_xls(filename, category_name)
+    print('Creating schedules: \n')
+    import_schedule_from_xls(filename, category_name)
+    print('Finished!')

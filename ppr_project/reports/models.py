@@ -189,6 +189,7 @@ class Schedule(models.Model):
 
     def __str__(self):
         return (
-            f'{self.equipment_type.maintenance_category} - '
-            f'{self.maintenance_type} {self.equipment_type}'
+            f'{self.equipment_type.maintenance_category} | '
+            f'{self.equipment_type.facility} | '
+            f'{self.maintenance_type} | {self.equipment_type}'
         )
