@@ -46,7 +46,7 @@ def import_schedule_from_xls(filename):
                 m_type = MaintenanceType.objects.get_or_create(
                     m_type=row[i].value.strip()
                 )[0]
-                date_scheduled = date(2021, i-1, 1)
+                date_scheduled = date(2022, i-1, 1)
                 Schedule.objects.create(
                     equipment_type=equipment_type,
                     maintenance_type=m_type,
