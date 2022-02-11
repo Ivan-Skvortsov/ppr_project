@@ -1,27 +1,29 @@
+{% comment %} categories never changes, so it seems that hardcode is ok here {% endcomment %}
 <ul class="nav nav-tabs card-header-tabs">
     <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">КЦ-1</a>
+      <a class="nav-link {% if not view.kwargs.category_id %}active{% endif %}" href="{{ plan_url }}">Все объекты</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#">КЦ-2</a>
+      <a class="nav-link {% if view.kwargs.category_id == 1 %}active{% endif %}" href="{{ plan_url }}1/">ППР КЦ-1</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#">ПБ</a>
+      <a class="nav-link {% if view.kwargs.category_id == 2 %}active{% endif %}" href="{{ plan_url }}2/">ППР КЦ-2</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#">ППР защит КЦ-1</a>
+      <a class="nav-link {% if view.kwargs.category_id == 3 %}active{% endif %}" href="{{ plan_url }}3/">ППР ПБ</a>
     </li>
     <li class="nav-item">
-      <li class="nav-item">
-        <a class="nav-link" href="#">ППР защит КЦ-2</a>
-      </li>
-      <a class="nav-link" href="#">АСПС, ПТ и КЗ КЦ-1</a>
+      <a class="nav-link {% if view.kwargs.category_id == 4 %}active{% endif %}" href="{{ plan_url }}4/">ППР защит КЦ-1</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#">АСПС, ПТ и КЗ КЦ-2</a>
+        <a class="nav-link {% if view.kwargs.category_id == 5 %}active{% endif %}" href="{{ plan_url }}5/">ППР защит КЦ-2</a>
+    </li>
+      <a class="nav-link {% if view.kwargs.category_id == 6 %}active{% endif %}" href="{{ plan_url }}6/">АСПС, ПТ и КЗ КЦ-1</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if view.kwargs.category_id == 7 %}active{% endif %}" href="{{ plan_url }}7/">АСПС, ПТ и КЗ КЦ-2</a>
     </li>          
     <li class="nav-item">
-      <a class="nav-link" href="#">СВТ</a>
+      <a class="nav-link {% if view.kwargs.category_id == 8 %}active{% endif %}" href="{{ plan_url }}8/">СВТ</a>
     </li>
-
 </ul>

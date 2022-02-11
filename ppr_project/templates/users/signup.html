@@ -1,27 +1,8 @@
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  {% include 'includes/styles_and_fonts.html' %}
-<title>Регистрация</title>
-</head>
-<body>
-  <div class="row justify-content-center">
-    <div class="col-md-6 p-5">
-      <div class="card">
-        <div class="card-header h4"><strong>Регистрация в системе</strong></div>
-          <div class="card-body">
-            {% include 'users/includes/render_form.html' %}
-            {# BUTTONS #}
-            <div class="col-md-12 text-center">
-              <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
-              <a class="btn btn-secondary" href="{% url 'reports:index'%}" role="button">Отмена</a>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% include 'includes/scripts.html' %}
-</body>
-</html>
+{% extends 'users/base_without_navbar.html' %}
+{% block title %}Регистрация{% endblock title %}
+{% block content %}
+  {% with card_header="Регистрация в системе" submit_button="Зарегистрироваться" %}
+  {% url 'users:login' as  cancel_url %}
+    {% include 'includes/card_with_form.html' %}
+  {% endwith %}
+{% endblock content %}

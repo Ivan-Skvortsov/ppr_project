@@ -1,0 +1,16 @@
+{% extends 'users/base_without_navbar.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 p-5">
+    <div class="card">
+      <div class="card-header h4"><strong>{% block header_text %}{% endblock header_text %}</strong></div>
+        <div class="card-body">
+          <div class="col-md-12 text-center">
+            <p class="display-6">{% block card_text %}{% endblock card_text %}</p>
+          </div>
+        </div>
+    </div>
+    {% block additional_link %}{% endblock additional_link %}
+  </div>
+</div>
+{% endblock content %}

@@ -44,7 +44,7 @@
                     </div>
                   </td>
                   <td>{{ entry.maintenance_type }}</td>
-                  <td><a class="text-decoration-none text-reset" href="{% url 'reports:schedule_detail' entry.pk %}" title="Редактировать работу">{{ entry.equipment_type }}</a></td>
+                  <td><a class="text-decoration-none text-reset" href="{% url 'reports:schedule_detail' pk=entry.pk return_url=request.resolver_match.url_name %}" title="Редактировать работу">{{ entry.equipment_type }}</a></td>
                   <td>{{ entry.date_sheduled|date:"d.m.Y" }}</td>
                   <td><input type="checkbox" class="form-check-input" disabled {% if entry.access_journal_filled %} checked {% endif %}></td>
                   <td><input type="checkbox" class="form-check-input" disabled {% if entry.result_journal_filled %} checked {% endif %}></td>

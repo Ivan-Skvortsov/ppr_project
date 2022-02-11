@@ -34,7 +34,7 @@ class DocxReportGenerator:
             'name1': self.schedule.employee1.name,
             'name2': self.schedule.employee2.name,
             'name3': self.schedule.employee3.name
-            if self.schedule.employee3 else None
+                if self.schedule.employee3 else None
         }
 
     def _get_docx_report_template(self):
