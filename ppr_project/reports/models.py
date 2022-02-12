@@ -34,7 +34,7 @@ class MaintenanceCategory(models.Model):
 
 
 class Facility(models.Model):
-    facility_name = models.CharField(max_length=20, verbose_name='Объект')
+    facility_name = models.CharField(max_length=100, verbose_name='Объект')
     maintenance_category = models.ForeignKey(
         MaintenanceCategory,
         on_delete=models.PROTECT,
@@ -65,7 +65,7 @@ class EquipmentType(models.Model):
         verbose_name='Объект'
     )
     eqipment_type_name = models.CharField(
-        max_length=30,
+        max_length=100,
         verbose_name='Тип оборудования'
     )
 
@@ -78,7 +78,7 @@ class EquipmentType(models.Model):
 
 
 class MaintenanceType(models.Model):
-    m_type = models.CharField(max_length=5, verbose_name='Тип ТО')
+    m_type = models.CharField(max_length=15, verbose_name='Тип ТО')
 
     class Meta:
         verbose_name = 'Тип ТО'
