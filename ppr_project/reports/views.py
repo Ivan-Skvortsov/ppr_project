@@ -66,8 +66,11 @@ class DayScheduleView(ScheduleListView):
             return Schedule.objects.filter(
                 date_sheduled=date.today(),
                 equipment_type__maintenance_category=maintenance_category
-            )
-        return Schedule.objects.filter(date_sheduled=date.today())
+            ).select_related('equipment_type__facility',
+                             'report',
+                             'maintenance_type')
+
+        return Schedule.objects.filter(date_sheduled=date.today()).select_related('equipment_type__facility', 'report', 'maintenance_type')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -89,8 +92,8 @@ class MonthScheduleView(ScheduleListView):
             return Schedule.objects.filter(
                 date_sheduled__month=month,
                 equipment_type__maintenance_category=maintenance_category
-            )
-        return Schedule.objects.filter(date_sheduled__month=month)
+            ).select_related('equipment_type__facility', 'report', 'maintenance_type')
+        return Schedule.objects.filter(date_sheduled__month=month).select_related('equipment_type__facility', 'report', 'maintenance_type')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -112,8 +115,8 @@ class WeekScheduleView(ScheduleListView):
             return Schedule.objects.filter(
                 date_sheduled__week=week,
                 equipment_type__maintenance_category=maintenance_category
-            )
-        return Schedule.objects.filter(date_sheduled__week=week)
+            ).select_related('equipment_type__facility', 'report', 'maintenance_type')
+        return Schedule.objects.filter(date_sheduled__week=week).select_related('equipment_type__facility', 'report', 'maintenance_type')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -135,8 +138,8 @@ class YearScheduleView(ScheduleListView):
             return Schedule.objects.filter(
                 date_sheduled__year=year,
                 equipment_type__maintenance_category=maintenance_category
-            )
-        return Schedule.objects.filter(date_sheduled__year=year)
+            ).select_related('equipment_type__facility', 'report', 'maintenance_type')
+        return Schedule.objects.filter(date_sheduled__year=year).select_related('equipment_type__facility', 'report', 'maintenance_type')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
