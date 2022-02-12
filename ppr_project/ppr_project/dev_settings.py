@@ -6,6 +6,21 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'reports.apps.ReportsConfig',
+    'users.apps.UsersConfig',
+    'core.apps.CoreConfig',
+    'bugtracker.apps.BugtrackerConfig',
+    'debug_toolbar',
+    'django.forms',  # to render django widgets
+    'simple_history'
+]
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -16,3 +31,7 @@ DATABASES = {
 STATIC_URL = '/static/'
 STATIC_ROOT = None
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda r: False,
+}

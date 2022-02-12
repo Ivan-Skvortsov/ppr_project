@@ -12,7 +12,6 @@ IS_DEV = os.getenv('IS_DEVELOPMENT')
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 ALLOWED_HOSTS = ['ks45.online', 'www.ks45.online', 'localhost']
@@ -28,14 +27,11 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',
     'bugtracker.apps.BugtrackerConfig',
-    'debug_toolbar',
-    'django.forms',  # to render django widgets
+    'django.forms',
     'simple_history'
 ]
 
-# maybe, I should change the stucture of template folders?
-# thus I can avoid overriding FORM_RENDERER
-FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'  # to render custom widgets
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -116,10 +112,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
-
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': lambda r: False,
-}
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
