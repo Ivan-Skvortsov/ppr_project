@@ -10,7 +10,7 @@
     {% endif %}
     <form method="post" action="">
       {% csrf_token %}
-      {% regroup schedule_plan by equipment_type.facility  as facility_list %}
+      {% regroup schedule_plan by equipment_type.facility  as facility_list %} {# FIXME: https://code.djangoproject.com/ticket/1575 #}
       <!--table header-->
         <table class="table align-middle table-sm" >
           <thead>
