@@ -3,10 +3,12 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# version: alpha-0.1.0
+# version: Версия alpha-0.1.0
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+IS_DEV = os.getenv('IS_DEVELOPMENT')
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
@@ -67,16 +69,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ppr_project.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD':  os.getenv('DB_PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': '',
+if not IS_DEV:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD':  os.getenv('DB_PASSWORD'),
+            'HOST': 'localhost',
+            'PORT': '',
+        }
     }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -105,7 +108,6 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-# STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'static'
 
 
@@ -137,3 +139,7 @@ ADMINS = [('Ivan Skvortsov', os.getenv('ADMIN_MAIL'))]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+if IS_DEV:
+    from .dev_settings import *
