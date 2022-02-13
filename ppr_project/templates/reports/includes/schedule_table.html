@@ -33,7 +33,7 @@
               </div>
             </div>
           </div>
-          
+
           {# table body #}
           {% for facility in facility_list %}
             {# facility name #}
@@ -48,12 +48,12 @@
                         {% if entry.date_completed and entry.access_journal_filled and entry.result_journal_filled %} bg-success bg-opacity-25{% endif %}">
                 <div class="col-12 col-lg-2">
                   <div class="row">
-                    <div class="col-1 col-lg-4 px-2">
+                    <div class="col-2 col-lg-4">
                       <div class="form-check form-switch">
                         <input type="checkbox" name="selected_schedule" value="{{ entry.pk }}" class="form-check-input" title="Выбрать работу">
                       </div>
                     </div>
-                    <div class="col-11 col-lg-8">{{ entry.maintenance_type }}</div>
+                    <div class="col-10 col-lg-8">{{ entry.maintenance_type }}</div>
                   </div>
                 </div>
                 <div class="col-12 col-lg-6">
