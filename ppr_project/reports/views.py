@@ -97,7 +97,7 @@ class MonthScheduleView(ScheduleListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = 'План на месяц'
+        context['plan_period'] = 'План на этот месяц'
         context['plan_url'] = reverse_lazy('reports:month_schedule')
         return context
 
@@ -126,26 +126,46 @@ class WeekScheduleView(ScheduleListView):
 
 
 class YearScheduleView(ScheduleListView):
-
+    """Временный костыль по просьбе Стругова А.А."""
     def get_queryset(self):
         category_id = self.kwargs.get('category_id', None)
-        year = date.today().year
+        month = date.today().month + 1
         if category_id:
             maintenance_category = get_object_or_404(
                 MaintenanceCategory,
                 pk=category_id
             )
             return Schedule.objects.filter(
-                date_sheduled__year=year,
+                date_sheduled__month=month,
                 equipment_type__maintenance_category=maintenance_category
             ).select_related('equipment_type__facility', 'report', 'maintenance_type')
-        return Schedule.objects.filter(date_sheduled__year=year).select_related('equipment_type__facility', 'report', 'maintenance_type')
+        return Schedule.objects.filter(date_sheduled__month=month).select_related('equipment_type__facility', 'report', 'maintenance_type')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = 'План на год'
+        context['plan_period'] = 'План на следующий месяц'
         context['plan_url'] = reverse_lazy('reports:year_schedule')
         return context
+
+    # def get_queryset(self):
+    #     category_id = self.kwargs.get('category_id', None)
+    #     year = date.today().year
+    #     if category_id:
+    #         maintenance_category = get_object_or_404(
+    #             MaintenanceCategory,
+    #             pk=category_id
+    #         )
+    #         return Schedule.objects.filter(
+    #             date_sheduled__year=year,
+    #             equipment_type__maintenance_category=maintenance_category
+    #         ).select_related('equipment_type__facility', 'report', 'maintenance_type')
+    #     return Schedule.objects.filter(date_sheduled__year=year).select_related('equipment_type__facility', 'report', 'maintenance_type')
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['plan_period'] = 'План на год'
+    #     context['plan_url'] = reverse_lazy('reports:year_schedule')
+    #     return context
 
 
 class IndexView(LoginRequiredMixin, ListView):
