@@ -2,7 +2,8 @@ from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
 from reports.models import (Employee, EquipmentType, Facility,
-                            MaintenanceCategory, ReportTemplate, Schedule)
+                            MaintenanceCategory, ReportTemplate, Schedule,
+                            MaintenanceType)
 
 
 @admin.register(Employee)
@@ -49,6 +50,11 @@ class ScheduleAdmin(SimpleHistoryAdmin):
 
 @admin.register(ReportTemplate)
 class ReportTemplateAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(MaintenanceType)
+class MaintenanceTypeAdmin(admin.ModelAdmin):
     pass
 
 
