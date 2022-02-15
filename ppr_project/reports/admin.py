@@ -50,12 +50,12 @@ class ScheduleAdmin(SimpleHistoryAdmin):
 
 @admin.register(ReportTemplate)
 class ReportTemplateAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'm_type')
-
+    pass
 
 @admin.register(MaintenanceType)
 class MaintenanceTypeAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('pk', 'm_type')
+
 
 
 admin.site.register(MaintenanceCategory)
