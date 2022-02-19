@@ -10,6 +10,8 @@ from django.views import View
 from django.views.generic import ListView
 from django.views.generic.edit import FormView, UpdateView
 
+from simple_history.utils import bulk_update_with_history
+
 from reports.forms import DateInputForm, EmployeeForm, ScheduleForm
 from reports.models import EquipmentType, MaintenanceCategory, Schedule
 from reports.services import DocxReportGenerator
@@ -38,10 +40,15 @@ class ScheduleListView(LoginRequiredMixin, ListView):
                 )
         qs = Schedule.objects.filter(pk__in=selected_schedules)
         if selected_action == 'access_journal_filled':
-            qs.update(access_journal_filled=True)
+            for entry in qs:
+                entry._change_reason = 'Changed state of access journal'
+                entry.access_journal_filled = True
+            bulk_update_with_history(qs, Schedule, ['access_journal_filled'], batch_size=500)
         if selected_action == 'result_journal_filled':
-            qs.update(result_journal_filled=True)
-
+            for entry in qs:
+                entry._change_reason = 'Changed state of result journal'
+                entry.result_journal_filled = True
+            bulk_update_with_history(qs, Schedule, ['result_journal_filled'], batch_size=500)
         return self.get(request, *args, **kwargs)
 
     def _redirect_to_confirmation_page(self, selected_schedules, page_url):
@@ -209,11 +216,17 @@ class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
         self.form = self.get_form(self.form_class)
         if self.form.is_valid():
             qs = Schedule.objects.filter(pk__in=self.schedule_list)
-            qs.update(
-                date_completed=date.today(),
-                employee1=self.form.cleaned_data['employee1'],
-                employee2=self.form.cleaned_data['employee2'],
-                employee3=self.form.cleaned_data['employee3']
+            for entry in qs:
+                entry._change_reason = 'Confirmed work completed'
+                entry.date_completed = date.today()
+                entry.employee1 = self.form.cleaned_data['employee1']
+                entry.employee2 = self.form.cleaned_data['employee2']
+                entry.employee3 = self.form.cleaned_data['employee3']
+            bulk_update_with_history(
+                qs,
+                Schedule,
+                ['date_completed', 'employee1', 'employee2', 'employee3'],
+                batch_size=500
             )
             return redirect(self.return_url)
         return self.get(request, **kwargs)
@@ -236,7 +249,10 @@ class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
         self.form = self.get_form(self.form_class)
         if self.form.is_valid():
             qs = Schedule.objects.filter(pk__in=self.schedule_list)
-            qs.update(date_sheduled=self.form.cleaned_data['input_date'])
+            for entry in qs:
+                entry._change_reason = 'Changed schedule date'
+                entry.date_sheduled = self.form.cleaned_data['input_date']
+            bulk_update_with_history(qs, Schedule, ['date_sheduled'], batch_size=500)            
             return redirect(self.return_url)
         return self.get(request, **kwargs)
 
