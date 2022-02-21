@@ -81,7 +81,7 @@ class DayScheduleView(ScheduleListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = 'План на день'
+        context['plan_period'] = 'План на сегодня'
         context['plan_url'] = reverse_lazy('reports:day_schedule')
         return context
 
@@ -127,7 +127,7 @@ class WeekScheduleView(ScheduleListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = 'План на неделю'
+        context['plan_period'] = 'План на эту неделю'
         context['plan_url'] = reverse_lazy('reports:week_schedule')
         return context
 
