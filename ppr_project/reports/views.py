@@ -189,6 +189,32 @@ class IndexView(LoginRequiredMixin, ListView):
         return super().get_queryset()
 
 
+class OverDueScheduleView(ScheduleListView):
+
+    def get_queryset(self):
+        category_id = self.kwargs.get('category_id', None)
+        if category_id:
+            maintenance_category = get_object_or_404(
+                MaintenanceCategory,
+                pk=category_id
+            )
+            return Schedule.objects.filter(
+                date_sheduled__lte=date.today(),
+                date_completed=None,
+                equipment_type__maintenance_category=maintenance_category
+            ).select_related('equipment_type__facility',
+                             'report',
+                             'maintenance_type')
+
+        return Schedule.objects.filter(date_sheduled__lte=date.today(), date_completed=None).select_related('equipment_type__facility', 'report', 'maintenance_type')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['plan_period'] = 'Просроченные работы'
+        context['plan_url'] = reverse_lazy('reports:overdue')
+        return context
+
+
 class ScheduleDetailInfoView(LoginRequiredMixin, UpdateView):
     template_name = 'reports/schedule_detail.html'
     model = Schedule
