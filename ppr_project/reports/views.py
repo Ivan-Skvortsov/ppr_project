@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -192,6 +192,7 @@ class IndexView(LoginRequiredMixin, ListView):
 class OverDueScheduleView(ScheduleListView):
 
     def get_queryset(self):
+        lte_date = date.today() - timedelta(days=1)
         category_id = self.kwargs.get('category_id', None)
         if category_id:
             maintenance_category = get_object_or_404(
@@ -199,14 +200,14 @@ class OverDueScheduleView(ScheduleListView):
                 pk=category_id
             )
             return Schedule.objects.filter(
-                date_sheduled__lte=date.today(),
+                date_sheduled__lte=lte_date,
                 date_completed=None,
                 equipment_type__maintenance_category=maintenance_category
             ).select_related('equipment_type__facility',
                              'report',
                              'maintenance_type')
 
-        return Schedule.objects.filter(date_sheduled__lte=date.today(), date_completed=None).select_related('equipment_type__facility', 'report', 'maintenance_type')
+        return Schedule.objects.filter(date_sheduled__lte=lte_date, date_completed=None).select_related('equipment_type__facility', 'report', 'maintenance_type')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

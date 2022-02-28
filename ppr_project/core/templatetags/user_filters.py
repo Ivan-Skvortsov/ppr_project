@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from django import template
 
 from reports.models import Schedule
@@ -13,6 +13,6 @@ def addclass(field, css):
 
 @register.simple_tag
 def count_overdue_schedules():
-    today_date = date.today()
-    return Schedule.objects.filter(date_sheduled__lte=today_date,
+    lte_date = date.today() - timedelta(days=1)
+    return Schedule.objects.filter(date_sheduled__lte=lte_date,
                                    date_completed=None).count()
