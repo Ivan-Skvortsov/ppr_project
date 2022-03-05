@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include 'includes/styles_and_fonts.html' %}
+    <title>Ошибка!</title>
+  </head>
+  <body>
+    <main class="my-auto p-5">
+      <div class="text-center py-5">
+        <h1 class="display-1">{% block error %}Ошибка!{% endblock error %}</h1>
+        <h2>{% block error_text %}Произошла ошибка!</h2>{% endblock error_text %}
+      </div>
+    </main>
+  {% include 'includes/scripts.html' %}
+  </body>
+</html>
