@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 from docxtpl import DocxTemplate
 from pathlib import Path
@@ -60,3 +61,43 @@ class DocxReportGenerator:
         docx_template.render(context=context)
         docx_template.save(output_file)
         return output_file
+
+
+class TxtWeekScheduleGenerator:
+    """Generate txt report with next week schedule."""  # TODO
+
+    def __init__(self, week_number):
+        self.week_schedule = Schedule.objects.filter(
+            date_sheduled__week=week_number
+        ).order_by('date_sheduled')
+
+    def generate_report(self):
+        out = defaultdict(list)
+        for shedule in self.week_schedule:
+            weekday = shedule.date_sheduled.strftime('%w')
+            out[weekday].append({
+                'facility': shedule.equipment_type.facility,
+                'equipment': shedule.equipment_type,
+                'to_type': shedule.maintenance_type
+            })
+        return out
+
+
+
+
+"""
+Понедельник:
+--
+Общее по всем объектам КЦ-1
+	Датчики T, осмотр кабельной продукции - ТО-4
+	Датчики P, осмотр кабельной продукции - ТО-2
+ГПА-12
+ 	АСКЗ - проверка
+	АСПС, ПТ - проверка
+Котельная НК-Терм
+	Датчики L - ТО-3
+
+Вторник
+--
+	
+"""
