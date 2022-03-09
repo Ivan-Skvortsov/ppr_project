@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 from docxtpl import DocxTemplate
 from pathlib import Path
@@ -26,7 +27,7 @@ class DocxReportGenerator:
             'year': self.schedule.date_completed.year,
             'sched_year': constants.SHEDULE_YEAR,
             'shed_date_utv': constants.SHEDULE_DATE_APPROVED,
-            'remarks': None,  # FIXME: add remarks to schedule model
+            'remarks': None,  # TODO: add remarks to schedule model
             'employee1': self.schedule.employee1.position,
             'employee2': self.schedule.employee2.position,
             'employee3': self.schedule.employee3.position
@@ -52,7 +53,7 @@ class DocxReportGenerator:
         return settings.MEDIA_ROOT / 'tmp' / self.get_docx_report_filename()
 
     def render_docx_report(self):
-        """Remders docx report."""
+        """Renders docx report."""
         template = self._get_docx_report_template()
         output_file = self._get_docx_report_output_file()
         context = self._get_context_for_docx_report()
@@ -60,3 +61,50 @@ class DocxReportGenerator:
         docx_template.render(context=context)
         docx_template.save(output_file)
         return output_file
+
+
+class TxtWeekScheduleGenerator:
+    """Generate txt report with week schedule."""
+
+    WEEK_DAY_NAMES = {
+        '1': 'Понедельник',
+        '2': 'Вторник',
+        '3': 'Среда',
+        '4': 'Четверг',
+        '5': 'Пятница',
+        '6': 'Суббота',
+        '7': 'Воскресенье',
+    }
+
+    def __init__(self, week_number):
+        self.week_schedule = Schedule.objects.filter(
+            date_sheduled__week=week_number
+        ).order_by('date_sheduled')
+
+    def _convert_queryset_to_dictionary(self):
+        """Converts queryset to defaultdict of defaultdicts"""
+        result = defaultdict(lambda: defaultdict(list))
+        for shedule in self.week_schedule:
+            weekday = shedule.date_sheduled.strftime('%w')
+            facility = shedule.equipment_type.facility.facility_name
+            equipment = shedule.equipment_type.eqipment_type_name
+            to_type = shedule.maintenance_type.m_type
+            result[weekday][facility].append({
+                'equipment': equipment,
+                'to_type': to_type
+            })
+        return result
+
+    def generate_report(self):
+        """Generates week report in txt format."""
+        schedule_dict = self._convert_queryset_to_dictionary()
+        tmp_text_file = settings.MEDIA_ROOT / 'tmp' / 'txt_report.txt'
+        with open(tmp_text_file, 'w') as f:
+            for day in schedule_dict:
+                f.write(f'{self.WEEK_DAY_NAMES[day]}:\n')
+                for facility in schedule_dict[day]:
+                    f.write(f'\t{facility}\n')
+                    for schedule in schedule_dict[day][facility]:
+                        f.write(f'\t\t{schedule["equipment"]} - '
+                                f'{schedule["to_type"]}\n')
+                f.write('--\n')
