@@ -35,60 +35,61 @@
         {# table body #}
         {% regroup schedule_plan by date_sheduled as plan_by_date %}
         {% for schedule_date in plan_by_date %}
-        <div class="row pt-5">
-          <div class="col-12"><h5>{{ schedule_date.grouper }}</h5></div>
-        </div>
-        {% regroup schedule_date.list by equipment_type.facility as facility_list %} {# FIXME: https://code.djangoproject.com/ticket/1575 #}
-        {% for facility in facility_list %}
-            {# facility name #}
-            <div class="row text-center border-bottom">
-              <div class="col-12"><h5 class="p-1">{{ facility.grouper }}</h5></div>
-            </div>
-            {% for entry in facility.list %}
-            {# table rows #}
-              <div class="row border-bottom my-auto py-1
-                        {% now "Y-m-d" as today_date %}
-                        {% if today_date > entry.date_sheduled|date:"Y-m-d" and not entry.date_completed %} bg-danger bg-opacity-25{% endif %}
-                        {% if entry.date_completed and entry.access_journal_filled and entry.result_journal_filled %} bg-success bg-opacity-25{% endif %}">
-                <div class="col-12 col-lg-2">
-                  <div class="row">
-                    <div class="col-2 col-lg-4">
-                      <div class="form-check form-switch">
-                        <input type="checkbox" name="selected_schedule" value="{{ entry.pk }}" class="form-check-input" title="Выбрать работу">
+        {# date scheduled #}
+          <div class="row pt-5">
+            <div class="col-12"><h5>{{ schedule_date.grouper }}</h5></div>
+          </div>
+          {% regroup schedule_date.list by equipment_type.facility as facility_list %}
+          {% for facility in facility_list %}
+              {# facility name #}
+              <div class="row text-center border-bottom">
+                <div class="col-12"><h5 class="p-1">{{ facility.grouper }}</h5></div>
+              </div>
+              {% for entry in facility.list %}
+              {# table rows #}
+                <div class="row border-bottom my-auto py-1
+                          {% now "Y-m-d" as today_date %}
+                          {% if today_date > entry.date_sheduled|date:"Y-m-d" and not entry.date_completed %} bg-danger bg-opacity-25{% endif %}
+                          {% if entry.date_completed and entry.access_journal_filled and entry.result_journal_filled %} bg-success bg-opacity-25{% endif %}">
+                  <div class="col-12 col-lg-2">
+                    <div class="row">
+                      <div class="col-2 col-lg-4">
+                        <div class="form-check form-switch">
+                          <input type="checkbox" name="selected_schedule" value="{{ entry.pk }}" class="form-check-input" title="Выбрать работу">
+                        </div>
+                      </div>
+                      <div class="col-10 col-lg-8">{{ entry.maintenance_type }}</div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-lg-6">
+                    <a class="text-decoration-none text-reset my_custom_text" href="{% url 'reports:schedule_detail' pk=entry.pk return_url=request.resolver_match.url_name %}" title="Редактировать работу">
+                      {{ entry.equipment_type }}
+                    </a>
+                  </div>
+                  <div class="col-6 d-lg-none"><small>Дата по плану:</small></div>
+                  <div class="col-6 col-lg-1">{{ entry.date_sheduled|date:"d.m.y" }}</div>
+                  <div class="col-12 col-lg-3">
+                    <div class="row">
+                      <div class="col-6 d-lg-none"><small>Журнал допуска:</small></div>
+                      <div class="col-6 col-lg-3">
+                        <input type="checkbox" class="form-check-input" disabled {% if entry.access_journal_filled %} checked {% endif %}>
+                      </div>
+                      <div class="col-6 d-lg-none"><small>Журнал ТО:</small></div>
+                      <div class="col-6 col-lg-3">
+                        <input type="checkbox" class="form-check-input" disabled {% if entry.result_journal_filled %} checked {% endif %}>
+                      </div>
+                      <div class="col-6 d-lg-none"><small>Работа проведена:</small></div>
+                      <div class="col-6 col-lg-3">
+                        <input type="checkbox" class="form-check-input" disabled {% if entry.date_completed %} checked {% endif %}>
+                      </div>
+                      <div class="d-none d-lg-block col-lg-3 text-muted">
+                        {% if entry.report and entry.date_completed %}<a href="{% url 'reports:docx_report' entry.pk %}" class="text-decoration-none text-muted" title="Скачать акт/протокол" download><i class="fas fa-file-alt"></i></a>{% endif %}
                       </div>
                     </div>
-                    <div class="col-10 col-lg-8">{{ entry.maintenance_type }}</div>
                   </div>
                 </div>
-                <div class="col-12 col-lg-6">
-                  <a class="text-decoration-none text-reset my_custom_text" href="{% url 'reports:schedule_detail' pk=entry.pk return_url=request.resolver_match.url_name %}" title="Редактировать работу">
-                    {{ entry.equipment_type }}
-                  </a>
-                </div>
-                <div class="col-6 d-lg-none"><small>Дата по плану:</small></div>
-                <div class="col-6 col-lg-1">{{ entry.date_sheduled|date:"d.m.y" }}</div>
-                <div class="col-12 col-lg-3">
-                  <div class="row">
-                    <div class="col-6 d-lg-none"><small>Журнал допуска:</small></div>
-                    <div class="col-6 col-lg-3">
-                      <input type="checkbox" class="form-check-input" disabled {% if entry.access_journal_filled %} checked {% endif %}>
-                    </div>
-                    <div class="col-6 d-lg-none"><small>Журнал ТО:</small></div>
-                    <div class="col-6 col-lg-3">
-                      <input type="checkbox" class="form-check-input" disabled {% if entry.result_journal_filled %} checked {% endif %}>
-                    </div>
-                    <div class="col-6 d-lg-none"><small>Работа проведена:</small></div>
-                    <div class="col-6 col-lg-3">
-                      <input type="checkbox" class="form-check-input" disabled {% if entry.date_completed %} checked {% endif %}>
-                    </div>
-                    <div class="d-none d-lg-block col-lg-3 text-muted">
-                      {% if entry.report and entry.date_completed %}<a href="{% url 'reports:docx_report' entry.pk %}" class="text-decoration-none text-muted" title="Скачать акт/протокол" download><i class="fas fa-file-alt"></i></a>{% endif %}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {% endfor %}
             {% endfor %}
-          {% endfor %}
           {% endfor %}
         </div>
         {# menu block #}
