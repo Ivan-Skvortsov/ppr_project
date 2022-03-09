@@ -10,32 +10,36 @@
     {% endif %}
     <form method="post" action="">
       {% csrf_token %}
-      {% regroup schedule_plan by equipment_type.facility  as facility_list %} {# FIXME: https://code.djangoproject.com/ticket/1575 #}
       {# table header #}
-        <div class="container">
-          <div class="d-none d-lg-block">
-            <div class="row border-bottom my-3 align-items-center">
-              <div class="col-12 col-lg-2 text-muted">
-                <div class="row">
-                  <div class="col-4">#</div>
-                  <div class="col-8">Тип ТО</div>
-                </div>
+      <div class="container">
+        <div class="d-none d-lg-block">
+          <div class="row border-bottom my-3 align-items-center">
+            <div class="col-12 col-lg-2 text-muted">
+              <div class="row">
+                <div class="col-4">#</div>
+                <div class="col-8">Тип ТО</div>
               </div>
-              <div class="col-12 col-lg-6 text-muted">Наименование оборудования</div>
-              <div class="col-6 col-lg-1 text-muted">Дата по плану</div>
-              <div class="col-12 col-lg-3">
-                <div class="row align-items-center">
-                  <div class="col-6 col-lg-3 text-muted"><small>Допуск</small></div>
-                  <div class="col-12 col-lg-3 text-muted"><small>Журнал ТО</small></div>
-                  <div class="col-12 col-lg-3 text-muted"><small>Работа проведена</small></div>
-                  <div class="col-12 col-lg-3 text-muted"><i class="fas fa-file-alt"></i></div>
-                </div>
+            </div>
+            <div class="col-12 col-lg-6 text-muted">Наименование оборудования</div>
+            <div class="col-6 col-lg-1 text-muted">Дата по плану</div>
+            <div class="col-12 col-lg-3">
+              <div class="row align-items-center">
+                <div class="col-6 col-lg-3 text-muted"><small>Допуск</small></div>
+                <div class="col-12 col-lg-3 text-muted"><small>Журнал ТО</small></div>
+                <div class="col-12 col-lg-3 text-muted"><small>Работа проведена</small></div>
+                <div class="col-12 col-lg-3 text-muted"><i class="fas fa-file-alt"></i></div>
               </div>
             </div>
           </div>
-
-          {# table body #}
-          {% for facility in facility_list %}
+        </div>
+        {# table body #}
+        {% regroup schedule_plan by date_sheduled as plan_by_date %}
+        {% for schedule_date in plan_by_date %}
+        <div class="row pt-5">
+          <div class="col-12"><h5>{{ schedule_date.grouper }}</h5></div>
+        </div>
+        {% regroup schedule_date.list by equipment_type.facility as facility_list %} {# FIXME: https://code.djangoproject.com/ticket/1575 #}
+        {% for facility in facility_list %}
             {# facility name #}
             <div class="row text-center border-bottom">
               <div class="col-12"><h5 class="p-1">{{ facility.grouper }}</h5></div>
@@ -84,6 +88,7 @@
                 </div>
               </div>
             {% endfor %}
+          {% endfor %}
           {% endfor %}
         </div>
         {# menu block #}

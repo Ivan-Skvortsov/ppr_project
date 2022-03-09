@@ -75,9 +75,9 @@ class DayScheduleView(ScheduleListView):
                 equipment_type__maintenance_category=maintenance_category
             ).select_related('equipment_type__facility',
                              'report',
-                             'maintenance_type')
+                             'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
 
-        return Schedule.objects.filter(date_sheduled=date.today()).select_related('equipment_type__facility', 'report', 'maintenance_type')
+        return Schedule.objects.filter(date_sheduled=date.today()).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,8 +99,8 @@ class MonthScheduleView(ScheduleListView):
             return Schedule.objects.filter(
                 date_sheduled__month=month,
                 equipment_type__maintenance_category=maintenance_category
-            ).select_related('equipment_type__facility', 'report', 'maintenance_type')
-        return Schedule.objects.filter(date_sheduled__month=month).select_related('equipment_type__facility', 'report', 'maintenance_type')
+            ).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
+        return Schedule.objects.filter(date_sheduled__month=month).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -122,8 +122,8 @@ class WeekScheduleView(ScheduleListView):
             return Schedule.objects.filter(
                 date_sheduled__week=week,
                 equipment_type__maintenance_category=maintenance_category
-            ).select_related('equipment_type__facility', 'report', 'maintenance_type')
-        return Schedule.objects.filter(date_sheduled__week=week).select_related('equipment_type__facility', 'report', 'maintenance_type')
+            ).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
+        return Schedule.objects.filter(date_sheduled__week=week).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -145,8 +145,8 @@ class YearScheduleView(ScheduleListView):
             return Schedule.objects.filter(
                 date_sheduled__month=month,
                 equipment_type__maintenance_category=maintenance_category
-            ).select_related('equipment_type__facility', 'report', 'maintenance_type')
-        return Schedule.objects.filter(date_sheduled__month=month).select_related('equipment_type__facility', 'report', 'maintenance_type')
+            ).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
+        return Schedule.objects.filter(date_sheduled__month=month).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -205,9 +205,9 @@ class OverDueScheduleView(ScheduleListView):
                 equipment_type__maintenance_category=maintenance_category
             ).select_related('equipment_type__facility',
                              'report',
-                             'maintenance_type')
+                             'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
 
-        return Schedule.objects.filter(date_sheduled__lte=lte_date, date_completed=None).select_related('equipment_type__facility', 'report', 'maintenance_type')
+        return Schedule.objects.filter(date_sheduled__lte=lte_date, date_completed=None).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
