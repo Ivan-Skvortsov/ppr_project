@@ -93,18 +93,6 @@ class ReportTemplate(models.Model):
         max_length=250,
         verbose_name='Имя шаблона'
     )
-    equipment_type = models.ForeignKey(
-        EquipmentType,
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Тип оборудования'
-    )
-    maintenance_type = models.ForeignKey(
-        MaintenanceType,
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Тип ТО'
-    )
     template = models.FileField(upload_to='templates/')
 
     class Meta:
