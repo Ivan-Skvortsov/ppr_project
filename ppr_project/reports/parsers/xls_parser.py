@@ -2,12 +2,12 @@ from datetime import date
 
 from openpyxl import load_workbook
 from reports.models import (EquipmentType, Facility, MaintenanceCategory,
-                            MaintenanceType, Schedule)
+                            MaintenanceType, Schedule, ReportTemplate)
 from tqdm import tqdm
 
 
 def import_objects_from_xls(filename, category_name):
-    """Imports objects from xlsx template."""
+    """Imports objects from xlsx file."""
     category = MaintenanceCategory.objects.get_or_create(
         category_name=category_name)[0]
     wb = load_workbook(filename=filename, read_only=True, data_only=True)
@@ -31,7 +31,7 @@ def import_objects_from_xls(filename, category_name):
 
 
 def import_schedule_from_xls(filename, category_name):
-    """Import schedules from xlsx templates."""
+    """Import schedules from xlsx file."""
     wb = load_workbook(filename=filename, read_only=True, data_only=True)
     worksheet = wb.active
     for row in tqdm(worksheet.iter_rows(min_row=2), total=100):
@@ -61,10 +61,60 @@ def import_schedule_from_xls(filename, category_name):
                 )
 
 
-def execute_import_from_xls(filename):
+def execute_import_schedules_and_objects(filename):
     category_name = input('Введите категорию: ')
     print('Creating objects: \n')
     import_objects_from_xls(filename, category_name)
     print('Creating schedules: \n')
     import_schedule_from_xls(filename, category_name)
     print('Finished!')
+
+
+def import_templates_from_xls(filename):
+    """Import templates from xlsx file."""
+    wb = load_workbook(filename=filename, read_only=True, data_only=True)
+    worksheet = wb.active
+    for row in worksheet.iter_rows(min_row=2):
+        for cell in (row[14], row[15], row[16], row[17]):
+            if cell.value:
+                report_name = cell.value
+                template_path = 'templates/' + cell.value + '.docx'
+                ReportTemplate.objects.get_or_create(
+                    template_name=report_name,
+                    template=template_path
+                )
+
+
+def update_template_in_schedules(filename):
+    """Updates field `report` in schedule model instances."""
+    maintenance_types = {
+        14: 'ТО',
+        15: 'ТО-3',
+        16: 'ТО-4',
+        17: 'Проверка'
+    }
+    wb = load_workbook(filename=filename, read_only=True, data_only=True)
+    worksheet = wb.active
+    for row in worksheet.iter_rows(min_row=2):
+        for column_number in maintenance_types:
+            if row[column_number].value:
+                print(row[column_number].value)
+                template = ReportTemplate.objects.get(
+                    template_name=row[column_number].value
+                )
+                equipment_type = EquipmentType.objects.get(
+                    facility__facility_name=row[0].value,
+                    eqipment_type_name=row[1].value
+                    )
+                qs = Schedule.objects.filter(
+                    equipment_type=equipment_type,
+                    maintenance_type__m_type=maintenance_types[column_number]
+                )
+                qs.update(report=template)
+
+
+def execute_import_templates(filename):
+    print('Importing templates...')
+    import_templates_from_xls(filename)
+    print('Updating schedules...')
+    update_template_in_schedules(filename)

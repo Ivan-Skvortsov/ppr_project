@@ -136,16 +136,17 @@ MEDIA_ROOT = BASE_DIR / 'media'
 if IS_DEV:
     from .dev_settings import *
 
-sentry_sdk.init(
-    dsn="https://a8df95fe0ead4f2ebfe1cb67fc5f3e48@o1144195.ingest.sentry.io/6207015",
-    integrations=[DjangoIntegration()],
+if not IS_DEV:
+    sentry_sdk.init(
+        dsn="https://a8df95fe0ead4f2ebfe1cb67fc5f3e48@o1144195.ingest.sentry.io/6207015",
+        integrations=[DjangoIntegration()],
 
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production.
-    traces_sample_rate=1.0,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
 
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
-)
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True
+    )
