@@ -28,16 +28,17 @@ class EquipmentTypeAdmin(admin.ModelAdmin):
 @admin.register(Schedule)
 class ScheduleAdmin(SimpleHistoryAdmin):
     list_display = (
+        'get_facility',
         'equipment_type',
         'maintenance_type',
         'date_sheduled',
         'date_completed',
-        'employee1',
-        'employee2',
-        'employee3',
-        'report'
     )
-    list_filter = ('maintenance_type',)
+    list_filter = ('maintenance_type', 'date_sheduled', 'date_completed')
+    search_fields = (
+        'equipment_type__eqipment_type_name',
+        'equipment_type__facility__facility_name'
+    )
     history_list_display = (
         'date_sheduled',
         'date_completed',
@@ -47,15 +48,19 @@ class ScheduleAdmin(SimpleHistoryAdmin):
         'photo'
     )
 
+    @admin.display
+    def get_facility(self, obj):
+        return obj.equipment_type.facility.facility_name
+
 
 @admin.register(ReportTemplate)
 class ReportTemplateAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(MaintenanceType)
 class MaintenanceTypeAdmin(admin.ModelAdmin):
     list_display = ('pk', 'm_type')
-
 
 
 admin.site.register(MaintenanceCategory)
