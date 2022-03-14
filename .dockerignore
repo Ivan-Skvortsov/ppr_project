@@ -1,5 +1,3 @@
 ppr_project/db.sqlite3
 ppr_project/media/**/*
 ppr_project/media/
-ppr_project/static/**/*
-ppr_project/static/

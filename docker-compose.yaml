@@ -23,3 +23,15 @@ services:
       - postgres_volume:/var/lib/postgresql/data
     env_file:
       - ppr_project/ppr_project/.env
+
+  nginx:
+    image: nginx:1.21.6-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/:/etc/nginx/conf.d/
+      - static_volume:/var/html/static/
+      - media_volume:/var/html/media/
+    depends_on:
+      - web
