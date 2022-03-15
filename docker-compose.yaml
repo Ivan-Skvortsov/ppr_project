@@ -3,11 +3,11 @@ version: '3.8'
 volumes:
   static_volume:
   media_volume:
-  postgres_volume:
 
 services:
   web:
-    build: .
+    image: profcheg/ppr_project:latest
+    command: sh -c "gunicorn ppr_project.wsgi:application --bind 0:8000"
     restart: always
     volumes:
       - static_volume:/app/static/
@@ -15,14 +15,12 @@ services:
     depends_on:
       - db
     env_file:
-      - ppr_project/ppr_project/.env
+      - ./.env
     
   db:
     image: postgres:13.0-alpine
-    volumes:
-      - postgres_volume:/var/lib/postgresql/data
     env_file:
-      - ppr_project/ppr_project/.env
+      - ./.env
 
   nginx:
     image: nginx:1.21.6-alpine
