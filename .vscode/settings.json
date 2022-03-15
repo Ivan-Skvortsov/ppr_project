@@ -2,4 +2,10 @@
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
     "emmet.includeLanguages": {"django-html": "html"},
+    "workbench.colorCustomizations": {
+        "titleBar.activeForeground": "#000",
+        "titleBar.inactiveForeground": "#000000CC",
+        "titleBar.activeBackground": "#639b77",
+        "titleBar.inactiveBackground": "#4ba86c"
+    }
 }

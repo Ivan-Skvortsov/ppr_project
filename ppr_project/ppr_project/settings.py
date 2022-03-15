@@ -16,7 +16,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['ks45.online', 'www.ks45.online', 'localhost']
+# ALLOWED_HOSTS = ['ks45.online', 'www.ks45.online', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'web']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -71,9 +72,9 @@ if not IS_DEV:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'NAME': os.getenv('POSTGRES_DB'),
+            'USER': os.getenv('POSTGRES_USER'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
             'HOST': os.getenv('DB_HOST'),
             'PORT': os.getenv('DB_PORT'),
         }
