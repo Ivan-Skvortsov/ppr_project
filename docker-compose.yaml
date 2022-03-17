@@ -29,7 +29,21 @@ services:
       - "443:443"
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
       - static_volume:/var/html/static/
       - media_volume:/var/html/media/
     depends_on:
       - web
+    
+  certbot:
+#    profiles: ["certbot"]
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email pprofcheg@gmail.com -d ks45.online -d www.ks45.online --agree-tos --staging
+    depends_on:
+      - nginx
+
