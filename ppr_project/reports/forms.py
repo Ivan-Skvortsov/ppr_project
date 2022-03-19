@@ -3,7 +3,7 @@ from django.forms.widgets import CheckboxInput, DateInput, Select, ClearableFile
 from django.core.validators import MinValueValidator
 from datetime import date
 
-from reports.models import Employee, Schedule
+from reports.models import Employee, Schedule, MaintenanceCategory, MaintenanceType
 
 
 class CustomFileInput(ClearableFileInput):
@@ -104,4 +104,47 @@ class DateInputForm(forms.Form):
         label='Дата',
         help_text='Выберите дату',
         validators=[MinValueValidator(date.today)]
+    )
+
+
+class ScheduleSearchForm(forms.Form):
+    equipment_type__maintenance_category__pk = forms.ModelChoiceField(
+        queryset=MaintenanceCategory.objects.all().order_by('pk'),
+        required=False,
+        label='Категория'
+    )
+    equipment_type__facility__facility_name__icontains = forms.CharField(
+        max_length=300,
+        required=False,
+        label='Объект'
+    )
+    equipment_type__eqipment_type_name__icontains = forms.CharField(
+        max_length=300,
+        required=False,
+        label='Наименование оборудования'
+    )
+    maintenance_type__pk = forms.ModelChoiceField(
+        queryset=MaintenanceType.objects.all().order_by('m_type'),
+        required=False,
+        label='Вид ТО'
+    )
+    date_sheduled__gte = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label='С даты'
+    )
+    date_sheduled__lte = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label='По дату'
+    )
+    date_completed__gte = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label='С даты'
+    )
+    date_completed__lte = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label='По дату'
     )

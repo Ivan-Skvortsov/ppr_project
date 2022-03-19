@@ -19,7 +19,7 @@ INSTALLED_APPS = [
     'bugtracker.apps.BugtrackerConfig',
     'debug_toolbar',
     'django.forms',  # to render django widgets
-    'simple_history'
+    'simple_history',
 ]
 DATABASES = {
     'default': {
@@ -30,7 +30,7 @@ DATABASES = {
 
 STATIC_URL = '/static/'
 STATIC_ROOT = None
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'staticfiles']
 
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda r: True,
