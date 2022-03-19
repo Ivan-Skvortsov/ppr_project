@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from operator import ge
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,7 +13,7 @@ from django.views.generic.edit import FormView, UpdateView
 
 from simple_history.utils import bulk_update_with_history
 
-from reports.forms import DateInputForm, EmployeeForm, ScheduleForm
+from reports.forms import DateInputForm, EmployeeForm, ScheduleForm, ScheduleSearchForm
 from reports.models import EquipmentType, MaintenanceCategory, Schedule
 from reports.services import DocxReportGenerator
 
@@ -309,3 +310,28 @@ class DocxReportDownloadView(View):
         except Exception as e:
             print(f'Error rendering docx: {e}')  # FIXME: logging!
             raise Http404
+
+
+class SearchView(ScheduleListView):
+    template_name = 'reports/schedule_search.html'
+
+    def get_queryset(self):
+        filter_params = {k: v for k, v in self.request.GET.items() if v}
+        if filter_params:
+            try:
+                return (Schedule.objects
+                                .filter(**filter_params)
+                                .select_related('equipment_type__facility',
+                                                'report',
+                                                'maintenance_type')
+                                .order_by('date_sheduled',
+                                          'equipment_type__facility'))
+            except Exception as e:
+                print(f'Wrong filter params! Error: {e}')  # FIXME: logging!
+                raise Http404
+        return None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_form'] = ScheduleSearchForm(self.request.GET)
+        return context

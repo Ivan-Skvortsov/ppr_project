@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load user_filters %}
+{% block title %}Поиск работ{% endblock title %}
+{% block content %}
+  <div class="accordion mt-3" id="accordionExample">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingOne">
+        <button class="accordion-button border" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+          Скрыть/показать фильтры
+        </button>
+      </h2>
+      <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <form name="search_form" action="{% url 'reports:search' %}" method="GET">
+            <div class="row my-3">
+              <div class="col">
+                <div class="form-floating">
+                  {{ search_form.equipment_type__maintenance_category__pk|addclass:'form-control form-select' }}
+                  <label>{{ search_form.equipment_type__maintenance_category__pk.label }}</label>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-floating">
+                  {{ search_form.maintenance_type__pk|addclass:'form-control form-select' }}
+                  <label>{{ search_form.maintenance_type__pk.label }}</label>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-floating">
+                  {{ search_form.equipment_type__facility__facility_name__icontains|addclass:'form-control' }}
+                  <label>{{ search_form.equipment_type__facility__facility_name__icontains.label }}</label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="form-floating">
+                  {{ search_form.equipment_type__eqipment_type_name__icontains|addclass:'form-control' }}
+                  <label>{{ search_form.equipment_type__eqipment_type_name__icontains.label }}</label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col mx-2 my-1">
+                <div class="row my-1">
+                  <div class="col">Дата по плану:</div>
+                </div>
+                <div class="row my-1">
+                  <div class="col">
+                    <div class="form-floating">
+                      {{ search_form.date_sheduled__gte|addclass:'form-control' }}
+                      <label>{{ search_form.date_sheduled__gte.label }}</label>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-floating">
+                      {{ search_form.date_sheduled__lte|addclass:'form-control' }}
+                      <label>{{ search_form.date_sheduled__lte.label }}</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col mx-2 my-1">
+                <div class="row my-1">
+                  <div class="col">Дата выполнения:</div>
+                </div>
+                <div class="row my-1">
+                  <div class="col">
+                    <div class="form-floating">
+                      {{ search_form.date_completed__gte|addclass:'form-control' }}
+                      <label>{{ search_form.date_completed__gte.label }}</label>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-floating">
+                      {{ search_form.date_completed__lte|addclass:'form-control' }}
+                      <label>{{ search_form.date_completed__lte.label }}</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col text-center">
+                <button type="submit" class="btn btn-primary">Искать</button>
+                <a class="btn btn-secondary" href="{% url 'reports:search' %}" role="button">Сброс</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card my-3">
+    <div class="card-header">
+      Результаты поиска
+    </div>
+    <div class="card-body">
+      {% include 'reports/includes/schedule_table.html' %}
+    </div>
+  </div>
+{% endblock content %}

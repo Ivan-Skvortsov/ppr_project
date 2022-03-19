@@ -37,7 +37,7 @@ services:
       - web
     
   certbot:
-#    profiles: ["certbot"]
+    profiles: ["certbot"]
     image: certbot/certbot
     container_name: certbot
     volumes:

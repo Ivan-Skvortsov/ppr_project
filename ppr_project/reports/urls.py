@@ -4,7 +4,8 @@ from reports.views import (ConfirmScheduleCompletedView,
                            ConfirmScheduleDateChangedView, DayScheduleView,
                            DocxReportDownloadView, IndexView,
                            MonthScheduleView, ScheduleDetailInfoView,
-                           WeekScheduleView, YearScheduleView, OverDueScheduleView)
+                           WeekScheduleView, YearScheduleView, OverDueScheduleView,
+                           SearchView)
 
 app_name = 'reports'
 
@@ -20,6 +21,7 @@ urlpatterns = [
     path('day/', DayScheduleView.as_view(), name='day_schedule'),
     path('overdue/<int:category_id>/', OverDueScheduleView.as_view(), name='overdue'),  # noqa: E501
     path('overdue/', OverDueScheduleView.as_view(), name='overdue'),
+    path('search/', SearchView.as_view(), name='search'),
 
 
     path(
