@@ -1,5 +1,4 @@
 from datetime import date, timedelta
-from operator import ge
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,7 +12,7 @@ from django.views.generic.edit import FormView, UpdateView
 
 from simple_history.utils import bulk_update_with_history
 
-from reports.forms import DateInputForm, EmployeeForm, ScheduleForm, ScheduleSearchForm
+from reports.forms import DateInputForm, EmployeeForm, ScheduleForm, ScheduleSearchForm, UncompleteReasonForm
 from reports.models import EquipmentType, MaintenanceCategory, Schedule
 from reports.services import DocxReportGenerator
 
@@ -38,6 +37,11 @@ class ScheduleListView(LoginRequiredMixin, ListView):
             return self._redirect_to_confirmation_page(
                 selected_schedules,
                 'reports:confirm_schedule_completed'
+                )
+        if selected_action == 'schedule_cant_be_completed':
+            return self._redirect_to_confirmation_page(
+                selected_schedules,
+                'reports:confirm_schedule_cant_complete'
                 )
         qs = Schedule.objects.filter(pk__in=selected_schedules)
         if selected_action == 'access_journal_filled':
@@ -155,26 +159,6 @@ class YearScheduleView(ScheduleListView):
         context['plan_url'] = reverse_lazy('reports:year_schedule')
         return context
 
-    # def get_queryset(self):
-    #     category_id = self.kwargs.get('category_id', None)
-    #     year = date.today().year
-    #     if category_id:
-    #         maintenance_category = get_object_or_404(
-    #             MaintenanceCategory,
-    #             pk=category_id
-    #         )
-    #         return Schedule.objects.filter(
-    #             date_sheduled__year=year,
-    #             equipment_type__maintenance_category=maintenance_category
-    #         ).select_related('equipment_type__facility', 'report', 'maintenance_type')
-    #     return Schedule.objects.filter(date_sheduled__year=year).select_related('equipment_type__facility', 'report', 'maintenance_type')
-
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['plan_period'] = 'План на год'
-    #     context['plan_url'] = reverse_lazy('reports:year_schedule')
-    #     return context
-
 
 class IndexView(LoginRequiredMixin, ListView):
 
@@ -200,15 +184,21 @@ class OverDueScheduleView(ScheduleListView):
                 MaintenanceCategory,
                 pk=category_id
             )
-            return Schedule.objects.filter(
-                date_sheduled__lte=lte_date,
-                date_completed=None,
-                equipment_type__maintenance_category=maintenance_category
-            ).select_related('equipment_type__facility',
-                             'report',
-                             'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
+            return (Schedule.objects
+                            .filter(date_sheduled__lte=lte_date,
+                                    date_completed=None,
+                                    uncompleted=None,
+                                    equipment_type__maintenance_category=maintenance_category)
+                            .select_related('equipment_type__facility',
+                                            'report',
+                                            'maintenance_type')
+                            .order_by('date_sheduled',
+                                      'equipment_type__facility'))
 
-        return Schedule.objects.filter(date_sheduled__lte=lte_date, date_completed=None).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
+        return (Schedule.objects
+                        .filter(date_sheduled__lte=lte_date, uncompleted=None, date_completed=None)
+                        .select_related('equipment_type__facility', 'report', 'maintenance_type')
+                        .order_by('date_sheduled', 'equipment_type__facility'))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -280,7 +270,7 @@ class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
             for entry in qs:
                 entry._change_reason = 'Changed schedule date'
                 entry.date_sheduled = self.form.cleaned_data['input_date']
-            bulk_update_with_history(qs, Schedule, ['date_sheduled'], batch_size=500)            
+            bulk_update_with_history(qs, Schedule, ['date_sheduled'], batch_size=500)
             return redirect(self.return_url)
         return self.get(request, **kwargs)
 
@@ -290,6 +280,32 @@ class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
         context['return_url'] = reverse_lazy(return_url)
         context['action_to_confirm'] = 'Выберите дату'
         return context
+
+
+class ConfirmScheduleCannotBeComplete(LoginRequiredMixin, FormView):
+    form_class = UncompleteReasonForm
+    template_name = 'reports/action_confirmation.html'
+
+    def post(self, request, **kwargs):
+        self.schedule_list = kwargs['schedule_list'].split('_')
+        self.return_url = f'reports:{kwargs["return_url"]}'
+        self.form = self.get_form(self.form_class)
+        if self.form.is_valid():
+            qs = Schedule.objects.filter(pk__in=self.schedule_list)
+            for entry in qs:
+                entry._change_reason = 'Marked as can not be completed'
+                entry.uncompleted = self.form.cleaned_data['reason']
+            bulk_update_with_history(qs, Schedule, ['uncompleted'], batch_size=500)
+            return redirect(self.return_url)
+        return self.get(request, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return_url = f'reports:{self.kwargs["return_url"]}'
+        context['return_url'] = reverse_lazy(return_url)
+        context['action_to_confirm'] = 'Выберите дату'
+        return context
+
 
 
 class DocxReportDownloadView(View):

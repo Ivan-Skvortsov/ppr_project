@@ -3,7 +3,7 @@ from django.forms.widgets import CheckboxInput, DateInput, Select, ClearableFile
 from django.core.validators import MinValueValidator
 from datetime import date
 
-from reports.models import Employee, Schedule, MaintenanceCategory, MaintenanceType
+from reports.models import Employee, Schedule, MaintenanceCategory, MaintenanceType, UncompleteReasons
 
 
 class CustomFileInput(ClearableFileInput):
@@ -29,7 +29,8 @@ class ScheduleForm(forms.ModelForm):
         exclude = [
             'equipment_type',
             'maintenance_type',
-            'report'
+            'report',
+            'uncompleted'
         ]
         widgets = {
             'date_sheduled': DateInput(
@@ -89,6 +90,17 @@ class EmployeeForm(forms.Form):
         ),
         label='Исполнитель #3'
 
+    )
+
+
+class UncompleteReasonForm(forms.Form):
+    reason = forms.ModelChoiceField(
+        queryset=UncompleteReasons.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-control form-select'
+            }
+        ),
+        label='Причина невыполнения работы'
     )
 
 

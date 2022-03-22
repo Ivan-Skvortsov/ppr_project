@@ -5,7 +5,7 @@ from reports.views import (ConfirmScheduleCompletedView,
                            DocxReportDownloadView, IndexView,
                            MonthScheduleView, ScheduleDetailInfoView,
                            WeekScheduleView, YearScheduleView, OverDueScheduleView,
-                           SearchView)
+                           SearchView, ConfirmScheduleCannotBeComplete)
 
 app_name = 'reports'
 
@@ -38,6 +38,11 @@ urlpatterns = [
         'schedule/confirm_date_changed/<slug:schedule_list>/<str:return_url>/',
         ConfirmScheduleDateChangedView.as_view(),
         name='confirm_date_changed'
+    ),
+    path(
+        'schedule/confirm_cant_complete/<slug:schedule_list>/<str:return_url>/',
+        ConfirmScheduleCannotBeComplete.as_view(),
+        name='confirm_schedule_cant_complete'
     ),
     path(
         'docx_report/<int:schedule_id>/',

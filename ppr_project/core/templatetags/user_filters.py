@@ -15,4 +15,5 @@ def addclass(field, css):
 def count_overdue_schedules():
     lte_date = date.today() - timedelta(days=1)
     return Schedule.objects.filter(date_sheduled__lte=lte_date,
-                                   date_completed=None).count()
+                                   date_completed=None,
+                                   uncompleted=None).count()

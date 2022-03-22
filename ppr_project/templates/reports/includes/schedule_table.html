@@ -49,7 +49,8 @@
               {# table rows #}
                 <div class="row border-bottom my-auto py-1
                           {% now "Y-m-d" as today_date %}
-                          {% if today_date > entry.date_sheduled|date:"Y-m-d" and not entry.date_completed %} bg-danger bg-opacity-25{% endif %}
+                          {% if entry.uncompleted and not entry.date_completed %} bg-secondary bg-opacity-25 {% endif %}
+                          {% if today_date > entry.date_sheduled|date:"Y-m-d" and not entry.date_completed  and not entry.uncompleted %} bg-danger bg-opacity-25{% endif %}
                           {% if entry.date_completed and entry.access_journal_filled and entry.result_journal_filled %} bg-success bg-opacity-25{% endif %}">
                   <div class="col-12 col-lg-2">
                     <div class="row">
@@ -102,6 +103,7 @@
                 <option value="result_journal_filled">Подтвердить заполнение журнала ТО</option>
                 <option value="date_scheduled_changed">Изменить плановую дату выполнения работ</option>
                 <option value="schedule_completed">Подтвердить, что работа проведена</option>
+                <option value="schedule_cant_be_completed">Отметить, что работа НЕ может быть проведена</option>
               </select>
               <button type="submit" class="btn btn-primary">Применить</button>
             </div>

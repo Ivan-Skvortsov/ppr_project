@@ -3,7 +3,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from reports.models import (Employee, EquipmentType, Facility,
                             MaintenanceCategory, ReportTemplate, Schedule,
-                            MaintenanceType)
+                            MaintenanceType, UncompleteReasons)
 
 
 @admin.register(Employee)
@@ -61,6 +61,11 @@ class ReportTemplateAdmin(admin.ModelAdmin):
 @admin.register(MaintenanceType)
 class MaintenanceTypeAdmin(admin.ModelAdmin):
     list_display = ('pk', 'm_type')
+
+
+@admin.register(UncompleteReasons)
+class UncompleteReasonsAdmin(admin.ModelAdmin):
+    pass
 
 
 admin.site.register(MaintenanceCategory)
