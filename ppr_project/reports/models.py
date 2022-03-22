@@ -104,6 +104,20 @@ class ReportTemplate(models.Model):
         return self.template_name
 
 
+class UncompleteReasons(models.Model):
+    reason = models.CharField(
+        max_length=250,
+        verbose_name='Причина невыполнения'
+    )
+
+    class Meta:
+        verbose_name = 'Причина невыполнения работ'
+        verbose_name_plural = 'Причины невыполнения работ'
+
+    def __str__(self):
+        return self.reason
+
+
 class Schedule(models.Model):
     equipment_type = models.ForeignKey(
         EquipmentType,
@@ -169,6 +183,14 @@ class Schedule(models.Model):
         upload_to='photo_approvals/%Y/%m/%d',
         blank=True,
         verbose_name='Подтверждающее фото'
+    )
+    uncompleted = models.ForeignKey(
+        UncompleteReasons,
+        on_delete=models.SET_NULL,
+        related_name='schedule_uncompleted_reason',
+        blank=True,
+        null=True,
+        verbose_name='Причина невыполнения работы'
     )
     history = HistoricalRecords()
 

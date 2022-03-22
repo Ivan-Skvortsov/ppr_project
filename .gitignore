@@ -130,9 +130,7 @@ dmypy.json
 
 .vscode/
 
-#docx reports
-tmp/
-photo_approvals/
-bugtracker/
+# media folder
+media/
 
 versions.txt
