@@ -204,3 +204,4 @@ class Schedule(models.Model):
             f'{self.equipment_type.facility} | '
             f'{self.maintenance_type} | {self.equipment_type}'
         )
+

@@ -29,8 +29,7 @@ class ScheduleForm(forms.ModelForm):
         exclude = [
             'equipment_type',
             'maintenance_type',
-            'report',
-            'uncompleted'
+            'report'
         ]
         widgets = {
             'date_sheduled': DateInput(
@@ -58,6 +57,9 @@ class ScheduleForm(forms.ModelForm):
             ),
             'photo': CustomFileInput(
                 attrs={'class': 'form-control'}
+            ),
+            'uncompleted': Select(
+                attrs={'class': 'form-control form-select'}
             )
         }
 
