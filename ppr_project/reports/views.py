@@ -207,6 +207,38 @@ class OverDueScheduleView(ScheduleListView):
         return context
 
 
+class UncompletableScheduleView(ScheduleListView):
+
+    def get_queryset(self):
+        category_id = self.kwargs.get('category_id', None)
+        if category_id:
+            maintenance_category = get_object_or_404(
+                MaintenanceCategory,
+                pk=category_id
+            )
+            return (Schedule.objects
+                            .filter(uncompleted__isnull=False,
+                                    date_completed__isnull=True,
+                                    equipment_type__maintenance_category=maintenance_category)
+                            .select_related('equipment_type__facility',
+                                            'report',
+                                            'maintenance_type')
+                            .order_by('date_sheduled',
+                                      'equipment_type__facility'))
+
+        return (Schedule.objects
+                        .filter(uncompleted__isnull=False, date_completed__isnull=True)
+                        .select_related('equipment_type__facility', 'report', 'maintenance_type')
+                        .order_by('date_sheduled', 'equipment_type__facility'))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['plan_period'] = 'Невыполнимые работы'
+        context['plan_url'] = reverse_lazy('reports:uncompletable')
+        return context
+
+
+
 class ScheduleDetailInfoView(LoginRequiredMixin, UpdateView):
     template_name = 'reports/schedule_detail.html'
     model = Schedule
@@ -305,7 +337,6 @@ class ConfirmScheduleCannotBeComplete(LoginRequiredMixin, FormView):
         context['return_url'] = reverse_lazy(return_url)
         context['action_to_confirm'] = 'Выберите дату'
         return context
-
 
 
 class DocxReportDownloadView(View):

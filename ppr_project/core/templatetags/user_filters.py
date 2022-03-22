@@ -17,3 +17,9 @@ def count_overdue_schedules():
     return Schedule.objects.filter(date_sheduled__lte=lte_date,
                                    date_completed=None,
                                    uncompleted=None).count()
+
+
+@register.simple_tag
+def count_uncompletable_schedules():
+    return Schedule.objects.filter(uncompleted__isnull=False,
+                                   date_completed__isnull=True).count()
