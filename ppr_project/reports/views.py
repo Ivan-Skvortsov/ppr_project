@@ -138,7 +138,7 @@ class NextMonthScheduleView(ScheduleListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['plan_period'] = 'План на следующий месяц'
-        context['plan_url'] = reverse_lazy('reports:year_schedule')
+        context['plan_url'] = reverse_lazy('reports:next_month_schedule')
         return context
 
 
