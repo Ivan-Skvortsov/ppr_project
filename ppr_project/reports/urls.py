@@ -4,15 +4,17 @@ from reports.views import (ConfirmScheduleCompletedView,
                            ConfirmScheduleDateChangedView, DayScheduleView,
                            DocxReportDownloadView, IndexView,
                            MonthScheduleView, ScheduleDetailInfoView,
-                           WeekScheduleView, YearScheduleView, OverDueScheduleView,
-                           SearchView, ConfirmScheduleCannotBeComplete, UncompletableScheduleView)
+                           WeekScheduleView, NextMonthScheduleView,
+                           OverDueScheduleView, SearchView,
+                           ConfirmScheduleCannotBeComplete,
+                           UncompletableScheduleView)
 
 app_name = 'reports'
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
-    path('year/<int:category_id>/', YearScheduleView.as_view(), name='year_schedule'),  # noqa: E501
-    path('year/', YearScheduleView.as_view(), name='year_schedule'),
+    path('year/<int:category_id>/', NextMonthScheduleView.as_view(), name='year_schedule'),  # noqa: E501
+    path('year/', NextMonthScheduleView.as_view(), name='year_schedule'),
     path('month/<int:category_id>/', MonthScheduleView.as_view(), name='month_schedule'),  # noqa: E501
     path('month/', MonthScheduleView.as_view(), name='month_schedule'),
     path('week/<int:category_id>/', WeekScheduleView.as_view(), name='week_schedule'),  # noqa: E501
@@ -21,7 +23,7 @@ urlpatterns = [
     path('day/', DayScheduleView.as_view(), name='day_schedule'),
     path('overdue/<int:category_id>/', OverDueScheduleView.as_view(), name='overdue'),  # noqa: E501
     path('overdue/', OverDueScheduleView.as_view(), name='overdue'),
-    path('uncompletable/', UncompletableScheduleView.as_view(), name='uncompletable'),
+    path('uncompletable/', UncompletableScheduleView.as_view(), name='uncompletable'),  # noqa: E501
     path('search/', SearchView.as_view(), name='search'),
 
 
@@ -41,7 +43,7 @@ urlpatterns = [
         name='confirm_date_changed'
     ),
     path(
-        'schedule/confirm_cant_complete/<slug:schedule_list>/<str:return_url>/',
+        'schedule/confirm_cant_complete/<slug:schedule_list>/<str:return_url>/',  # noqa: E501
         ConfirmScheduleCannotBeComplete.as_view(),
         name='confirm_schedule_cant_complete'
     ),

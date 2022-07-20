@@ -7,13 +7,14 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.urls.base import resolve
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, RedirectView
 from django.views.generic.edit import FormView, UpdateView
 
 from simple_history.utils import bulk_update_with_history
 
-from reports.forms import DateInputForm, EmployeeForm, ScheduleForm, ScheduleSearchForm, UncompleteReasonForm
-from reports.models import EquipmentType, MaintenanceCategory, Schedule
+from reports.forms import (DateInputForm, EmployeeForm, ScheduleForm,
+                           ScheduleSearchForm, UncompleteReasonForm)
+from reports.models import MaintenanceCategory, Schedule
 from reports.services import DocxReportGenerator
 
 
@@ -48,13 +49,33 @@ class ScheduleListView(LoginRequiredMixin, ListView):
             for entry in qs:
                 entry._change_reason = 'Changed state of access journal'
                 entry.access_journal_filled = True
-            bulk_update_with_history(qs, Schedule, ['access_journal_filled'], batch_size=500)
+            bulk_update_with_history(
+                qs, Schedule, ['access_journal_filled'], batch_size=500
+            )
         if selected_action == 'result_journal_filled':
             for entry in qs:
                 entry._change_reason = 'Changed state of result journal'
                 entry.result_journal_filled = True
-            bulk_update_with_history(qs, Schedule, ['result_journal_filled'], batch_size=500)
+            bulk_update_with_history(
+                qs, Schedule, ['result_journal_filled'], batch_size=500
+            )
         return self.get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        category_id = self.kwargs.get('category_id', None)
+        qs = (Schedule.objects.select_related('equipment_type__facility',
+                                              'report',
+                                              'maintenance_type')
+                              .order_by('date_sheduled',
+                                        'equipment_type__facility'))
+        if category_id:
+            maintenance_category = get_object_or_404(
+                MaintenanceCategory, pk=category_id
+            )
+            return qs.filter(
+                equipment_type__maintenance_category=maintenance_category
+            )
+        return qs
 
     def _redirect_to_confirmation_page(self, selected_schedules, page_url):
         return_url = resolve(self.request.path_info).url_name
@@ -69,20 +90,8 @@ class ScheduleListView(LoginRequiredMixin, ListView):
 class DayScheduleView(ScheduleListView):
 
     def get_queryset(self):
-        category_id = self.kwargs.get('category_id', None)
-        if category_id:
-            maintenance_category = get_object_or_404(
-                MaintenanceCategory,
-                pk=category_id
-            )
-            return Schedule.objects.filter(
-                date_sheduled=date.today(),
-                equipment_type__maintenance_category=maintenance_category
-            ).select_related('equipment_type__facility',
-                             'report',
-                             'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
-
-        return Schedule.objects.filter(date_sheduled=date.today()).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
+        qs = super().get_queryset()
+        return qs.filter(date_sheduled=date.today())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -94,18 +103,9 @@ class DayScheduleView(ScheduleListView):
 class MonthScheduleView(ScheduleListView):
 
     def get_queryset(self):
-        category_id = self.kwargs.get('category_id', None)
+        qs = super().get_queryset()
         month = date.today().month
-        if category_id:
-            maintenance_category = get_object_or_404(
-                MaintenanceCategory,
-                pk=category_id
-            )
-            return Schedule.objects.filter(
-                date_sheduled__month=month,
-                equipment_type__maintenance_category=maintenance_category
-            ).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
-        return Schedule.objects.filter(date_sheduled__month=month).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
+        return qs.filter(date_sheduled__month=month)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -117,18 +117,9 @@ class MonthScheduleView(ScheduleListView):
 class WeekScheduleView(ScheduleListView):
 
     def get_queryset(self):
-        category_id = self.kwargs.get('category_id', None)
+        qs = super().get_queryset()
         week = date.today().isocalendar()[1]  # Get week number
-        if category_id:
-            maintenance_category = get_object_or_404(
-                MaintenanceCategory,
-                pk=category_id
-            )
-            return Schedule.objects.filter(
-                date_sheduled__week=week,
-                equipment_type__maintenance_category=maintenance_category
-            ).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
-        return Schedule.objects.filter(date_sheduled__week=week).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
+        return qs.filter(date_sheduled__week=week)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -137,21 +128,12 @@ class WeekScheduleView(ScheduleListView):
         return context
 
 
-class YearScheduleView(ScheduleListView):
-    """Временный костыль по просьбе Стругова А.А."""
+class NextMonthScheduleView(ScheduleListView):
+
     def get_queryset(self):
-        category_id = self.kwargs.get('category_id', None)
-        month = date.today().month + 1
-        if category_id:
-            maintenance_category = get_object_or_404(
-                MaintenanceCategory,
-                pk=category_id
-            )
-            return Schedule.objects.filter(
-                date_sheduled__month=month,
-                equipment_type__maintenance_category=maintenance_category
-            ).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
-        return Schedule.objects.filter(date_sheduled__month=month).select_related('equipment_type__facility', 'report', 'maintenance_type').order_by('date_sheduled', 'equipment_type__facility')
+        qs = super().get_queryset()
+        next_month = date.today().month + 1
+        return qs.filter(date_sheduled__month=next_month)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -160,45 +142,21 @@ class YearScheduleView(ScheduleListView):
         return context
 
 
-class IndexView(LoginRequiredMixin, ListView):
+class IndexView(LoginRequiredMixin, RedirectView):
 
-    #  ВРЕМЕННАЯ ЗАГЛУШКА
-    def get(self, request, *args, **kwargs):
-        return redirect('reports:week_schedule')
-
-    template_name = 'reports/index.html'
-    model = EquipmentType
-    context_object_name = 'equipment_type'
-
-    def get_queryset(self):
-        return super().get_queryset()
+    url = reverse_lazy('reports:week_schedule')
 
 
 class OverDueScheduleView(ScheduleListView):
 
     def get_queryset(self):
+        qs = super().get_queryset()
         lte_date = date.today() - timedelta(days=1)
-        category_id = self.kwargs.get('category_id', None)
-        if category_id:
-            maintenance_category = get_object_or_404(
-                MaintenanceCategory,
-                pk=category_id
-            )
-            return (Schedule.objects
-                            .filter(date_sheduled__lte=lte_date,
-                                    date_completed=None,
-                                    uncompleted=None,
-                                    equipment_type__maintenance_category=maintenance_category)
-                            .select_related('equipment_type__facility',
-                                            'report',
-                                            'maintenance_type')
-                            .order_by('date_sheduled',
-                                      'equipment_type__facility'))
-
-        return (Schedule.objects
-                        .filter(date_sheduled__lte=lte_date, uncompleted=None, date_completed=None)
-                        .select_related('equipment_type__facility', 'report', 'maintenance_type')
-                        .order_by('date_sheduled', 'equipment_type__facility'))
+        return qs.filter(
+            date_sheduled__lte=lte_date,
+            uncompleted__isnull=True,
+            date_completed__isnull=True
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -210,33 +168,16 @@ class OverDueScheduleView(ScheduleListView):
 class UncompletableScheduleView(ScheduleListView):
 
     def get_queryset(self):
-        category_id = self.kwargs.get('category_id', None)
-        if category_id:
-            maintenance_category = get_object_or_404(
-                MaintenanceCategory,
-                pk=category_id
-            )
-            return (Schedule.objects
-                            .filter(uncompleted__isnull=False,
-                                    date_completed__isnull=True,
-                                    equipment_type__maintenance_category=maintenance_category)
-                            .select_related('equipment_type__facility',
-                                            'report',
-                                            'maintenance_type')
-                            .order_by('date_sheduled',
-                                      'equipment_type__facility'))
-
-        return (Schedule.objects
-                        .filter(uncompleted__isnull=False, date_completed__isnull=True)
-                        .select_related('equipment_type__facility', 'report', 'maintenance_type')
-                        .order_by('date_sheduled', 'equipment_type__facility'))
+        qs = super().get_queryset()
+        return qs.filter(
+            uncompleted__isnull=False, date_completed__isnull=True
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['plan_period'] = 'Невыполнимые работы'
         context['plan_url'] = reverse_lazy('reports:uncompletable')
         return context
-
 
 
 class ScheduleDetailInfoView(LoginRequiredMixin, UpdateView):
@@ -302,7 +243,9 @@ class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
             for entry in qs:
                 entry._change_reason = 'Changed schedule date'
                 entry.date_sheduled = self.form.cleaned_data['input_date']
-            bulk_update_with_history(qs, Schedule, ['date_sheduled'], batch_size=500)
+            bulk_update_with_history(
+                qs, Schedule, ['date_sheduled'], batch_size=500
+            )
             return redirect(self.return_url)
         return self.get(request, **kwargs)
 
@@ -327,7 +270,9 @@ class ConfirmScheduleCannotBeComplete(LoginRequiredMixin, FormView):
             for entry in qs:
                 entry._change_reason = 'Marked as can not be completed'
                 entry.uncompleted = self.form.cleaned_data['reason']
-            bulk_update_with_history(qs, Schedule, ['uncompleted'], batch_size=500)
+            bulk_update_with_history(
+                qs, Schedule, ['uncompleted'], batch_size=500
+            )
             return redirect(self.return_url)
         return self.get(request, **kwargs)
 
@@ -365,14 +310,9 @@ class SearchView(ScheduleListView):
     def get_queryset(self):
         filter_params = {k: v for k, v in self.request.GET.items() if v}
         if filter_params:
+            qs = super().get_queryset()
             try:
-                return (Schedule.objects
-                                .filter(**filter_params)
-                                .select_related('equipment_type__facility',
-                                                'report',
-                                                'maintenance_type')
-                                .order_by('date_sheduled',
-                                          'equipment_type__facility'))
+                return qs.filter(**filter_params)
             except Exception as e:
                 print(f'Wrong filter params! Error: {e}')  # FIXME: logging!
                 raise Http404
