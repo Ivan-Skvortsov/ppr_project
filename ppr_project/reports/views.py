@@ -12,7 +12,7 @@ from django.views.generic.edit import FormView, UpdateView
 
 from simple_history.utils import bulk_update_with_history
 
-from reports.forms import (DateInputForm, EmployeeForm, ScheduleForm,
+from reports.forms import (DateInputForm, CompleteScheduleForm, ScheduleForm,
                            ScheduleSearchForm, UncompleteReasonForm)
 from reports.models import MaintenanceCategory, Schedule
 from reports.services import DocxReportGenerator
@@ -198,7 +198,7 @@ class ScheduleDetailInfoView(LoginRequiredMixin, UpdateView):
 
 
 class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
-    form_class = EmployeeForm
+    form_class = CompleteScheduleForm
     template_name = 'reports/action_confirmation.html'
 
     def post(self, request, **kwargs):
@@ -209,7 +209,7 @@ class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
             qs = Schedule.objects.filter(pk__in=self.schedule_list)
             for entry in qs:
                 entry._change_reason = 'Confirmed work completed'
-                entry.date_completed = date.today()
+                entry.date_completed = self.form.cleaned_data['date_completed']
                 entry.employee1 = self.form.cleaned_data['employee1']
                 entry.employee2 = self.form.cleaned_data['employee2']
                 entry.employee3 = self.form.cleaned_data['employee3']
@@ -226,7 +226,7 @@ class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
         context = super().get_context_data(**kwargs)
         return_url = f'reports:{self.kwargs["return_url"]}'
         context['return_url'] = reverse_lazy(return_url)
-        context['action_to_confirm'] = 'Выберите исполнителей работ'
+        context['action_to_confirm'] = 'Выберите дату и исполнителей'
         return context
 
 

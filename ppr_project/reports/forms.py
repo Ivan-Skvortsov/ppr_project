@@ -1,9 +1,11 @@
 from django import forms
-from django.forms.widgets import CheckboxInput, DateInput, Select, ClearableFileInput
+from django.forms.widgets import (CheckboxInput, DateInput, Select,
+                                  ClearableFileInput)
 from django.core.validators import MinValueValidator
 from datetime import date
 
-from reports.models import Employee, Schedule, MaintenanceCategory, MaintenanceType, UncompleteReasons
+from reports.models import (Employee, Schedule, MaintenanceCategory,
+                            MaintenanceType, UncompleteReasons)
 
 
 class CustomFileInput(ClearableFileInput):
@@ -64,8 +66,19 @@ class ScheduleForm(forms.ModelForm):
         }
 
 
-class EmployeeForm(forms.Form):
+class CompleteScheduleForm(forms.Form):
     qs = Employee.objects.all()
+    date_completed = forms.DateField(
+        widget=forms.DateInput(
+            attrs={
+                'type': 'date',
+                'class': 'form-control',
+                'value': date.today
+            }
+        ),
+        label='Дата выполнения работы',
+        help_text='Выберите дату выполнения',
+    )
     employee1 = forms.ModelChoiceField(
         queryset=qs,
         widget=forms.Select(attrs={
@@ -91,7 +104,6 @@ class EmployeeForm(forms.Form):
             }
         ),
         label='Исполнитель #3'
-
     )
 
 
