@@ -13,8 +13,8 @@ app_name = 'reports'
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
-    path('year/<int:category_id>/', NextMonthScheduleView.as_view(), name='year_schedule'),  # noqa: E501
-    path('year/', NextMonthScheduleView.as_view(), name='year_schedule'),
+    path('next_month/<int:category_id>/', NextMonthScheduleView.as_view(), name='next_month_schedule'),  # noqa: E501
+    path('next_month/', NextMonthScheduleView.as_view(), name='next_month_schedule'),  # noqa: E501
     path('month/<int:category_id>/', MonthScheduleView.as_view(), name='month_schedule'),  # noqa: E501
     path('month/', MonthScheduleView.as_view(), name='month_schedule'),
     path('week/<int:category_id>/', WeekScheduleView.as_view(), name='week_schedule'),  # noqa: E501
