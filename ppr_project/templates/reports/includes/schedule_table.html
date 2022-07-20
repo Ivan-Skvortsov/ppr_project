@@ -16,7 +16,11 @@
           <div class="row border-bottom my-3 align-items-center">
             <div class="col-12 col-lg-2 text-muted">
               <div class="row">
-                <div class="col-4">#</div>
+                <div class="col-4">
+                  <div class="form-check form-switch">
+                    <input type="checkbox" onclick="toggle(this);" class="form-check-input" title="Выбрать все работы">
+                  </div>
+                </div>
                 <div class="col-8">Тип ТО</div>
               </div>
             </div>
@@ -33,6 +37,13 @@
           </div>
         </div>
         {# table body #}
+        {# checkbox "select_all" visible only on smaller screens #}
+        <div class="d-block d-lg-none form-check form-switch">
+          <input type="checkbox" onclick="toggle(this);" class="form-check-input" title="Выбрать все работы" id="SelectAllCheckbox">
+          <label class="form-check-label" for="SelectAllCheckbox">
+            Выбрать все работы на странице
+          </label>
+        </div>
         {% regroup schedule_plan by date_sheduled as plan_by_date %}
         {% for schedule_date in plan_by_date %}
         {# date scheduled #}
