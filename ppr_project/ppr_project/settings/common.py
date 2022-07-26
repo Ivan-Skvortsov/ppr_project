@@ -1,23 +1,13 @@
 import os
 from pathlib import Path
 
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-
 from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-IS_DEV = os.getenv('IS_DEVELOPMENT')
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
-
-DEBUG = False
-
-ALLOWED_HOSTS = ['ks45.online', 'www.ks45.online', 'localhost', 'web']
-# ALLOWED_HOSTS = ['127.0.0.1', 'web', ' 45.11.24.194']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -68,18 +58,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ppr_project.wsgi.application'
 
-if not IS_DEV:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.getenv('POSTGRES_DB'),
-            'USER': os.getenv('POSTGRES_USER'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT'),
-        }
-    }
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -105,11 +83,13 @@ USE_L10N = True
 
 USE_TZ = True
 
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'staticfiles',
 ]
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -131,25 +111,3 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = f'Cистема управления ППР КС-45 <{EMAIL_HOST_USER}>'
 
 ADMINS = [('Ivan Skvortsov', os.getenv('ADMIN_MAIL'))]
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-
-if IS_DEV:
-    from .dev_settings import *
-
-if not IS_DEV:
-    sentry_sdk.init(
-        dsn="https://a8df95fe0ead4f2ebfe1cb67fc5f3e48@o1144195.ingest.sentry.io/6207015",
-        integrations=[DjangoIntegration()],
-
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
-        traces_sample_rate=1.0,
-
-        # If you wish to associate users to errors (assuming you are using
-        # django.contrib.auth) you may enable sending PII data.
-        send_default_pii=True
-    )
