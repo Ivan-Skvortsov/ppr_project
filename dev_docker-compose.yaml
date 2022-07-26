@@ -9,7 +9,10 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    command: sh -c "python3 manage.py runserver 0.0.0.0:8000 --settings=ppr_project.settings.dev_docker"
+    command: >
+      sh -c "python3 manage.py collectstatic --settings=ppr_project.settings.dev_docker &&
+             python3 manage.py migrate --settings=ppr_project.settings.dev_docker &&
+             python3 manage.py runserver 0.0.0.0:8000 --settings=ppr_project.settings.dev_docker"
     ports:
       - 8000:8000
     volumes:
