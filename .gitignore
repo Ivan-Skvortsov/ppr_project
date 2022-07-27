@@ -133,4 +133,11 @@ dmypy.json
 # media folder
 media/
 
+# versions tracker
 versions.txt
+
+# fixtures for dev server
+dev_fixtures/
+
+# docker-compose for dev server
+dev_docker-compose.yaml
