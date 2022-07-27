@@ -9,15 +9,15 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    command: >
-      sh -c "python3 manage.py collectstatic --settings=ppr_project.settings.dev_docker &&
-             python3 manage.py migrate --settings=ppr_project.settings.dev_docker &&
-             python3 manage.py runserver 0.0.0.0:8000 --settings=ppr_project.settings.dev_docker"
+    command: sh -c "python manage.py loaddata dev_fixtures/db_fixture.json --settings=ppr_project.settings.dev_docker &&
+                    python manage.py runserver 0.0.0.0:8000 --settings=ppr_project.settings.dev_docker"
     ports:
       - 8000:8000
     volumes:
       - static_volume:/app/static/
       - media_volume:/app/media/
+      - ./dev_fixtures:/app/dev_fixtures/
+
     depends_on:
       - db
     env_file:
