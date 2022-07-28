@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib import messages
 from django.contrib.auth.models import User, Group
 
 
@@ -27,3 +28,6 @@ class UserAdmin(admin.ModelAdmin):
                        f'{user.get_username()}\nСпасибо, что ты с нами!')
             user.save()
             user.email_user(subject, message)
+        self.message_user(
+            request, 'Пользователи оповещены!', messages.SUCCESS
+            )
