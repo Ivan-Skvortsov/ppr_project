@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
 
+from users.tasks import send_email_task
+
 
 admin.site.unregister(User)
 admin.site.unregister(Group)
@@ -27,7 +29,7 @@ class UserAdmin(admin.ModelAdmin):
                        'На всякий случай (если ты забыл), твой логин - '
                        f'{user.get_username()}\nСпасибо, что ты с нами!')
             user.save()
-            user.email_user(subject, message)
+            send_email_task.delay(subject, message, [user.email])
         self.message_user(
             request, 'Пользователи оповещены!', messages.SUCCESS
             )

@@ -21,7 +21,7 @@ DATABASES = {
 STATIC_ROOT = BASE_DIR / 'static'
 
 sentry_sdk.init(
-    dsn="https://a8df95fe0ead4f2ebfe1cb67fc5f3e48@o1144195.ingest.sentry.io/6207015",
+    dsn=os.getenv('SENTRY_DSN'),
     integrations=[DjangoIntegration()],
 
     traces_sample_rate=1.0,

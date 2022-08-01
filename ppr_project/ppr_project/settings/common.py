@@ -111,3 +111,5 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = f'Cистема управления ППР КС-45 <{EMAIL_HOST_USER}>'
 
 ADMINS = [('Ivan Skvortsov', os.getenv('ADMIN_MAIL'))]
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
