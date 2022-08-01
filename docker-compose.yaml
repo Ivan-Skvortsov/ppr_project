@@ -7,7 +7,10 @@ volumes:
 services:
   web:
     image: profcheg/ppr_project:latest
-    command: sh -c "gunicorn ppr_project.wsgi:application --bind 0:8000"
+    command: >
+      sh -c "python manage.py migrate &&
+      python manage.py collectstatic --no-input --clear &&
+      gunicorn ppr_project.wsgi:application --bind 0:8000"
     restart: always
     volumes:
       - static_volume:/app/static/
@@ -47,3 +50,15 @@ services:
     depends_on:
       - nginx
 
+  redis:
+    image: redis:7.0.4-alpine
+
+  celery:
+    image: profcheg/ppr_project:latest
+    command: sh -c "celery -A ppr_project worker --loglevel=INFO"
+    restart: always
+    depends_on:
+      - web
+      - redis
+    env_file:
+      - ./.env
