@@ -1,8 +1,9 @@
+import json
 from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.urls.base import resolve
@@ -322,3 +323,28 @@ class SearchView(ScheduleListView):
         context = super().get_context_data(**kwargs)
         context['search_form'] = ScheduleSearchForm(self.request.GET)
         return context
+
+
+class MarkJournalFilledView(LoginRequiredMixin, View):
+    """View for fetch-api calls."""
+
+    def post(self, request, pk):
+        if not request.body:
+            return JsonResponse({'error': 'Invalid request'}, status=400)
+        shedule = get_object_or_404(Schedule, pk=pk)
+        data = json.loads(request.body)
+        action = data.get('action')
+        is_checked = data.get('is_checked')
+        if action == 'access_journal_filled':
+            shedule.access_journal_filled = is_checked
+            shedule._change_reason = 'Changed state of access journal'
+        elif action == 'result_journal_filled':
+            shedule.result_journal_filled = is_checked
+            shedule._change_reason = 'Changed state of result journal'
+        else:
+            return JsonResponse({'error': 'Invalid request'}, status=400)
+        shedule.save()
+        completed = all([shedule.access_journal_filled,
+                        shedule.result_journal_filled,
+                        shedule.date_completed])
+        return JsonResponse({'completed': completed})
