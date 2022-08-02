@@ -28,10 +28,9 @@
             <div class="col-6 col-lg-1 text-muted">Дата по плану</div>
             <div class="col-12 col-lg-3">
               <div class="row align-items-center">
-                <div class="col-6 col-lg-3 text-muted"><small>Допуск</small></div>
-                <div class="col-12 col-lg-3 text-muted"><small>Журнал ТО</small></div>
-                <div class="col-12 col-lg-3 text-muted"><small>Работа проведена</small></div>
-                <div class="col-12 col-lg-3 text-muted"><i class="fas fa-file-alt"></i></div>
+                <div class="col-6 col-lg-4 text-muted"><small>Допуск</small></div>
+                <div class="col-12 col-lg-4 text-muted"><small>Журнал ТО</small></div>
+                <div class="col-12 col-lg-4 text-muted"><small>Дата выполнения</small></div>
               </div>
             </div>
           </div>
@@ -58,7 +57,7 @@
               </div>
               {% for entry in facility.list %}
               {# table rows #}
-                <div class="row border-bottom my-auto py-1
+                <div id="sheduleRow{{ entry.pk }}" class="row border-bottom my-auto py-1
                           {% now "Y-m-d" as today_date %}
                           {% if entry.uncompleted and not entry.date_completed %} bg-secondary bg-opacity-25 {% endif %}
                           {% if today_date > entry.date_sheduled|date:"Y-m-d" and not entry.date_completed  and not entry.uncompleted %} bg-danger bg-opacity-25{% endif %}
@@ -83,19 +82,16 @@
                   <div class="col-12 col-lg-3">
                     <div class="row">
                       <div class="col-6 d-lg-none"><small>Журнал допуска:</small></div>
-                      <div class="col-6 col-lg-3">
-                        <input type="checkbox" class="form-check-input" disabled {% if entry.access_journal_filled %} checked {% endif %}>
+                      <div class="col-6 col-lg-4">
+                        <input type="checkbox" class="form-check-input" name="access_journal_filled" value="{{ entry.pk }}" onclick="markJournalCheckbox(this);" {% if entry.access_journal_filled %} checked {% endif %}>
                       </div>
                       <div class="col-6 d-lg-none"><small>Журнал ТО:</small></div>
-                      <div class="col-6 col-lg-3">
-                        <input type="checkbox" class="form-check-input" disabled {% if entry.result_journal_filled %} checked {% endif %}>
+                      <div class="col-6 col-lg-4">
+                        <input type="checkbox" class="form-check-input" name="result_journal_filled" value="{{ entry.pk }}" onclick="markJournalCheckbox(this);" {% if entry.result_journal_filled %} checked {% endif %}>
                       </div>
-                      <div class="col-6 d-lg-none"><small>Работа проведена:</small></div>
-                      <div class="col-6 col-lg-3">
-                        <input type="checkbox" class="form-check-input" disabled {% if entry.date_completed %} checked {% endif %}>
-                      </div>
-                      <div class="d-none d-lg-block col-lg-3 text-muted">
-                        {% if entry.report and entry.date_completed %}<a href="{% url 'reports:docx_report' entry.pk %}" class="text-decoration-none text-muted" title="Скачать акт/протокол" download><i class="fas fa-file-alt"></i></a>{% endif %}
+                      <div class="col-6 d-lg-none"><small>Дата выполнения:</small></div>
+                      <div class="col-6 col-lg-4">
+                        {% if entry.date_completed %}{{ entry.date_completed|date:"d.m.y" }}{% else %}---{% endif %}
                       </div>
                     </div>
                   </div>
@@ -110,11 +106,11 @@
           <div class="card-body">
             <div class="input-group mb-3">
               <select name="selected_action" class="form-select">
-                <option value="access_journal_filled">Подтвердить заполнение журнала допуска</option>
-                <option value="result_journal_filled">Подтвердить заполнение журнала ТО</option>
+                {% comment %} <option value="access_journal_filled">Подтвердить заполнение журнала допуска</option>
+                <option value="result_journal_filled">Подтвердить заполнение журнала ТО</option> {% endcomment %}
                 <option value="date_scheduled_changed">Изменить плановую дату выполнения работ</option>
-                <option value="schedule_completed">Подтвердить, что работа проведена</option>
-                <option value="schedule_cant_be_completed">Отметить, что работа НЕ может быть проведена</option>
+                <option value="schedule_completed">Подтвердить, что работа выполнена</option>
+                <option value="schedule_cant_be_completed">Отметить, что работа НЕ может быть выполнена</option>
               </select>
               <button type="submit" class="btn btn-primary">Применить</button>
             </div>

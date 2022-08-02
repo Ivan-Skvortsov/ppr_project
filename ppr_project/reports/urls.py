@@ -7,7 +7,7 @@ from reports.views import (ConfirmScheduleCompletedView,
                            WeekScheduleView, NextMonthScheduleView,
                            OverDueScheduleView, SearchView,
                            ConfirmScheduleCannotBeComplete,
-                           UncompletableScheduleView)
+                           UncompletableScheduleView, MarkJournalFilledView)
 
 app_name = 'reports'
 
@@ -52,4 +52,8 @@ urlpatterns = [
         DocxReportDownloadView.as_view(),
         name='docx_report'
     ),
+    path(
+        'mark_journal_filled/<int:pk>/',
+        MarkJournalFilledView.as_view(),
+        name='mark_journal_filled')
 ]
