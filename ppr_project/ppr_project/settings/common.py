@@ -21,7 +21,8 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'bugtracker.apps.BugtrackerConfig',
     'django.forms',
-    'simple_history'
+    'simple_history',
+    'sorl.thumbnail'
 ]
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'

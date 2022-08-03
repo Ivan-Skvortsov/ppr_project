@@ -2,8 +2,14 @@
 {% block content %}
 <div class="mt-3">
   <div class="my-2">
-    <a class="btn btn-primary" href="{% url 'bugtracker:create'%}" role="button">Добавить замечание или предложение</a>
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseCreationForm" role="button" aria-expanded="false" aria-controls="collapseExample">Добавить замечание или предложение</a>
   </div>
+</div>
+<div class="collapse" id="collapseCreationForm">
+  <div class="card card-body">
+    {% include 'bugtracker/bug_form.html' %}
+  </div>
+</div>
 <!--table header-->
 <table class="table align-middle table-sm" >
     <thead>
@@ -30,5 +36,4 @@
     {% endfor %}
     </tbody>
 </table>
-</div>
 {% endblock content %}

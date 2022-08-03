@@ -167,7 +167,7 @@ class OverDueScheduleView(ScheduleListView):
 
 
 class UncompletableScheduleView(ScheduleListView):
-    """View uncimoletable schedules for last two months."""
+    """View uncompletable schedules for last two months."""
 
     def get_queryset(self):
         qs = super().get_queryset()
