@@ -1,5 +1,5 @@
 import json
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -167,16 +167,18 @@ class OverDueScheduleView(ScheduleListView):
 
 
 class UncompletableScheduleView(ScheduleListView):
+    """View uncimoletable schedules for last two months."""
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(
-            uncompleted__isnull=False, date_completed__isnull=True
-        )
+        previous_month = datetime.today().month - 1
+        return qs.filter(uncompleted__isnull=False,
+                         date_completed__isnull=True,
+                         date_sheduled__month__gte=previous_month)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = 'Невыполнимые работы'
+        context['plan_period'] = 'Невыполнимые работы (последние два месяца)'
         context['plan_url'] = reverse_lazy('reports:uncompletable')
         return context
 
