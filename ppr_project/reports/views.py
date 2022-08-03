@@ -1,5 +1,5 @@
 import json
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -171,7 +171,7 @@ class UncompletableScheduleView(ScheduleListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        previous_month = datetime.today().month - 1
+        previous_month = date.today().month - 1
         return qs.filter(uncompleted__isnull=False,
                          date_completed__isnull=True,
                          date_sheduled__month__gte=previous_month)
