@@ -1,39 +1,5 @@
 {% extends 'base.html' %}
 {% block content %}
-{% comment %} <div class="mt-3">
-  <div class="my-2">
-    <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseCreationForm" role="button" aria-expanded="false" aria-controls="collapseExample">+ Добавить замечание или предложение</a>
-  </div>
-  <div class="collapse" id="collapseCreationForm">
-    {% include 'bugtracker/bug_form.html' %}
-  </div> {% endcomment %}
-<!--table header-->
-{% comment %} <table class="table align-middle table-sm" >
-    <thead>
-    <tr>
-        <th class="text-muted" style="width: 10%" scope="col">Тип</th>
-        <th class="text-muted" style="width: 12%" scope="col">Дата публикации</th>
-        <th class="text-muted " style="width: 55%" scope="col">Описание</th>
-        <th class="text-muted" style="width: 10%" scope="col">Автор</th>
-        <th class="text-muted" style="width: 12%" scope="col">Дата устранения</th>
-        <th class="text-muted" style="width: 3%" scope="col">Фото</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for bug in bugs %}
-        <!--table rows-->
-        <tr {% if bug.close_date  %}class="table-success"{% endif %}>
-            <td>{{ bug.get_type_display }}</td>
-            <td>{{ bug.pub_date }}</td>
-            <td>{{ bug.bug_description }}</td>
-            <td>{{ bug.author }}</td>
-            <td> {% if bug.close_date %}{{ bug.close_date }} {% else %} - {% endif %}</td>
-            <td>{% if bug.screenshot %}<a href="{{ bug.screenshot.url }}" class="text-decoration-none text-muted" title="Скриншот или фото" target="_blank"><i class="fas fa-file-image"></a>{% endif %}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table> {% endcomment %}
-
 <div class="row d-flex justify-content-center my-2">
   <div class="col">
     <div class="card shadow-0 border" style="background-color: #f0f2f5;">
@@ -45,7 +11,7 @@
           {% include 'bugtracker/bug_form.html' %}
         </div>
         {% for bug in bugs %} 
-          <div class="card mb-2">
+          <div class="card mb-2 {% if bug.close_date %}bg-success bg-opacity-25{% endif %}">
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div class="d-flex flex-row align-items-center">
@@ -76,6 +42,4 @@
     </div>
   </div>
 </div>
-
-
 {% endblock content %}
