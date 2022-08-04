@@ -50,6 +50,7 @@ class Bug(models.Model):
 
     class Meta:
 
+        ordering = ['-pub_date']
         verbose_name = 'Замечание/предложение'
         verbose_name_plural = 'Замечания/предложения'
 
