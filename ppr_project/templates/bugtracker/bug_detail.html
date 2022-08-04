@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% block content %}
+<div class="row my-3">
+<aside class="col-12 col-md-3">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+          Дата публикации:<span>{{ bug.pub_date|date:"d E Y" }}</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        Тип:<span>{{ bug.get_type_display }}</span>
+      </li>    
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        Автор: <span>{{ bug.author.username }}</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        Дата выполнения: <span>{% if not bug.close_date %} --- {% else %}{{ bug.close_date|date:"d E Y"  }}{% endif %}</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a class="text-decoration-none" href="{% url 'bugtracker:index' %}">Вернуться к списку</a>
+      </li>
+    </ul>
+  </aside>
+  <article class="col-12 col-md-9 my-2">
+    {% thumbnail bug.screenshot "960x339" crop="center" upscale=True as im %}
+    <a href="{{ bug.screenshot.url }}" target="_blank"><img class="card-img my-2" src="{{ im.url }}"></a>
+    {% endthumbnail %}
+    <p class="mb-5">
+      {{ bug.bug_description }}
+    </p>
+    <hr>
+    <section>
+      <p class="h5 mb-3">Комментарии:</p>
+      {% include 'bugtracker/comments.html' %}
+    </section>
+  </article>
+</div> 
+{% endblock content %}

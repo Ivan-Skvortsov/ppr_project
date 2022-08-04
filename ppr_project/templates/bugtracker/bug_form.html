@@ -1,0 +1,54 @@
+<div class="row my-4">
+  <div class="col-lg-6">
+    <div class="card">
+        <div class="card-body">
+            {% load user_filters %}
+            {# ERRORS #}
+            {% if form.errors %}
+            {# field errors #}
+              {% for field in form %} 
+                {% for error in field.errors %}            
+                  <div class="alert alert-danger">
+                    {{ error|escape }}
+                  </div>
+                {% endfor %}
+              {% endfor %}
+              {# non-field errors #}
+              {% for error in form.non_field_errors %}
+                <div class="alert alert-danger">
+                  {{ error|escape }} 
+                </div>
+              {% endfor %}
+            {% endif %}
+            
+            {# FORM #}
+            <form method="post" action="{% url 'bugtracker:create' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+              {% for field in form %} 
+                <div class="form-group row my-3">
+                  {# label #}
+                    <label for="{{ field.id_for_label }}">
+                      {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="required text-danger">*</span>
+                      {% endif %}
+                    </label>
+                  {# field #}
+                  {{ field|addclass:'form-control' }} 
+                  {# helptext #}
+                  {% if field.help_text %}
+                    <small id="{{ field.id_for_label }}-help" class="form-text text-muted">
+                      {{ field.help_text|safe }}
+                    </small>
+                  {% endif %}
+                </div>
+              {% endfor %}
+          {# BUTTONS #}
+          <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-primary">Добавить</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
