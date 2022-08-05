@@ -21,8 +21,9 @@ def count_overdue_schedules():
 
 @register.simple_tag
 def count_uncompletable_schedules():
-    """Template tag to count uncompletable schedules for last two months."""
-    previous_month = date.today().month - 1
-    return Schedule.objects.filter(date_sheduled__month__gte=previous_month,
-                                   date_completed__isnull=True,
-                                   uncompleted__isnull=False).count()
+    """Template tag to count uncompletable schedules for last three months."""
+    previous_month = date.today().month - 2
+    return Schedule.objects.filter(
+        date_sheduled__month__gte=previous_month,
+        date_completed__isnull=True,
+        uncompleted__reason__icontains='магистраль').count()
