@@ -145,7 +145,7 @@ class NextMonthScheduleView(ScheduleListView):
 
 class IndexView(LoginRequiredMixin, RedirectView):
 
-    url = reverse_lazy('reports:week_schedule')
+    url = reverse_lazy('reports:day_schedule')
 
 
 class OverDueScheduleView(ScheduleListView):
@@ -167,12 +167,12 @@ class OverDueScheduleView(ScheduleListView):
 
 
 class UncompletableScheduleView(ScheduleListView):
-    """View uncompletable schedules for last two months."""
+    """View uncompletable schedules for last three months."""
 
     def get_queryset(self):
         qs = super().get_queryset()
-        previous_month = date.today().month - 1
-        return qs.filter(uncompleted__isnull=False,
+        previous_month = date.today().month - 2
+        return qs.filter(uncompleted__reason__icontains='магистраль',
                          date_completed__isnull=True,
                          date_sheduled__month__gte=previous_month)
 
@@ -216,6 +216,7 @@ class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
                 entry.employee1 = self.form.cleaned_data['employee1']
                 entry.employee2 = self.form.cleaned_data['employee2']
                 entry.employee3 = self.form.cleaned_data['employee3']
+                entry.uncompleted = None
             bulk_update_with_history(
                 qs,
                 Schedule,
