@@ -13,6 +13,9 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" onclick="showSpinner(this);" href="{% url 'reports:xlsx_report' type='maintenance' period='week' %}" download><i class="fas fa-file"></i> Протокол за неделю (beta)</a>
+        </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
             <i class="fas fa-screwdriver"></i> Посмотреть план
@@ -37,7 +40,6 @@
                 <span class="badge badge-pill bg-secondary">{{ count_uncomletable }}</span>
               </a>
             </li>
-
           </ul>
         </li>
         <li class="nav-item">

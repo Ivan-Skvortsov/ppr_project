@@ -2,7 +2,7 @@ from django.urls import path
 
 from reports.views import (ConfirmScheduleCompletedView,
                            ConfirmScheduleDateChangedView, DayScheduleView,
-                           DocxReportDownloadView, IndexView,
+                           XlsxReportDownloadView, IndexView,
                            MonthScheduleView, ScheduleDetailInfoView,
                            WeekScheduleView, NextMonthScheduleView,
                            OverDueScheduleView, SearchView,
@@ -48,9 +48,9 @@ urlpatterns = [
         name='confirm_schedule_cant_complete'
     ),
     path(
-        'docx_report/<int:schedule_id>/',
-        DocxReportDownloadView.as_view(),
-        name='docx_report'
+        'xlsx_report/<str:type>/<str:period>/',
+        XlsxReportDownloadView.as_view(),
+        name='xlsx_report'
     ),
     path(
         'mark_journal_filled/<int:pk>/',
