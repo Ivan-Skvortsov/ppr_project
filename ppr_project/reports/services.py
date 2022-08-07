@@ -43,12 +43,12 @@ class XlsxReportGenerator:
         ws = report.active
         for i, work in enumerate(self.qs):
             employees = (
-                f'{work.employee1.position}\n{work.employee1.name}\n'
+                f'{work.employee1.position}\n{work.employee1.name}\n\n'
                 f'{work.employee2.position}\n{work.employee2.name}\n'
             )
             if work.employee3 is not None:
                 employees += (
-                    f'{work.employee3.position}\n{work.employee3.name}\n'
+                    f'\n{work.employee3.position}\n{work.employee3.name}\n'
                 )
             date_completed = _date(work.date_completed, 'd.m.Y')
             ws.append(
