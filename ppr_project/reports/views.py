@@ -13,10 +13,12 @@ from django.views.generic.edit import FormView, UpdateView
 
 from simple_history.utils import bulk_update_with_history
 
+from openpyxl.writer.excel import save_virtual_workbook
+
 from reports.forms import (DateInputForm, CompleteScheduleForm, ScheduleForm,
                            ScheduleSearchForm, UncompleteReasonForm)
 from reports.models import MaintenanceCategory, Schedule
-from reports.services import DocxReportGenerator
+from reports.services import XlsxReportGenerator
 
 
 class ScheduleListView(LoginRequiredMixin, ListView):
@@ -288,23 +290,20 @@ class ConfirmScheduleCannotBeComplete(LoginRequiredMixin, FormView):
         return context
 
 
-class DocxReportDownloadView(View):
+class XlsxReportDownloadView(View):
 
-    def get(self, request, schedule_id):
+    def get(self, request, type, period):
 
         try:
-            report_generator = DocxReportGenerator(schedule_id)
-            docx_file = report_generator.render_docx_report()
-            docx_filename = report_generator.get_docx_report_filename()
-            with open(docx_file, 'rb') as f:
-                response = HttpResponse(
-                    f.read(),
-                    content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'  # noqa: E501
-                )
-            response['Content-Disposition'] = 'inline; filename=' + docx_filename  # noqa: E501
+            report_generator = XlsxReportGenerator(type, period)
+            report = report_generator.render_styled_report()
+            response = HttpResponse(
+                content=save_virtual_workbook(report),
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  # noqa
+            response['Content-Disposition'] = 'attachment; filename=week_report.xlsx'  # noqa
             return response
         except Exception as e:
-            print(f'Error rendering docx: {e}')  # FIXME: logging!
+            print(f'Error rendering xlsx: {e}')  # FIXME: logging!
             raise Http404
 
 
