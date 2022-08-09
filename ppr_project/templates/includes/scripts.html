@@ -72,12 +72,4 @@ function getCookie(name) {
   }
   return cookieValue;
 }
-
-{# tmp script to hide download link #}
-function showSpinner(source) {
-  const spinner = document.createElement('div');
-  spinner.className = 'w-25 p-3 spinner-border spinner-border-sm text-secondary';
-  source.parentNode.replaceChild(spinner, source);
-  setTimeout(() => {  spinner.parentNode.replaceChild(source, spinner);}, 5000);
-}
 </script>

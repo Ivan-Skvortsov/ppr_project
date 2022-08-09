@@ -16,7 +16,8 @@ from simple_history.utils import bulk_update_with_history
 from openpyxl.writer.excel import save_virtual_workbook
 
 from reports.forms import (DateInputForm, CompleteScheduleForm, ScheduleForm,
-                           ScheduleSearchForm, UncompleteReasonForm)
+                           ScheduleSearchForm, UncompleteReasonForm,
+                           ReportDateRangeForm)
 from reports.models import MaintenanceCategory, Schedule
 from reports.services import XlsxReportGenerator
 
@@ -290,23 +291,6 @@ class ConfirmScheduleCannotBeComplete(LoginRequiredMixin, FormView):
         return context
 
 
-class XlsxReportDownloadView(View):
-
-    def get(self, request, type, period):
-
-        try:
-            report_generator = XlsxReportGenerator(type, period)
-            report = report_generator.render_styled_report()
-            response = HttpResponse(
-                content=save_virtual_workbook(report),
-                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  # noqa
-            response['Content-Disposition'] = 'attachment; filename=week_report.xlsx'  # noqa
-            return response
-        except Exception as e:
-            print(f'Error rendering xlsx: {e}')  # FIXME: logging!
-            raise Http404
-
-
 class SearchView(ScheduleListView):
     template_name = 'reports/schedule_search.html'
 
@@ -350,3 +334,26 @@ class MarkJournalFilledView(LoginRequiredMixin, View):
                         shedule.result_journal_filled,
                         shedule.date_completed])
         return JsonResponse({'completed': completed})
+
+
+class XlsxReportDownloadView(LoginRequiredMixin, FormView):
+    form_class = ReportDateRangeForm
+    template_name = 'reports/xlsx_report_download.html'
+
+    def post(self, request, **kwargs):
+        self.form = self.get_form(self.form_class)
+        if self.form.is_valid():
+            date_from = self.form.data.get('date_from')
+            date_to = self.form.data.get('date_to')
+            try:
+                report_generator = XlsxReportGenerator(date_from, date_to)
+                report = report_generator.render_styled_report()
+                response = HttpResponse(
+                    content=save_virtual_workbook(report),
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  # noqa
+                response['Content-Disposition'] = 'attachment; filename=protocol.xlsx'  # noqa
+                return response
+            except Exception as e:
+                print(f'Error rendering xlsx: {e}')  # FIXME: logging!
+                raise Http404
+        return self.get(request, **kwargs)
