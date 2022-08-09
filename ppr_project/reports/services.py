@@ -1,7 +1,7 @@
-from datetime import date
+from datetime import datetime
 
-from openpyxl import Workbook
-from openpyxl.styles import Font, Alignment, Border, Side, NamedStyle
+from openpyxl import Workbook, worksheet
+from openpyxl.styles import Font, Alignment, Border, Side
 
 from django.template.defaultfilters import date as _date
 
@@ -10,23 +10,32 @@ from reports.models import Schedule
 
 class XlsxReportGenerator:
 
-    def __init__(self, type, period):
-        self.type = type
-        self.period = period
-        week = date.today().isocalendar()[1]
-        self.qs = Schedule.objects.filter(
-            maintenance_type__m_type__icontains='ТО',
-            date_sheduled__week=week,
+    def __init__(self, date_from, date_to):
+        self.date_from = date_from
+        self.date_to = date_to
+
+    def _get_querysets(self) -> tuple:
+        works_list_qs = Schedule.objects.filter(
+            date_sheduled__gte=self.date_from,
+            date_sheduled__lte=self.date_to,
             date_completed__isnull=False
             ).order_by('date_completed', 'equipment_type__facility')
+        maintenance_qs = works_list_qs.filter(
+            maintenance_type__m_type__icontains='ТО'
+        )
+        protect_qs = works_list_qs.filter(
+            maintenance_type__m_type__icontains='Проверка'
+        )
+        return maintenance_qs, protect_qs
 
-    def _render_report_header(self):
-        wb = Workbook()
-        ws = wb.active
+    def _render_report_header(self, ws: worksheet, maintenance_type: str):
+        date_from = datetime.strptime(self.date_from, '%Y-%m-%d')
+        date_to = datetime.strptime(self.date_to, '%Y-%m-%d')
         ws['G1'] = 'Утверждаю'
-        ws['A7'] = 'Протокол проведения ППР оборудования АСУ, А и ТМ'
+        ws['A7'] = f'Протокол проведения {maintenance_type}'
         ws['A8'] = 'объектов КС-45 Усинская'
-        ws['A9'] = _date(self.qs[0].date_sheduled, 'F Y')
+        ws['A9'] = (f'за период с {_date(date_from, "d E")} по '
+                    f'{_date(date_to, "d E Y")} г.')
         ws['A11'] = ('Основание проведения работ: График проведения ППР '
                      'оборудования АСУ, А и ТМ КС-45 Усинская на 2022 год.')
         ws['A12'] = ''
@@ -34,22 +43,23 @@ class XlsxReportGenerator:
                    'Объект',
                    'Наименование объекта/системы',
                    'Тип ТО',
-                   'Результат ТО',
+                   'Результат',
                    'Дата',
                    'Ответственные лица'])
-        return wb
 
-    def _render_report_body(self, report: Workbook) -> Workbook:
-        ws = report.active
-        for i, work in enumerate(self.qs):
-            employees = (
-                f'{work.employee1.position}\n{work.employee1.name}\n\n'
-                f'{work.employee2.position}\n{work.employee2.name}\n'
+    def _render_report_body(self, ws: worksheet, queryset):
+        if queryset.count() == 0:
+            ws.append(
+                ['', '', 'За выбранный период завершенных работ не найдено']
             )
-            if work.employee3 is not None:
-                employees += (
-                    f'\n{work.employee3.position}\n{work.employee3.name}\n'
+            return
+        for i, work in enumerate(queryset):
+            employees = [
+                f'{e.position}\n{e.name}\n\n' for e in (
+                    work.employee1, work.employee2, work.employee3
                 )
+                if e is not None and e.position != 'Приборист'
+            ]
             date_completed = _date(work.date_completed, 'd.m.Y')
             ws.append(
                 [i + 1,
@@ -58,14 +68,12 @@ class XlsxReportGenerator:
                  work.maintenance_type.m_type,
                  'Выполнено.\nЗамечаний нет.',
                  date_completed,
-                 employees]
+                 ''.join(employees)]
             )
-        self._post_process_report(14, report)
-        return report
+        self._post_process_report(14, ws)
 
-    def _post_process_report(self, start_row: int, report: Workbook) -> None:
+    def _post_process_report(self, start_row: int, ws: worksheet) -> None:
         """Merge cells with same data in cols 2, 6, 7 (Объект, Дата, ФИО)."""
-        ws = report.active
         start_row = start_row
         end_row = ws.max_row
         facility = None
@@ -88,8 +96,7 @@ class XlsxReportGenerator:
             ws.merge_cells(start_column=6, end_column=6, start_row=row - merge_count, end_row=row)  # noqa
             ws.merge_cells(start_column=7, end_column=7, start_row=row - merge_count, end_row=row)  # noqa
 
-    def _style_report(self, report: Workbook):
-        ws = report.active
+    def _style_worksheet(self, ws: worksheet):
         bold_font = Font(name='Times New Roman', size=12, bold=True)
         regular_font = Font(name='Times New Roman', size=12)
 
@@ -114,10 +121,10 @@ class XlsxReportGenerator:
         ws.column_dimensions['A'].width = 4
         ws.column_dimensions['B'].width = 19
         ws.column_dimensions['C'].width = 33
-        ws.column_dimensions['D'].width = 9
+        ws.column_dimensions['D'].width = 10
         ws.column_dimensions['E'].width = 19
         ws.column_dimensions['F'].width = 13
-        ws.column_dimensions['G'].width = 27
+        ws.column_dimensions['G'].width = 26
         ws.page_setup.orientation = ws.ORIENTATION_LANDSCAPE
         ws.page_margins.left = 0.5
         ws.page_margins.right = 0.5
@@ -126,11 +133,6 @@ class XlsxReportGenerator:
         ws.page_margins.header = 0
         ws.page_margins.footer = 0
 
-        # header styling
-        header_style = NamedStyle(name='header_style')
-        header_style.font = bold_font
-        header_style.alignment = alignment_center
-
         ws.merge_cells(start_row=7, end_row=7, start_column=1, end_column=7)
         ws.merge_cells(start_row=8, end_row=8, start_column=1, end_column=7)
         ws.merge_cells(start_row=9, end_row=9, start_column=1, end_column=7)
@@ -138,7 +140,8 @@ class XlsxReportGenerator:
 
         for row in ws.iter_rows(min_row=1, max_row=13):
             for cell in row:
-                cell.style = header_style
+                cell.font = bold_font
+                cell.alignment = alignment_center
         for cell in ws[13]:
             cell.border = border_all
 
@@ -146,23 +149,25 @@ class XlsxReportGenerator:
         ws['A11'].alignment = Alignment(horizontal='left')
         ws['A11'].font = regular_font
 
-        # body styling
-        body_style = NamedStyle(name='body_style')
-        body_style.font = regular_font
-        body_style.border = border_all
-        body_style.alignment = alignment_top_left
-
         for row in ws.iter_rows(min_row=14, max_row=ws.max_row):
             for cell in row:
-                cell.style = body_style
+                cell.font = regular_font
+                cell.border = border_all
                 if cell.column in [1, 4, 5, 6]:
                     cell.alignment = alignment_top_center
-        return report
-
-    def render_report(self):
-        header = self._render_report_header()
-        return self._render_report_body(header)
+                else:
+                    cell.alignment = alignment_top_left
 
     def render_styled_report(self):
-        report = self.render_report()
-        return self._style_report(report)
+        qs = self._get_querysets()
+        wb = Workbook()
+        ppr = wb.create_sheet('PPR')
+        ppz = wb.create_sheet('PPZ')
+        self._render_report_header(ppr, 'ППР оборудования АСУ, А и ТМ')
+        self._render_report_header(ppz, 'проверок защит')
+        self._render_report_body(ppr, qs[0])
+        self._render_report_body(ppz, qs[1])
+        self._style_worksheet(ppr)
+        self._style_worksheet(ppz)
+        del wb['Sheet']
+        return wb

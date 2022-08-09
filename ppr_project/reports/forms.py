@@ -133,6 +133,39 @@ class DateInputForm(forms.Form):
     )
 
 
+class ReportDateRangeForm(forms.Form):
+    date_from = forms.DateField(
+        widget=forms.DateInput(
+            attrs={
+                'type': 'date',
+                'class': 'form-control',
+            }
+        ),
+        label='Начало периода',
+        help_text='Выберите дату',
+    )
+    date_to = forms.DateField(
+        widget=forms.DateInput(
+            attrs={
+                'type': 'date',
+                'class': 'form-control',
+            }
+        ),
+        label='Конец периода',
+        help_text='Выберите дату',
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date_from = cleaned_data.get('date_from')
+        date_to = cleaned_data.get('date_to')
+        if date_from > date_to:
+            raise forms.ValidationError(
+                'Начало периода не может быть позже конца периода!'
+            )
+        return cleaned_data
+
+
 class ScheduleSearchForm(forms.Form):
     equipment_type__maintenance_category__pk = forms.ModelChoiceField(
         queryset=MaintenanceCategory.objects.all().order_by('pk'),

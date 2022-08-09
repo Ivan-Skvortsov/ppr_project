@@ -48,7 +48,7 @@ urlpatterns = [
         name='confirm_schedule_cant_complete'
     ),
     path(
-        'xlsx_report/<str:type>/<str:period>/',
+        'xlsx_report/',
         XlsxReportDownloadView.as_view(),
         name='xlsx_report'
     ),
