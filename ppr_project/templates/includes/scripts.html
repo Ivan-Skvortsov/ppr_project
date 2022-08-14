@@ -1,75 +1,56 @@
+{% load static %}
+
+{# bootstrap #}
 <script
   src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
   integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-  crossorigin="anonymous">
-</script>
+  crossorigin="anonymous"
+></script>
 
+{# static #}
+<script src="{% static 'js/main.js' %}"></script>
+
+{# leaving this function here so we can use django url tags #}
 <script>
-  {# select/deselect all checkboxes #}
-  function toggle(source) {
-    var checkboxes = document.querySelectorAll('input[name="selected_schedule"]');
-    for (var i = 0; i < checkboxes.length; i++) {
-      if (checkboxes[i] != source)
-        checkboxes[i].checked = source.checked;
-    }
+  function markJournalCheckbox(source) {
+    var payload = {
+      is_checked: source.checked,
+      action: source.name,
+    };
+    var pk = source.value;
+    var url = "{% url 'reports:mark_journal_filled' pk=0 %}".replace("0", pk);
+    // replace checkbox with spinner
+    const spinner = document.createElement("div");
+    spinner.className = "spinner-border spinner-border-sm text-secondary";
+    source.parentNode.replaceChild(spinner, source);
+
+    fetch(url, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "X-CSRFToken": getCookie("csrftoken"),
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        //replace spinner with checkbox
+        spinner.parentNode.replaceChild(source, spinner);
+        //row color when completed
+        const sheduleRow = document.getElementById("sheduleRow" + pk);
+        if (data.completed === true) {
+          sheduleRow.className =
+            "row border-bottom my-auto py-1 bg-success bg-opacity-25";
+        } else {
+          sheduleRow.className = "row border-bottom my-auto py-1";
+        }
+      })
+      .catch(function (error) {
+        console.error("Error:", error);
+      });
   }
-
-{# fetch api to mark journals filled #}
- function markJournalCheckbox(source) {
-  var payload = {
-    is_checked: source.checked,
-    action: source.name
-  };
-  var pk = source.value;
-  var url = "{% url 'reports:mark_journal_filled' pk=0 %}".replace('0', pk);
-  // replace checkbox with spinner
-  const spinner = document.createElement('div');
-  spinner.className = 'spinner-border spinner-border-sm text-secondary';
-  source.parentNode.replaceChild(spinner, source);
-
-  fetch(url, {
-    method: 'POST',
-    credentials: "same-origin",
-    headers: {
-      "X-CSRFToken": getCookie("csrftoken"),
-      "Accept": "application/json",
-      "Content-Type": "application/json"
-  },
-    body: JSON.stringify(payload),
-  })
-  .then(function(response) {
-    return response.json();
-  })
-  .then(function(data) {
-    //replace spinner with checkbox
-    spinner.parentNode.replaceChild(source, spinner);
-    //row color when completed
-    const sheduleRow = document.getElementById('sheduleRow' + pk);
-    if (data.completed === true) {
-      sheduleRow.className = 'row border-bottom my-auto py-1 bg-success bg-opacity-25'
-    } else {
-      sheduleRow.className = 'row border-bottom my-auto py-1'
-    }
-  })
-  .catch(function(error) {
-    console.error('Error:', error);
-  });
-}
-
-{# get coockie for csrf token (from django docs) #}
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          // Does this cookie string begin with the name we want?
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-              break;
-          }
-      }
-  }
-  return cookieValue;
-}
 </script>
