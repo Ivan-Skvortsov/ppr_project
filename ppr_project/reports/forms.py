@@ -134,6 +134,19 @@ class DateInputForm(forms.Form):
 
 
 class ReportDateRangeForm(forms.Form):
+    report_type = forms.ChoiceField(
+        choices=[
+            ('ppr', 'Протокол ППР'),
+            ('ppz', 'Протокол проверки защит'),
+            ('asps', 'Отчет по АСПС для пожарных')
+        ],
+        initial='ppr',
+        widget=forms.Select(
+            attrs={'class': 'form-select'}
+        ),
+        label='Тип протокола',
+        help_text='Выберите тип протокола'
+    )
     date_from = forms.DateField(
         widget=forms.DateInput(
             attrs={

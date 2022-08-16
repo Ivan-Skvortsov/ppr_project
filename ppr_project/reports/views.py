@@ -345,8 +345,11 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
         if self.form.is_valid():
             date_from = self.form.data.get('date_from')
             date_to = self.form.data.get('date_to')
+            report_type = self.form.data.get('report_type')
             try:
-                report_generator = XlsxReportGenerator(date_from, date_to)
+                report_generator = XlsxReportGenerator(
+                    date_from, date_to, report_type
+                )
                 report = report_generator.render_styled_report()
                 response = HttpResponse(
                     content=save_virtual_workbook(report),
