@@ -3,6 +3,7 @@ from datetime import datetime
 from openpyxl import Workbook, worksheet
 from openpyxl.styles import Font, Alignment, Border, Side
 
+from django.db.models import Q
 from django.template.defaultfilters import date as _date
 
 from reports.models import Schedule
@@ -10,23 +11,23 @@ from reports.models import Schedule
 
 class XlsxReportGenerator:
 
-    def __init__(self, date_from, date_to):
+    def __init__(self, date_from, date_to, report_type):
         self.date_from = date_from
         self.date_to = date_to
+        self.report_type = report_type
 
     def _get_querysets(self) -> tuple:
+        qs_filter = {
+            'ppr': Q(maintenance_type__m_type__icontains='ТО'),
+            'ppz': Q(maintenance_type__m_type__icontains='Проверка'),
+            'asps': Q(equipment_type__eqipment_type_name__icontains='АСПС')
+        }
         works_list_qs = Schedule.objects.filter(
             date_sheduled__gte=self.date_from,
             date_sheduled__lte=self.date_to,
             date_completed__isnull=False
             ).order_by('date_completed', 'equipment_type__facility')
-        maintenance_qs = works_list_qs.filter(
-            maintenance_type__m_type__icontains='ТО'
-        )
-        protect_qs = works_list_qs.filter(
-            maintenance_type__m_type__icontains='Проверка'
-        )
-        return maintenance_qs, protect_qs
+        return works_list_qs.filter(qs_filter[self.report_type])
 
     def _render_report_header(self, ws: worksheet, maintenance_type: str):
         date_from = datetime.strptime(self.date_from, '%Y-%m-%d')
@@ -47,6 +48,15 @@ class XlsxReportGenerator:
                    'Дата',
                    'Ответственные лица'])
 
+    def _render_employees_string(self, entry) -> str:
+        employees = [
+            f'{e.position}\n{e.name}\n\n' for e in (
+                entry.employee1, entry.employee2, entry.employee3
+            )
+            if e is not None and e.position != 'Приборист'
+        ]
+        return ''.join(employees)
+
     def _render_report_body(self, ws: worksheet, queryset):
         if queryset.count() == 0:
             ws.append(
@@ -54,12 +64,7 @@ class XlsxReportGenerator:
             )
             return
         for i, work in enumerate(queryset):
-            employees = [
-                f'{e.position}\n{e.name}\n\n' for e in (
-                    work.employee1, work.employee2, work.employee3
-                )
-                if e is not None and e.position != 'Приборист'
-            ]
+            employees = self._render_employees_string(work)
             date_completed = _date(work.date_completed, 'd.m.Y')
             ws.append(
                 [i + 1,
@@ -68,7 +73,7 @@ class XlsxReportGenerator:
                  work.maintenance_type.m_type,
                  'Выполнено.\nЗамечаний нет.',
                  date_completed,
-                 ''.join(employees)]
+                 employees]
             )
         self._post_process_report(14, ws)
 
@@ -158,16 +163,76 @@ class XlsxReportGenerator:
                 else:
                     cell.alignment = alignment_top_left
 
+    def _render_asps_report(self, ws: worksheet, queryset):
+        """
+        Renders asps report. This report is different from default
+        reports, thats why render and styling of it are united in this
+        single function.
+        """
+        ws.append(
+            ['Дата проверки',
+             'Местонахождение системы противопожарной защиты',
+             'Вид мероприятия по эксплуатации систем противопожарной защиты',
+             'Наличие/отсутствие замечаний',
+             'Подтверждающий документ (акт, протокол)',
+             'Должность,Ф.И.О проводившего проверку']
+        )
+        ws.append([1, 2, 3, 4, 5, 6])
+        if queryset.count() == 0:
+            ws.append(
+                ['', '', 'За выбранный период завершенных работ не найдено']
+            )
+            return
+        for work in queryset:
+            employees = self._render_employees_string(work)
+            date_completed = _date(work.date_completed, 'd.m.Y')
+            work_type_and_name = (
+                f'{work.maintenance_type.m_type}: '
+                f'{work.equipment_type.eqipment_type_name}'
+            )
+            ws.append(
+                [date_completed,
+                 work.equipment_type.facility.facility_name,
+                 work_type_and_name,
+                 'Замечаний нет',
+                 f'Запись в журнале от {date_completed}',
+                 employees.replace('\n', ' ')]
+            )
+
+        # styling
+        ws.column_dimensions['A'].width = 14
+        ws.column_dimensions['B'].width = 40
+        ws.column_dimensions['C'].width = 45
+        ws.column_dimensions['D'].width = 27
+        ws.column_dimensions['E'].width = 40
+        ws.column_dimensions['F'].width = 55
+
+        border_all = Border(bottom=Side(border_style='thin', color='FF000000'),
+                            top=Side(border_style='thin', color='FF000000'),
+                            left=Side(border_style='thin', color='FF000000'),
+                            right=Side(border_style='thin', color='FF000000'))
+        alignment_center = Alignment(horizontal='center',
+                                     vertical='center',
+                                     wrap_text=True)
+        for row in ws.iter_rows(min_row=1, max_row=ws.max_row):
+            for cell in row:
+                cell.font = Font(name='Times New Roman', size=12)
+                cell.border = border_all
+                cell.alignment = alignment_center
+
     def render_styled_report(self):
-        qs = self._get_querysets()
+        rep_type = {
+            'ppr': 'ППР оборудования АСУ, А и ТМ',
+            'ppz': 'проверок защит'
+        }
         wb = Workbook()
-        ppr = wb.create_sheet('PPR')
-        ppz = wb.create_sheet('PPZ')
-        self._render_report_header(ppr, 'ППР оборудования АСУ, А и ТМ')
-        self._render_report_header(ppz, 'проверок защит')
-        self._render_report_body(ppr, qs[0])
-        self._render_report_body(ppz, qs[1])
-        self._style_worksheet(ppr)
-        self._style_worksheet(ppz)
+        qs = self._get_querysets()
         del wb['Sheet']
+        ws = wb.create_sheet(self.report_type)
+        if self.report_type == 'asps':
+            self._render_asps_report(ws, qs)
+            return wb
+        self._render_report_header(ws, rep_type[self.report_type])
+        self._render_report_body(ws, qs)
+        self._style_worksheet(ws)
         return wb
