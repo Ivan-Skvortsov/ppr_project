@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.urls.base import resolve
 from django.views import View
@@ -181,7 +181,7 @@ class UncompletableScheduleView(ScheduleListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = 'Невыполнимые работы (последние два месяца)'
+        context['plan_period'] = 'Невыполнимые работы (последние три месяца)'
         context['plan_url'] = reverse_lazy('reports:uncompletable')
         return context
 
