@@ -56,8 +56,7 @@ function showModalForm(url) {
 
 // submit form with download
 function submitModalForm(evnt, form) {
-  const submitButton = document.querySelector("button[type='submit']");
-  const subbmitButtonInnerHtml = submitButton.innerHTML;
+  const submitButton = document.querySelector("#submitAndDownload");
   submitButton.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Загрузка`;
   submitButton.disabled = true;
   evnt.preventDefault();
@@ -83,8 +82,6 @@ function submitModalForm(evnt, form) {
       const modalWindow = bootstrap.Modal.getInstance(modalWindowEl);
       if (typeof data === "string") {
         modalWindowEl.innerHTML = data;
-        submitButton.innerHTML = subbmitButtonInnerHtml;
-        submitButton.disabled = false;
       } else {
         const reportFile = window.URL.createObjectURL(data);
         window.location.assign(reportFile);
