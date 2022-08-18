@@ -1,54 +1,49 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-6 p-5">
-    <div class="card border-primary">
-      <div class="card-header bg-primary text-white"><strong>Выберите период формирования протокола</strong></div>
-        <div class="card-body">
-          {% comment %} form erros {% endcomment %}
-          {% if form.errors %}
-            {% for field in form %} 
-              {% for error in field.errors %}            
-                <div class="alert alert-danger">
-                  {{ error|escape }}
-                </div>
-              {% endfor %}
-            {% endfor %}
-            {% for error in form.non_field_errors %}
-              <div class="alert alert-danger">
-                {{ error|escape }}
-              </div>
-            {% endfor %}
-          {% endif %}
-          <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% comment %} form fields {% endcomment %}
-            {% for field in form %} 
-              <div class="row my-2 align-items-center">
-                <div class="col">
-                  <label for="{{ field.id_for_label }}">
-                    {{ field.label }}
-                      {% if field.field.required %}
-                        <span class="required text-danger">*</span>
-                      {% endif %}
-                  </label>
-                </div>
-                <div class="col">
-                  {{ field }} 
-                </div>
-              </div>
-            {% endfor %}
-            {% comment %} buttons {% endcomment %}
-            <div class="container-lg mt-3">
-              <div class="row justify-content-center">
-                <div class="col-8 py-2">
-                    <button type="submit" class="btn btn-primary w-100">Скачать</button>
-                </div>
-              </div>
+<div class="modal-dialog">
+  <div class="modal-content" id="modalWindowContent">
+    <div class="modal-header">
+      <h5 class="modal-title" id="modalWindowLabel">Выберите тип и период протокола</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      {% comment %} form erros {% endcomment %}
+      {% if form.errors %}
+        {% for field in form %} 
+          {% for error in field.errors %}            
+            <div class="alert alert-danger">
+              {{ error|escape }}
             </div>
-          </form>
+          {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+          <div class="alert alert-danger">
+            {{ error|escape }}
+          </div>
+        {% endfor %}
+      {% endif %}
+      <form method="post" action="{% url 'reports:xlsx_report' %}" enctype="multipart/form-data" onsubmit="submitModalForm(event, this);">
+        {% csrf_token %}
+        {% comment %} form fields {% endcomment %}
+        {% for field in form %} 
+          <div class="row my-2 align-items-center">
+            <div class="col">
+              <label for="{{ field.id_for_label }}">
+                {{ field.label }}
+                  {% if field.field.required %}
+                    <span class="required text-danger">*</span>
+                  {% endif %}
+              </label>
+            </div>
+            <div class="col">
+              {{ field }} 
+            </div>
+          </div>
+        {% endfor %}
+        {% comment %} buttons {% endcomment %}
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Скачать</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
         </div>
+      </form>
     </div>
   </div>
 </div>
-{% endblock content %}

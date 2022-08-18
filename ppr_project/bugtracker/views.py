@@ -60,9 +60,8 @@ class AddCommentView(LoginRequiredMixin, CreateView):
 
 class CloseBug(UserPassesTestMixin, View):
     """
-    Close bug. Closing bug means that you provide data
-    to close_date field of Bug model.
-    Allowed only to staff users.
+    Close bug. Closing bug means that close_date field of Bug model is
+    set to now(). Allowed only to staff users.
     """
 
     def test_func(self):

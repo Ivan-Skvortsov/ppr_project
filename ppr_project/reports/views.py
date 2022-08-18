@@ -181,7 +181,7 @@ class UncompletableScheduleView(ScheduleListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = 'Невыполнимые работы (последние два месяца)'
+        context['plan_period'] = 'Невыполнимые работы (последние три месяца)'
         context['plan_url'] = reverse_lazy('reports:uncompletable')
         return context
 
