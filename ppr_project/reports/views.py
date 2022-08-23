@@ -19,7 +19,8 @@ from reports.forms import (DateInputForm, CompleteScheduleForm, ScheduleForm,
                            ScheduleSearchForm, UncompleteReasonForm,
                            ReportDateRangeForm)
 from reports.models import MaintenanceCategory, Schedule
-from reports.services import XlsxReportGenerator
+from reports.services import (XlsxReportGenerator,
+                              distribute_next_month_works_by_dates)
 
 
 class ScheduleListView(LoginRequiredMixin, ListView):
@@ -360,3 +361,10 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
                 print(f'Error rendering xlsx: {e}')  # FIXME: logging!
                 raise Http404
         return self.get(request, **kwargs)
+
+
+class DistributeNextMonthSchedules(LoginRequiredMixin, View):
+
+    def get(self, request, **kwargs):
+        distribute_next_month_works_by_dates()
+        return redirect('reports:next_month_schedule')

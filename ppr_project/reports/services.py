@@ -1,10 +1,12 @@
-from datetime import datetime
+from collections import defaultdict
+from datetime import datetime, date
+from calendar import monthrange
 
 from openpyxl import Workbook, worksheet
 from openpyxl.styles import Font, Alignment, Border, Side
-
 from django.db.models import Q
 from django.template.defaultfilters import date as _date
+from simple_history.utils import bulk_update_with_history
 
 from reports.models import Schedule
 
@@ -236,3 +238,29 @@ class XlsxReportGenerator:
         self._render_report_body(ws, qs)
         self._style_worksheet(ws)
         return wb
+
+
+def distribute_next_month_works_by_dates():
+    current_date = date.today()
+    current_year = current_date.year
+    next_month = current_date.month + 1
+    last_day_of_month = monthrange(current_year, next_month)[1]
+    qs = (Schedule.objects.select_related('equipment_type__facility')
+                          .filter(date_sheduled__month=next_month)
+                          .order_by('equipment_type__facility'))
+    regouped_schedules = defaultdict(list)
+    for schedule in qs:
+        regouped_schedules[schedule.equipment_type.facility].append(schedule)
+    current_day = 1
+    for group in regouped_schedules:
+        for schedule in regouped_schedules[group]:
+            schedule.date_sheduled = date(
+                year=current_year, month=next_month, day=current_day
+            )
+            schedule._change_reason = 'Distributed next month shedules by day'
+        current_day += 1
+        if current_day > last_day_of_month:
+            current_day = 1
+    bulk_update_with_history(
+        qs, Schedule, ['date_sheduled'], batch_size=500
+    )

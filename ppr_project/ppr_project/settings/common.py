@@ -114,3 +114,5 @@ DEFAULT_FROM_EMAIL = f'Cистема управления ППР КС-45 <{EMAIL
 ADMINS = [('Ivan Skvortsov', os.getenv('ADMIN_MAIL'))]
 
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 4000

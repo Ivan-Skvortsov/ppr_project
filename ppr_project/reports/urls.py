@@ -7,7 +7,8 @@ from reports.views import (ConfirmScheduleCompletedView,
                            WeekScheduleView, NextMonthScheduleView,
                            OverDueScheduleView, SearchView,
                            ConfirmScheduleCannotBeComplete,
-                           UncompletableScheduleView, MarkJournalFilledView)
+                           UncompletableScheduleView, MarkJournalFilledView,
+                           DistributeNextMonthSchedules)
 
 app_name = 'reports'
 
@@ -55,5 +56,11 @@ urlpatterns = [
     path(
         'mark_journal_filled/<int:pk>/',
         MarkJournalFilledView.as_view(),
-        name='mark_journal_filled')
+        name='mark_journal_filled'
+    ),
+    path(
+        'distribute_next_month/',
+        DistributeNextMonthSchedules.as_view(),
+        name='distribute_next_month'
+    )
 ]
