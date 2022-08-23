@@ -3,7 +3,12 @@
 {% block content %}
 
 <div class="my-3 p-2 text-left text-muted">
-  <h5>{{ plan_period }}</h5>
+  <h5>
+    {{ plan_period }}
+    {% if plan_period == 'План на следующий месяц' %} - 
+    <a class="text-decoration-none" href="{% url 'reports:distribute_next_month' %}"> распределить работы по дням (beta)</a>
+    {% endif %}
+  </h5>
 </div>
 
   <div class="card my-3">
@@ -15,7 +20,4 @@
       {% include 'reports/includes/schedule_table.html' %}
     </div>
   </div>
-
-  {% include 'reports/includes/modal_window.html' %}
-
 {% endblock content %}
