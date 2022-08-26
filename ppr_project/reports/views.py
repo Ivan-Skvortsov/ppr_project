@@ -20,7 +20,8 @@ from reports.forms import (DateInputForm, CompleteScheduleForm, ScheduleForm,
                            ReportDateRangeForm)
 from reports.models import MaintenanceCategory, Schedule
 from reports.services import (XlsxReportGenerator,
-                              distribute_next_month_works_by_dates)
+                              distribute_next_month_works_by_dates,
+                              get_next_month_plans)
 
 
 class ScheduleListView(LoginRequiredMixin, ListView):
@@ -368,3 +369,14 @@ class DistributeNextMonthSchedules(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
         distribute_next_month_works_by_dates()
         return redirect('reports:next_month_schedule')
+
+
+class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
+
+    def get(self, request, **kwargs):
+        xlsx_file = get_next_month_plans()
+        response = HttpResponse(
+            content=save_virtual_workbook(xlsx_file),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  # noqa
+        response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'  # noqa
+        return response

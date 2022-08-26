@@ -13,9 +13,18 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          {% now "n" as current_month %}
-          <a class="nav-link" style="cursor:pointer" onclick="showModalForm({% url 'reports:xlsx_report' %});"><i class="fas fa-file"></i> Скачать протокол</a>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-download"></i> Загрузки
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              {% now "n" as current_month %}
+              <a class="dropdown-item" style="cursor:pointer" onclick="showModalForm({% url 'reports:xlsx_report' %});"><i class="fas fa-file"></i> Протокол выполнения</a>
+            </li>
+            <li><a class="dropdown-item" href="{% url 'reports:next_month_plan_xlsx' %}"><i class="fas fa-table"></i> План на следующий месяц</a></li>
+          </ul>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
