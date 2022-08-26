@@ -8,7 +8,8 @@ from reports.views import (ConfirmScheduleCompletedView,
                            OverDueScheduleView, SearchView,
                            ConfirmScheduleCannotBeComplete,
                            UncompletableScheduleView, MarkJournalFilledView,
-                           DistributeNextMonthSchedules)
+                           DistributeNextMonthSchedules,
+                           XlsxNextMonthDownloadView)
 
 app_name = 'reports'
 
@@ -62,5 +63,10 @@ urlpatterns = [
         'distribute_next_month/',
         DistributeNextMonthSchedules.as_view(),
         name='distribute_next_month'
+    ),
+    path(
+        'next_month_plan_xlsx/',
+        XlsxNextMonthDownloadView.as_view(),
+        name='next_month_plan_xlsx'
     )
 ]

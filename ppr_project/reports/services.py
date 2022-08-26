@@ -241,6 +241,7 @@ class XlsxReportGenerator:
 
 
 def distribute_next_month_works_by_dates():
+    """Distributes netx month schedules by dates."""
     current_date = date.today()
     current_year = current_date.year
     next_month = current_date.month + 1
@@ -264,3 +265,33 @@ def distribute_next_month_works_by_dates():
     bulk_update_with_history(
         qs, Schedule, ['date_sheduled'], batch_size=500
     )
+
+
+def get_next_month_plans():
+    current_date = date.today()
+    next_month = current_date.month + 1
+    qs = (Schedule.objects.select_related('equipment_type__facility',
+                                          'maintenance_type',
+                                          'equipment_type')
+                          .order_by('date_sheduled',
+                                    'equipment_type__facility')
+                          .filter(date_sheduled__month=next_month))
+    regrouped_schedules = defaultdict(list)
+    for schedule in qs:
+        regrouped_schedules[schedule.date_sheduled].append(schedule)
+    wb = Workbook()
+    ws = wb.active
+    for schedule_date in regrouped_schedules:
+        formatted_date = _date(schedule_date, 'd E Y')
+        ws.append([formatted_date])
+        for schedule in regrouped_schedules[schedule_date]:
+            ws.append([
+                schedule.equipment_type.facility.facility_name,
+                schedule.equipment_type.eqipment_type_name,
+                schedule.maintenance_type.m_type
+            ])
+        ws.append([''])
+    ws.column_dimensions['A'].width = 20
+    ws.column_dimensions['B'].width = 55
+    ws.column_dimensions['C'].width = 10
+    return wb
