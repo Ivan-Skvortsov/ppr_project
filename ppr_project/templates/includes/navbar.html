@@ -2,6 +2,7 @@
 {% load user_filters %}
 {% count_overdue_schedules as count_overdue %}
 {% count_uncompletable_schedules as count_uncomletable %}
+{% count_schedules_without_photo_approvals as count_no_photo %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-xxl">
     <a class="navbar-brand" href="{% url 'reports:index' %}">
@@ -30,7 +31,7 @@
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
             <i class="fas fa-screwdriver"></i> Посмотреть план
             {% if count_overdue %}
-              <span class="badge badge-pill bg-danger">{{ count_overdue }}</span>
+              <span class="badge badge-pill bg-danger">{{ count_overdue|add:count_no_photo }}</span>
             {% endif %}
           </a>
           <ul class="dropdown-menu">
@@ -48,6 +49,12 @@
               <a class="dropdown-item" href="{% url 'reports:uncompletable' %}">
                 Невыполнимые
                 <span class="badge badge-pill bg-secondary">{{ count_uncomletable }}</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'reports:no_photo_apporval' %}">
+                Не загружено фото
+                <span class="badge badge-pill bg-danger">{{ count_no_photo }}</span>
               </a>
             </li>
           </ul>

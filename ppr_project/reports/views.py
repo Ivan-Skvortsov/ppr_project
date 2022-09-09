@@ -188,6 +188,23 @@ class UncompletableScheduleView(ScheduleListView):
         return context
 
 
+class NoPhotoScheduleView(ScheduleListView):
+    """View completed schedules without photo approvals."""
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(date_completed__isnull=False,
+                         photo='',
+                         maintenance_type__m_type__icontains='Проверка')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['plan_period'] = ('Завершенные проверки защит, '
+                                  'к которым не загружены фото')
+        context['plan_url'] = reverse_lazy('reports:no_photo_apporval')
+        return context
+
+
 class ScheduleDetailInfoView(LoginRequiredMixin, UpdateView):
     template_name = 'reports/schedule_detail.html'
     model = Schedule
@@ -380,3 +397,16 @@ class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  # noqa
         response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'  # noqa
         return response
+
+
+class UploadPhotoApprovalView(LoginRequiredMixin, View):
+
+    def post(self, request, pk):
+        photo_approval = request.FILES.get('photo')
+        if not photo_approval:
+            return JsonResponse({'error': 'Invalid request'}, status=400)
+        shedule = get_object_or_404(Schedule, pk=pk)
+        shedule.photo = photo_approval
+        shedule._change_reason = 'Uploaded photo approval'
+        shedule.save()
+        return JsonResponse({'OK': 'completed'})

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-lg-6 p-5">
@@ -60,11 +61,13 @@
             <div class="container-lg mt-3">
               <div class="row justify-content-center">
                 <div class="col py-2">
-                    <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+                  <button type="submit" class="btn btn-primary w-100">Сохранить</button>
                 </div>
                 <div class="col py-2">
-                    <a class="btn btn-secondary w-100" href="{{ return_url }}" role="button">Отмена</a>
+                  <a class="btn btn-secondary w-100" href="{{ return_url }}" role="button">Отмена</a>
                 </div>
+                {# url for image upload #}
+                <input type="hidden" id="photoUploadUrl" value="{% url 'reports:upload_photo_approval' schedule_entry.pk %}">
               </div>
             </div>
           </form>
@@ -72,4 +75,6 @@
     </div>
   </div>
 </div>
+<script src="{% static 'js/image_compress.js' %}"></script>
+<script src="{% static 'js/compressor.min.js' %}"></script>
 {% endblock content %}

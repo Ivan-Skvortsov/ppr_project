@@ -9,7 +9,8 @@ from reports.views import (ConfirmScheduleCompletedView,
                            ConfirmScheduleCannotBeComplete,
                            UncompletableScheduleView, MarkJournalFilledView,
                            DistributeNextMonthSchedules,
-                           XlsxNextMonthDownloadView)
+                           XlsxNextMonthDownloadView, UploadPhotoApprovalView,
+                           NoPhotoScheduleView)
 
 app_name = 'reports'
 
@@ -26,6 +27,7 @@ urlpatterns = [
     path('overdue/<int:category_id>/', OverDueScheduleView.as_view(), name='overdue'),  # noqa: E501
     path('overdue/', OverDueScheduleView.as_view(), name='overdue'),
     path('uncompletable/', UncompletableScheduleView.as_view(), name='uncompletable'),  # noqa: E501
+    path('no_photo_apporval/', NoPhotoScheduleView.as_view(), name='no_photo_apporval'),  # noqa: E501
     path('search/', SearchView.as_view(), name='search'),
 
 
@@ -68,5 +70,10 @@ urlpatterns = [
         'next_month_plan_xlsx/',
         XlsxNextMonthDownloadView.as_view(),
         name='next_month_plan_xlsx'
-    )
+    ),
+    path(
+        'upload_photo_approval/<int:pk>/',
+        UploadPhotoApprovalView.as_view(),
+        name='upload_photo_approval'
+    ),
 ]

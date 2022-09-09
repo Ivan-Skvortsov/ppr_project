@@ -58,7 +58,8 @@ class ScheduleForm(forms.ModelForm):
                 attrs={'class': 'form-check-input'}
             ),
             'photo': CustomFileInput(
-                attrs={'class': 'form-control'}
+                attrs={'class': 'form-control',
+                       'id': 'photo_approval'}
             ),
             'uncompleted': Select(
                 attrs={'class': 'form-control form-select'}
