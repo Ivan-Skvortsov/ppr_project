@@ -54,7 +54,7 @@
             <li>
               <a class="dropdown-item" href="{% url 'reports:no_photo_apporval' %}">
                 Не загружено фото
-                <span class="badge badge-pill bg-danger">{{ count_no_photo }}</span>
+                <span class="badge badge-pill {% if count_overdue %}bg-danger{% else %}bg-secondary{% endif %}">{{ count_no_photo }}</span>
               </a>
             </li>
           </ul>
