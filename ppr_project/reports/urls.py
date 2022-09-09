@@ -74,5 +74,4 @@ urlpatterns = [
         UploadPhotoApprovalView.as_view(),
         name='upload_photo_approval'
     ),
-    
 ]
