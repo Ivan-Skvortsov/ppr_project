@@ -27,3 +27,13 @@ def count_uncompletable_schedules():
         date_sheduled__month__gte=previous_month,
         date_completed__isnull=True,
         uncompleted__reason__icontains='магистраль').count()
+
+
+@register.simple_tag
+def count_schedules_without_photo_approvals():
+    """Counts completed schedules with no photo approvals attached."""
+    return Schedule.objects.filter(
+        date_completed__isnull=False,
+        photo='',
+        maintenance_type__m_type__icontains='Проверка'
+    ).count()
