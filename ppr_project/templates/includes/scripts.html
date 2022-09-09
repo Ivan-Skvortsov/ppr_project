@@ -34,8 +34,8 @@
       },
       body: JSON.stringify(payload),
     })
-      .then(function (response) {
-        return response.json();
+    .then(function (response) {
+      return response.json();
       })
       .then(function (data) {
         //replace spinner with checkbox
@@ -44,7 +44,7 @@
         const sheduleRow = document.getElementById("sheduleRow" + pk);
         if (data.completed === true) {
           sheduleRow.className =
-            "row border-bottom my-auto py-1 bg-success bg-opacity-25";
+          "row border-bottom my-auto py-1 bg-success bg-opacity-25";
         } else {
           sheduleRow.className = "row border-bottom my-auto py-1";
         }
@@ -52,5 +52,5 @@
       .catch(function (error) {
         console.error("Error:", error);
       });
-  }
-</script>
+    }
+  </script>

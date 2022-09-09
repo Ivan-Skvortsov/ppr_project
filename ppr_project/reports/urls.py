@@ -9,7 +9,7 @@ from reports.views import (ConfirmScheduleCompletedView,
                            ConfirmScheduleCannotBeComplete,
                            UncompletableScheduleView, MarkJournalFilledView,
                            DistributeNextMonthSchedules,
-                           XlsxNextMonthDownloadView)
+                           XlsxNextMonthDownloadView, UploadPhotoApprovalView)
 
 app_name = 'reports'
 
@@ -68,5 +68,11 @@ urlpatterns = [
         'next_month_plan_xlsx/',
         XlsxNextMonthDownloadView.as_view(),
         name='next_month_plan_xlsx'
-    )
+    ),
+    path(
+        'upload_photo_approval/<int:pk>/',
+        UploadPhotoApprovalView.as_view(),
+        name='upload_photo_approval'
+    ),
+    
 ]

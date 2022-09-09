@@ -380,3 +380,16 @@ class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  # noqa
         response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'  # noqa
         return response
+
+
+class UploadPhotoApprovalView(LoginRequiredMixin, View):
+
+    def post(self, request, pk):
+        photo_approval = request.FILES.get('photo')
+        if not photo_approval:
+            return JsonResponse({'error': 'Invalid request'}, status=400)
+        shedule = get_object_or_404(Schedule, pk=pk)
+        shedule.photo = photo_approval
+        shedule._change_reason = 'Uploaded photo approval'
+        shedule.save()
+        return JsonResponse({'OK': 'completed'})
