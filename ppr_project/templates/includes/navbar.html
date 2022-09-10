@@ -30,7 +30,7 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
             <i class="fas fa-screwdriver"></i> Посмотреть план
-            {% if count_overdue %}
+            {% if count_overdue or count_no_photo%}
               <span class="badge badge-pill bg-danger">{{ count_overdue|add:count_no_photo }}</span>
             {% endif %}
           </a>
