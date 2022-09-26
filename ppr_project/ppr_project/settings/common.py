@@ -117,3 +117,13 @@ ADMINS = [('Ivan Skvortsov', os.getenv('ADMIN_MAIL'))]
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 4000
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}

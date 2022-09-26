@@ -3,10 +3,9 @@ from rest_framework import serializers
 from reports.models import Employee, Schedule
 
 
-class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
+class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        # fields = ['name', 'position', 'department']
         fields = '__all__'
 
 

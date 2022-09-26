@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import mixins, viewsets
 
 from api.serializers import EmployeeSerializer, ScheduleSerializer
 from reports.models import Employee, Schedule
@@ -10,7 +10,6 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     serializer_class = EmployeeSerializer
 
 
-class ScheduleViewSet(viewsets.ModelViewSet):
-
-    queryset = Schedule.objects.all()[:30]
+class ScheduleViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
