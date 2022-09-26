@@ -28,6 +28,7 @@ django-filter = "^22.1"
 [tool.poetry.group.dev.dependencies]
 django-debug-toolbar = "^3.6.0"
 flake8 = "^5.0.4"
+pre-commit = "^2.20.0"
 
 [build-system]
 requires = ["poetry-core"]
