@@ -1,5 +1,6 @@
-from reports.models import Employee, Schedule
 from rest_framework import serializers
+
+from reports.models import Employee, Schedule
 
 
 class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
