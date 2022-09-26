@@ -19,10 +19,12 @@ INSTALLED_APPS = [
     'reports.apps.ReportsConfig',
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',
+    'api.apps.ApiConfig',
     'bugtracker.apps.BugtrackerConfig',
     'django.forms',
     'simple_history',
-    'sorl.thumbnail'
+    'sorl.thumbnail',
+    'rest_framework',
 ]
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'

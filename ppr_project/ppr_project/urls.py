@@ -9,6 +9,7 @@ urlpatterns = [
     path('auth/', include('django.contrib.auth.urls')),
     path('bugs/', include('bugtracker.urls', namespace='bugtracker')),
     path('ppradmin/', admin.site.urls),
+    path('api/v1/', include('api.urls')),
 ]
 
 handler404 = 'core.views.page_not_found'
