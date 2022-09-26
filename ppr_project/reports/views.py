@@ -1,4 +1,3 @@
-import json
 from datetime import date, timedelta
 
 from django.contrib import messages
@@ -11,17 +10,23 @@ from django.views import View
 from django.views.generic import ListView, RedirectView
 from django.views.generic.edit import FormView, UpdateView
 
+from openpyxl.writer.excel import save_virtual_workbook
 from simple_history.utils import bulk_update_with_history
 
-from openpyxl.writer.excel import save_virtual_workbook
-
-from reports.forms import (DateInputForm, CompleteScheduleForm, ScheduleForm,
-                           ScheduleSearchForm, UncompleteReasonForm,
-                           ReportDateRangeForm)
+from reports.forms import (
+    CompleteScheduleForm,
+    DateInputForm,
+    ReportDateRangeForm,
+    ScheduleForm,
+    ScheduleSearchForm,
+    UncompleteReasonForm,
+)
 from reports.models import MaintenanceCategory, Schedule
-from reports.services import (XlsxReportGenerator,
-                              distribute_next_month_works_by_dates,
-                              get_next_month_plans)
+from reports.services import (
+    XlsxReportGenerator,
+    distribute_next_month_works_by_dates,
+    get_next_month_plans,
+)
 
 
 class ScheduleListView(LoginRequiredMixin, ListView):
@@ -37,43 +42,23 @@ class ScheduleListView(LoginRequiredMixin, ListView):
             return self.get(request, *args, **kwargs)
         if selected_action == 'date_scheduled_changed':
             return self._redirect_to_confirmation_page(
-                selected_schedules,
-                'reports:confirm_date_changed'
-                )
+                selected_schedules, 'reports:confirm_date_changed'
+            )
         if selected_action == 'schedule_completed':
             return self._redirect_to_confirmation_page(
-                selected_schedules,
-                'reports:confirm_schedule_completed'
-                )
+                selected_schedules, 'reports:confirm_schedule_completed'
+            )
         if selected_action == 'schedule_cant_be_completed':
             return self._redirect_to_confirmation_page(
-                selected_schedules,
-                'reports:confirm_schedule_cant_complete'
-                )
-        qs = Schedule.objects.filter(pk__in=selected_schedules)
-        if selected_action == 'access_journal_filled':
-            for entry in qs:
-                entry._change_reason = 'Changed state of access journal'
-                entry.access_journal_filled = True
-            bulk_update_with_history(
-                qs, Schedule, ['access_journal_filled'], batch_size=500
-            )
-        if selected_action == 'result_journal_filled':
-            for entry in qs:
-                entry._change_reason = 'Changed state of result journal'
-                entry.result_journal_filled = True
-            bulk_update_with_history(
-                qs, Schedule, ['result_journal_filled'], batch_size=500
+                selected_schedules, 'reports:confirm_schedule_cant_complete'
             )
         return self.get(request, *args, **kwargs)
 
     def get_queryset(self):
         category_id = self.kwargs.get('category_id', None)
-        qs = (Schedule.objects.select_related('equipment_type__facility',
-                                              'report',
-                                              'maintenance_type')
-                              .order_by('date_sheduled',
-                                        'equipment_type__facility'))
+        qs = Schedule.objects.select_related(
+            'equipment_type__facility', 'report', 'maintenance_type'
+        ).order_by('date_sheduled', 'equipment_type__facility')
         if category_id:
             maintenance_category = get_object_or_404(
                 MaintenanceCategory, pk=category_id
@@ -87,14 +72,11 @@ class ScheduleListView(LoginRequiredMixin, ListView):
         return_url = resolve(self.request.path_info).url_name
         schedule_list = '_'.join(selected_schedules)
         return redirect(
-            page_url,
-            schedule_list=schedule_list,
-            return_url=return_url
+            page_url, schedule_list=schedule_list, return_url=return_url
         )
 
 
 class DayScheduleView(ScheduleListView):
-
     def get_queryset(self):
         qs = super().get_queryset()
         return qs.filter(date_sheduled=date.today())
@@ -107,7 +89,6 @@ class DayScheduleView(ScheduleListView):
 
 
 class MonthScheduleView(ScheduleListView):
-
     def get_queryset(self):
         qs = super().get_queryset()
         month = date.today().month
@@ -121,7 +102,6 @@ class MonthScheduleView(ScheduleListView):
 
 
 class WeekScheduleView(ScheduleListView):
-
     def get_queryset(self):
         qs = super().get_queryset()
         week = date.today().isocalendar()[1]  # Get week number
@@ -135,7 +115,6 @@ class WeekScheduleView(ScheduleListView):
 
 
 class NextMonthScheduleView(ScheduleListView):
-
     def get_queryset(self):
         qs = super().get_queryset()
         next_month = date.today().month + 1
@@ -154,14 +133,13 @@ class IndexView(LoginRequiredMixin, RedirectView):
 
 
 class OverDueScheduleView(ScheduleListView):
-
     def get_queryset(self):
         qs = super().get_queryset()
         lte_date = date.today() - timedelta(days=1)
         return qs.filter(
             date_sheduled__lte=lte_date,
             uncompleted__isnull=True,
-            date_completed__isnull=True
+            date_completed__isnull=True,
         )
 
     def get_context_data(self, **kwargs):
@@ -177,9 +155,11 @@ class UncompletableScheduleView(ScheduleListView):
     def get_queryset(self):
         qs = super().get_queryset()
         previous_month = date.today().month - 2
-        return qs.filter(uncompleted__reason__icontains='магистраль',
-                         date_completed__isnull=True,
-                         date_sheduled__month__gte=previous_month)
+        return qs.filter(
+            uncompleted__reason__icontains='магистраль',
+            date_completed__isnull=True,
+            date_sheduled__month__gte=previous_month,
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -193,14 +173,17 @@ class NoPhotoScheduleView(ScheduleListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(date_completed__isnull=False,
-                         photo='',
-                         maintenance_type__m_type__icontains='Проверка')
+        return qs.filter(
+            date_completed__isnull=False,
+            photo='',
+            maintenance_type__m_type__icontains='Проверка',
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = ('Завершенные проверки защит, '
-                                  'к которым не загружены фото')
+        context['plan_period'] = (
+            'Завершенные проверки защит, ' 'к которым не загружены фото'
+        )
         context['plan_url'] = reverse_lazy('reports:no_photo_apporval')
         return context
 
@@ -243,7 +226,7 @@ class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
                 qs,
                 Schedule,
                 ['date_completed', 'employee1', 'employee2', 'employee3'],
-                batch_size=500
+                batch_size=500,
             )
             return redirect(self.return_url)
         return self.get(request, **kwargs)
@@ -330,31 +313,6 @@ class SearchView(ScheduleListView):
         return context
 
 
-class MarkJournalFilledView(LoginRequiredMixin, View):
-    """View for fetch-api calls."""
-
-    def post(self, request, pk):
-        if not request.body:
-            return JsonResponse({'error': 'Invalid request'}, status=400)
-        shedule = get_object_or_404(Schedule, pk=pk)
-        data = json.loads(request.body)
-        action = data.get('action')
-        is_checked = data.get('is_checked')
-        if action == 'access_journal_filled':
-            shedule.access_journal_filled = is_checked
-            shedule._change_reason = 'Changed state of access journal'
-        elif action == 'result_journal_filled':
-            shedule.result_journal_filled = is_checked
-            shedule._change_reason = 'Changed state of result journal'
-        else:
-            return JsonResponse({'error': 'Invalid request'}, status=400)
-        shedule.save()
-        completed = all([shedule.access_journal_filled,
-                        shedule.result_journal_filled,
-                        shedule.date_completed])
-        return JsonResponse({'completed': completed})
-
-
 class XlsxReportDownloadView(LoginRequiredMixin, FormView):
     form_class = ReportDateRangeForm
     template_name = 'reports/xlsx_report_download.html'
@@ -370,9 +328,8 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
                     date_from, date_to, report_type
                 )
                 report = report_generator.render_styled_report()
-                response = HttpResponse(
-                    content=save_virtual_workbook(report),
-                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  # noqa
+                response = HttpResponse(content=save_virtual_workbook(report),
+                                        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',)  # noqa
                 response['Content-Disposition'] = 'attachment; filename=protocol.xlsx'  # noqa
                 return response
             except Exception as e:
@@ -382,25 +339,21 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
 
 
 class DistributeNextMonthSchedules(LoginRequiredMixin, View):
-
     def get(self, request, **kwargs):
         distribute_next_month_works_by_dates()
         return redirect('reports:next_month_schedule')
 
 
 class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
-
     def get(self, request, **kwargs):
         xlsx_file = get_next_month_plans()
-        response = HttpResponse(
-            content=save_virtual_workbook(xlsx_file),
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  # noqa
+        response = HttpResponse(content=save_virtual_workbook(xlsx_file),
+                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',)  # noqa
         response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'  # noqa
         return response
 
 
 class UploadPhotoApprovalView(LoginRequiredMixin, View):
-
     def post(self, request, pk):
         photo_approval = request.FILES.get('photo')
         if not photo_approval:

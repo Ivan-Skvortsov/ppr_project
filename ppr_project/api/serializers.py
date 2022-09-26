@@ -13,3 +13,19 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = '__all__'
+
+
+class ScheduleWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Schedule
+        fields = [
+            'date_sheduled',
+            'date_completed',
+            'access_journal_filled',
+            'result_journal_filled',
+            'employee1',
+            'employee2',
+            'employee3',
+            'photo',
+            'uncompleted',
+        ]
