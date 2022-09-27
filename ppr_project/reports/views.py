@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.urls.base import resolve
@@ -63,17 +63,13 @@ class ScheduleListView(LoginRequiredMixin, ListView):
             maintenance_category = get_object_or_404(
                 MaintenanceCategory, pk=category_id
             )
-            return qs.filter(
-                equipment_type__maintenance_category=maintenance_category
-            )
+            return qs.filter(equipment_type__maintenance_category=maintenance_category)
         return qs
 
     def _redirect_to_confirmation_page(self, selected_schedules, page_url):
         return_url = resolve(self.request.path_info).url_name
         schedule_list = '_'.join(selected_schedules)
-        return redirect(
-            page_url, schedule_list=schedule_list, return_url=return_url
-        )
+        return redirect(page_url, schedule_list=schedule_list, return_url=return_url)
 
 
 class DayScheduleView(ScheduleListView):
@@ -252,9 +248,7 @@ class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
             for entry in qs:
                 entry._change_reason = 'Changed schedule date'
                 entry.date_sheduled = self.form.cleaned_data['input_date']
-            bulk_update_with_history(
-                qs, Schedule, ['date_sheduled'], batch_size=500
-            )
+            bulk_update_with_history(qs, Schedule, ['date_sheduled'], batch_size=500)
             return redirect(self.return_url)
         return self.get(request, **kwargs)
 
@@ -279,9 +273,7 @@ class ConfirmScheduleCannotBeComplete(LoginRequiredMixin, FormView):
             for entry in qs:
                 entry._change_reason = 'Marked as can not be completed'
                 entry.uncompleted = self.form.cleaned_data['reason']
-            bulk_update_with_history(
-                qs, Schedule, ['uncompleted'], batch_size=500
-            )
+            bulk_update_with_history(qs, Schedule, ['uncompleted'], batch_size=500)
             return redirect(self.return_url)
         return self.get(request, **kwargs)
 
@@ -324,13 +316,15 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
             date_to = self.form.data.get('date_to')
             report_type = self.form.data.get('report_type')
             try:
-                report_generator = XlsxReportGenerator(
-                    date_from, date_to, report_type
-                )
+                report_generator = XlsxReportGenerator(date_from, date_to, report_type)
                 report = report_generator.render_styled_report()
-                response = HttpResponse(content=save_virtual_workbook(report),
-                                        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',)  # noqa
-                response['Content-Disposition'] = 'attachment; filename=protocol.xlsx'  # noqa
+                response = HttpResponse(
+                    content=save_virtual_workbook(report),
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                )  # noqa
+                response[
+                    'Content-Disposition'
+                ] = 'attachment; filename=protocol.xlsx'  # noqa
                 return response
             except Exception as e:
                 print(f'Error rendering xlsx: {e}')  # FIXME: logging!
@@ -347,19 +341,9 @@ class DistributeNextMonthSchedules(LoginRequiredMixin, View):
 class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
         xlsx_file = get_next_month_plans()
-        response = HttpResponse(content=save_virtual_workbook(xlsx_file),
-                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',)  # noqa
+        response = HttpResponse(
+            content=save_virtual_workbook(xlsx_file),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )  # noqa
         response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'  # noqa
         return response
-
-
-class UploadPhotoApprovalView(LoginRequiredMixin, View):
-    def post(self, request, pk):
-        photo_approval = request.FILES.get('photo')
-        if not photo_approval:
-            return JsonResponse({'error': 'Invalid request'}, status=400)
-        shedule = get_object_or_404(Schedule, pk=pk)
-        shedule.photo = photo_approval
-        shedule._change_reason = 'Uploaded photo approval'
-        shedule.save()
-        return JsonResponse({'OK': 'completed'})

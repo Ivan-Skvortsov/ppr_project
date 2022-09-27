@@ -14,7 +14,6 @@ from reports.views import (
     ScheduleDetailInfoView,
     SearchView,
     UncompletableScheduleView,
-    UploadPhotoApprovalView,
     WeekScheduleView,
     XlsxNextMonthDownloadView,
     XlsxReportDownloadView,
@@ -29,60 +28,19 @@ urlpatterns = [
         NextMonthScheduleView.as_view(),
         name='next_month_schedule',
     ),
+    path('next_month/', NextMonthScheduleView.as_view(), name='next_month_schedule'),
     path(
-        'next_month/',
-        NextMonthScheduleView.as_view(),
-        name='next_month_schedule'
+        'month/<int:category_id>/', MonthScheduleView.as_view(), name='month_schedule'
     ),
-    path(
-        'month/<int:category_id>/',
-        MonthScheduleView.as_view(),
-        name='month_schedule'
-    ),
-    path(
-        'month/',
-        MonthScheduleView.as_view(),
-        name='month_schedule'
-    ),
-    path(
-        'week/<int:category_id>/',
-        WeekScheduleView.as_view(),
-        name='week_schedule'
-    ),
-    path(
-        'week/',
-        WeekScheduleView.as_view(),
-        name='week_schedule'
-    ),
-    path(
-        'day/<int:category_id>/',
-        DayScheduleView.as_view(),
-        name='day_schedule'
-    ),
-    path(
-        'day/',
-        DayScheduleView.as_view(),
-        name='day_schedule'
-    ),
-    path(
-        'overdue/<int:category_id>/',
-        OverDueScheduleView.as_view(),
-        name='overdue'
-    ),
-    path(
-        'overdue/',
-        OverDueScheduleView.as_view(),
-        name='overdue'),
-    path(
-        'uncompletable/',
-        UncompletableScheduleView.as_view(),
-        name='uncompletable'
-    ),
-    path(
-        'no_photo_apporval/',
-        NoPhotoScheduleView.as_view(),
-        name='no_photo_apporval'
-    ),
+    path('month/', MonthScheduleView.as_view(), name='month_schedule'),
+    path('week/<int:category_id>/', WeekScheduleView.as_view(), name='week_schedule'),
+    path('week/', WeekScheduleView.as_view(), name='week_schedule'),
+    path('day/<int:category_id>/', DayScheduleView.as_view(), name='day_schedule'),
+    path('day/', DayScheduleView.as_view(), name='day_schedule'),
+    path('overdue/<int:category_id>/', OverDueScheduleView.as_view(), name='overdue'),
+    path('overdue/', OverDueScheduleView.as_view(), name='overdue'),
+    path('uncompletable/', UncompletableScheduleView.as_view(), name='uncompletable'),
+    path('no_photo_apporval/', NoPhotoScheduleView.as_view(), name='no_photo_apporval'),
     path('search/', SearchView.as_view(), name='search'),
     path(
         'schedule/<int:pk>/<str:return_url>/',
@@ -114,10 +72,5 @@ urlpatterns = [
         'next_month_plan_xlsx/',
         XlsxNextMonthDownloadView.as_view(),
         name='next_month_plan_xlsx',
-    ),
-    path(
-        'upload_photo_approval/<int:pk>/',
-        UploadPhotoApprovalView.as_view(),
-        name='upload_photo_approval',
     ),
 ]
