@@ -13,20 +13,13 @@ from django.views.generic.edit import FormView, UpdateView
 from openpyxl.writer.excel import save_virtual_workbook
 from simple_history.utils import bulk_update_with_history
 
-from reports.forms import (
-    CompleteScheduleForm,
-    DateInputForm,
-    ReportDateRangeForm,
-    ScheduleForm,
-    ScheduleSearchForm,
-    UncompleteReasonForm,
-)
+from reports.forms import (CompleteScheduleForm, DateInputForm,
+                           ReportDateRangeForm, ScheduleForm,
+                           ScheduleSearchForm, UncompleteReasonForm)
 from reports.models import MaintenanceCategory, Schedule
-from reports.services import (
-    XlsxReportGenerator,
-    distribute_next_month_works_by_dates,
-    get_next_month_plans,
-)
+from reports.services import (XlsxReportGenerator,
+                              distribute_next_month_works_by_dates,
+                              get_next_month_plans)
 
 
 class ScheduleListView(LoginRequiredMixin, ListView):
@@ -63,13 +56,17 @@ class ScheduleListView(LoginRequiredMixin, ListView):
             maintenance_category = get_object_or_404(
                 MaintenanceCategory, pk=category_id
             )
-            return qs.filter(equipment_type__maintenance_category=maintenance_category)
+            return qs.filter(
+                equipment_type__maintenance_category=maintenance_category
+            )
         return qs
 
     def _redirect_to_confirmation_page(self, selected_schedules, page_url):
         return_url = resolve(self.request.path_info).url_name
         schedule_list = '_'.join(selected_schedules)
-        return redirect(page_url, schedule_list=schedule_list, return_url=return_url)
+        return redirect(
+            page_url, schedule_list=schedule_list, return_url=return_url
+        )
 
 
 class DayScheduleView(ScheduleListView):
@@ -178,7 +175,7 @@ class NoPhotoScheduleView(ScheduleListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['plan_period'] = (
-            'Завершенные проверки защит, ' 'к которым не загружены фото'
+            'Завершенные проверки защит, к которым не загружены фото'
         )
         context['plan_url'] = reverse_lazy('reports:no_photo_apporval')
         return context
@@ -248,7 +245,9 @@ class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
             for entry in qs:
                 entry._change_reason = 'Changed schedule date'
                 entry.date_sheduled = self.form.cleaned_data['input_date']
-            bulk_update_with_history(qs, Schedule, ['date_sheduled'], batch_size=500)
+            bulk_update_with_history(
+                qs, Schedule, ['date_sheduled'], batch_size=500
+            )
             return redirect(self.return_url)
         return self.get(request, **kwargs)
 
@@ -273,7 +272,9 @@ class ConfirmScheduleCannotBeComplete(LoginRequiredMixin, FormView):
             for entry in qs:
                 entry._change_reason = 'Marked as can not be completed'
                 entry.uncompleted = self.form.cleaned_data['reason']
-            bulk_update_with_history(qs, Schedule, ['uncompleted'], batch_size=500)
+            bulk_update_with_history(
+                qs, Schedule, ['uncompleted'], batch_size=500
+            )
             return redirect(self.return_url)
         return self.get(request, **kwargs)
 
@@ -316,12 +317,14 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
             date_to = self.form.data.get('date_to')
             report_type = self.form.data.get('report_type')
             try:
-                report_generator = XlsxReportGenerator(date_from, date_to, report_type)
+                report_generator = XlsxReportGenerator(
+                    date_from, date_to, report_type
+                )
                 report = report_generator.render_styled_report()
                 response = HttpResponse(
                     content=save_virtual_workbook(report),
-                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                )  # noqa
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',  # noqa
+                )
                 response[
                     'Content-Disposition'
                 ] = 'attachment; filename=protocol.xlsx'  # noqa
@@ -343,7 +346,7 @@ class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
         xlsx_file = get_next_month_plans()
         response = HttpResponse(
             content=save_virtual_workbook(xlsx_file),
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        )  # noqa
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',  # noqa
+        )
         response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'  # noqa
         return response
