@@ -21,8 +21,8 @@
         <div class="card-body">
           <!-- form erros -->
           {% if form.errors %}
-            {% for field in form %} 
-              {% for error in field.errors %}            
+            {% for field in form %}
+              {% for error in field.errors %}
                 <div class="alert alert-danger">
                   {{ error|escape }}
                 </div>
@@ -41,7 +41,7 @@
             <h6 class="text-muted">{{ schedule_entry.equipment_type.eqipment_type_name }}</h6>
             <h6 class="text-muted">{{ schedule_entry.maintenance_type.m_type }}</h6>
             <!-- form fields -->
-            {% for field in form %} 
+            {% for field in form %}
               <div class="row my-2 align-items-center">
                 <hr>
                 <div class="col">
@@ -53,7 +53,7 @@
                   </label>
                 </div>
                 <div class="col">
-                  {{ field }} 
+                  {{ field }}
                 </div>
               </div>
             {% endfor %}
@@ -67,7 +67,7 @@
                   <a class="btn btn-secondary w-100" href="{{ return_url }}" role="button">Отмена</a>
                 </div>
                 {# url for image upload #}
-                <input type="hidden" id="photoUploadUrl" value="{% url 'reports:upload_photo_approval' schedule_entry.pk %}">
+                <input type="hidden" id="photoUploadUrl" value="{% url 'api:schedules-detail' schedule_entry.pk %}">
               </div>
             </div>
           </form>

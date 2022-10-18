@@ -54,7 +54,7 @@ function showModalForm(url) {
     .catch((error) => console.error("Error", error));
 }
 
-// submit form with download
+// submit form and download file
 function submitModalForm(evnt, form) {
   const submitButton = document.querySelector("#submitAndDownload");
   submitButton.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Загрузка`;
@@ -83,9 +83,50 @@ function submitModalForm(evnt, form) {
       if (typeof data === "string") {
         modalWindowEl.innerHTML = data;
       } else {
-        const reportFile = window.URL.createObjectURL(data);
-        window.location.assign(reportFile);
+        const downloadFile = window.URL.createObjectURL(data);
+        window.location.assign(downloadFile);
         modalWindow.hide();
+      }
+    })
+    .catch((error) => console.error("Error", error));
+}
+
+// mark journal checked
+function markJournalCheckbox(source) {
+  const url = `/api/v1/schedules/${source.value}/`;
+  let payload = {};
+  payload[source.name] = source.checked;
+
+  // replace checkbox with spinner
+  const spinner = document.createElement("div");
+  spinner.className = "spinner-border spinner-border-sm text-secondary";
+  source.parentNode.replaceChild(spinner, source);
+
+  fetch(url, {
+    method: "PATCH",
+    credentials: "same-origin",
+    headers: {
+      "X-CSRFToken": getCookie("csrftoken"),
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      //replace spinner with checkbox
+      spinner.parentNode.replaceChild(source, spinner);
+      //row color when completed
+      const sheduleRow = document.getElementById("sheduleRow" + source.value);
+      if (
+        data.result_journal_filled === true &&
+        data.access_journal_filled === true &&
+        data.date_completed !== null
+      ) {
+        sheduleRow.className =
+          "row border-bottom my-auto py-1 bg-success bg-opacity-25";
+      } else {
+        sheduleRow.className = "row border-bottom my-auto py-1";
       }
     })
     .catch((error) => console.error("Error", error));

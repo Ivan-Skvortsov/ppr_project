@@ -28,7 +28,7 @@ document.querySelector("#photo_approval").addEventListener("change", (e) => {
 function postCompressedImage(formData) {
   const url = document.querySelector("#photoUploadUrl").value;
   const options = {
-    method: "POST",
+    method: "PATCH",
     credentials: "same-origin",
     headers: {
       "X-CSRFToken": getCookie("csrftoken"),

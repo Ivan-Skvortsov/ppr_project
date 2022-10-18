@@ -19,10 +19,12 @@ INSTALLED_APPS = [
     'reports.apps.ReportsConfig',
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',
+    'api.apps.ApiConfig',
     'bugtracker.apps.BugtrackerConfig',
     'django.forms',
     'simple_history',
-    'sorl.thumbnail'
+    'sorl.thumbnail',
+    'rest_framework',
 ]
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
@@ -35,7 +37,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware'
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'ppr_project.urls'
@@ -60,16 +62,16 @@ WSGI_APPLICATION = 'ppr_project.wsgi.application'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',  # noqa
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',  # noqa
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',  # noqa
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',  # noqa
     },
 ]
 
@@ -115,3 +117,13 @@ ADMINS = [('Ivan Skvortsov', os.getenv('ADMIN_MAIL'))]
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 4000
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
