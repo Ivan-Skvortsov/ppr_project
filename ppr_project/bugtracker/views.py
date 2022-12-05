@@ -1,17 +1,19 @@
 from datetime import date
-from django.views.generic import ListView, CreateView, DetailView, View
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse_lazy
-from django.shortcuts import get_object_or_404, redirect
 
-from bugtracker.models import Bug, Comment
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DetailView, ListView, View
+
 from bugtracker.forms import BugForm, CommentForm
+from bugtracker.models import Bug, Comment
 
 
 class BugListView(LoginRequiredMixin, ListView):
     model = Bug
     context_object_name = 'bugs'
     template_name = 'bugtracker/index.html'
+    paginate_by = 10
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -54,8 +56,7 @@ class AddCommentView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy(
-            'bugtracker:detail', kwargs={'pk': self.kwargs['pk']})
+        return reverse_lazy('bugtracker:detail', kwargs={'pk': self.kwargs['pk']})
 
 
 class CloseBug(UserPassesTestMixin, View):
