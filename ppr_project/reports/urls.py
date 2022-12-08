@@ -1,23 +1,15 @@
 from django.urls import path
 
-from reports.views import (
-    ConfirmScheduleCannotBeComplete,
-    ConfirmScheduleCompletedView,
-    ConfirmScheduleDateChangedView,
-    DayScheduleView,
-    DistributeNextMonthSchedules,
-    IndexView,
-    MonthScheduleView,
-    NextMonthScheduleView,
-    NoPhotoScheduleView,
-    OverDueScheduleView,
-    ScheduleDetailInfoView,
-    SearchView,
-    UncompletableScheduleView,
-    WeekScheduleView,
-    XlsxNextMonthDownloadView,
-    XlsxReportDownloadView,
-)
+from reports.views import (ConfirmScheduleCannotBeComplete,
+                           ConfirmScheduleCompletedView,
+                           ConfirmScheduleDateChangedView, DayScheduleView,
+                           DistributeNextMonthSchedules, IndexView,
+                           MonthScheduleView, NextMonthScheduleView,
+                           NoPhotoScheduleView, OverDueScheduleView,
+                           ScheduleCreateView, ScheduleDetailInfoView,
+                           SearchView, UncompletableScheduleView,
+                           WeekScheduleView, XlsxNextMonthDownloadView,
+                           XlsxReportDownloadView)
 
 app_name = 'reports'
 
@@ -73,4 +65,5 @@ urlpatterns = [
         XlsxNextMonthDownloadView.as_view(),
         name='next_month_plan_xlsx',
     ),
+    path('create/', ScheduleCreateView.as_view(), name='create_schedule')
 ]

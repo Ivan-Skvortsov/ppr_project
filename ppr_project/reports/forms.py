@@ -175,3 +175,33 @@ class ScheduleSearchForm(forms.Form):
         widget=forms.DateInput(attrs={'type': 'date'}),
         label='По дату'
     )
+
+
+class ScheduleCreateForm(forms.Form):
+    maintenance_category = forms.ModelChoiceField(
+        queryset=MaintenanceCategory.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control form-select'}),
+        label='Категория',
+        help_text='Выберите категорию',
+    )
+    facility = forms.ChoiceField(
+        widget=forms.Select(attrs={'class': 'form-control form-select', 'disabled': 'true'}),
+        label='Объект',
+        help_text='Выберите объект',
+    )
+    equipment_type = forms.ChoiceField(
+        widget=forms.Select(attrs={'class': 'form-control form-select', 'disabled': 'true'}),
+        label='Наименование оборудования',
+        help_text='Выберите наименование оборудования'
+    )
+    maintenance_type = forms.ModelChoiceField(
+        queryset=MaintenanceType.objects.all().order_by('m_type'),
+        widget=forms.Select(attrs={'class': 'form-control form-select'}),
+        label='Вид ТО',
+        help_text='Выберите вид ТО'
+    )
+    date_scheduled = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        label='Дата по плану',
+        help_text='Выберите дату по плану'
+    )

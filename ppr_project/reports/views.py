@@ -14,8 +14,9 @@ from openpyxl.writer.excel import save_virtual_workbook
 from simple_history.utils import bulk_update_with_history
 
 from reports.forms import (CompleteScheduleForm, DateInputForm,
-                           ReportDownloadForm, ScheduleForm,
-                           ScheduleSearchForm, UncompleteReasonForm)
+                           ReportDownloadForm, ScheduleCreateForm,
+                           ScheduleForm, ScheduleSearchForm,
+                           UncompleteReasonForm)
 from reports.models import MaintenanceCategory, Schedule
 from reports.services import (XlsxReportGenerator,
                               distribute_next_month_works_by_dates,
@@ -350,3 +351,8 @@ class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
         )
         response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'  # noqa
         return response
+
+
+class ScheduleCreateView(LoginRequiredMixin, FormView):
+    form_class = ScheduleCreateForm
+    template_name = 'reports/action_confirmation.html'
