@@ -26,12 +26,18 @@ class ScheduleWriteSerializer(serializers.ModelSerializer):
 
 
 class FacilitySerializer(serializers.ModelSerializer):
+
+    name = serializers.CharField(source='facility_name')
+
     class Meta:
         model = Facility
-        fields = ['id', 'facility_name']
+        fields = ['id', 'name']
 
 
 class EquipmentTypeSerializer(serializers.ModelSerializer):
+
+    name = serializers.CharField(source='eqipment_type_name')
+
     class Meta:
         model = EquipmentType
-        fields = ['id', 'eqipment_type_name']
+        fields = ['id', 'name']
