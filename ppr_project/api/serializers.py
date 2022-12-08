@@ -1,12 +1,6 @@
 from rest_framework import serializers
 
-from reports.models import Employee, Schedule
-
-
-class EmployeeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Employee
-        fields = '__all__'
+from reports.models import EquipmentType, Facility, Schedule
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -29,3 +23,15 @@ class ScheduleWriteSerializer(serializers.ModelSerializer):
             'photo',
             'uncompleted',
         ]
+
+
+class FacilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Facility
+        fields = ['id', 'facility_name']
+
+
+class EquipmentTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EquipmentType
+        fields = ['id', 'eqipment_type_name']
