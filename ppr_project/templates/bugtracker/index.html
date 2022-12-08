@@ -10,7 +10,7 @@
         <div class="collapse" id="collapseCreationForm">
           {% include 'bugtracker/bug_form.html' %}
         </div>
-        {% for bug in bugs %} 
+        {% for bug in bugs %}
           <div class="card mb-2">
             <div class="card-body">
               <div class="d-flex justify-content-between">
@@ -35,12 +35,12 @@
                   {% if bug.close_date %}<p class="small text-muted mb-0">Выполнено {{ bug.close_date }}</p>
                   {% else %} <div class="badge bg-primary text-wrap" style="width: 6rem;">В работе</div>
                   {% endif %}
-                  
                 </div>
               </div>
             </div>
           </div>
         {% endfor %}
+        {% include 'bugtracker/pagination.html' %}
       </div>
     </div>
   </div>

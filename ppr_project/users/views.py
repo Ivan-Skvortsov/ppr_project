@@ -1,3 +1,4 @@
+from django.contrib.auth.views import PasswordResetView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 
@@ -12,3 +13,9 @@ class SignUp(CreateView):
 
 class SignUpDone(TemplateView):
     template_name = 'users/signup_done.html'
+
+
+class ResetPassword(PasswordResetView):
+    template_name = 'users/password_reset_form.html'
+    email_template_name = 'users/password_reset_email.html'
+    subject_template_name = 'users/password_reset_subject.txt'
