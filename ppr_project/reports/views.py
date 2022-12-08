@@ -357,9 +357,10 @@ class ScheduleCreateView(LoginRequiredMixin, CreateView):
     form_class = ScheduleCreateForm
     model = Schedule
     template_name = 'reports/action_confirmation.html'
-    success_url = reverse_lazy('reports:day')
+    success_url = reverse_lazy('reports:day_schedule')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action_to_confirm'] = 'Добавить внеплановую работу'
+        context['return_url'] = self.success_url
         return context
