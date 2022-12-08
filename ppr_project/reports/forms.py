@@ -177,7 +177,7 @@ class ScheduleSearchForm(forms.Form):
     )
 
 
-class ScheduleCreateForm(forms.Form):
+class ScheduleCreateForm(forms.ModelForm):
     maintenance_category = forms.ModelChoiceField(
         queryset=MaintenanceCategory.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control form-select'}),
@@ -200,8 +200,12 @@ class ScheduleCreateForm(forms.Form):
         label='Вид ТО',
         help_text='Выберите вид ТО'
     )
-    date_scheduled = forms.DateField(
+    date_sheduled = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         label='Дата по плану',
         help_text='Выберите дату по плану'
     )
+
+    class Meta:
+        model = Schedule
+        fields = ['maintenance_category', 'facility', 'equipment_type', 'maintenance_type', 'date_sheduled']

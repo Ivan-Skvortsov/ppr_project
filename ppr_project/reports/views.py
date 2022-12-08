@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.urls.base import resolve
 from django.views import View
 from django.views.generic import ListView, RedirectView
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import CreateView, FormView, UpdateView
 
 from openpyxl.writer.excel import save_virtual_workbook
 from simple_history.utils import bulk_update_with_history
@@ -353,6 +353,13 @@ class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
         return response
 
 
-class ScheduleCreateView(LoginRequiredMixin, FormView):
+class ScheduleCreateView(LoginRequiredMixin, CreateView):
     form_class = ScheduleCreateForm
+    model = Schedule
     template_name = 'reports/action_confirmation.html'
+    success_url = reverse_lazy('reports:day')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action_to_confirm'] = 'Добавить внеплановую работу'
+        return context
