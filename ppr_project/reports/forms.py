@@ -102,7 +102,7 @@ class DateInputForm(forms.Form):
     )
 
 
-class ReportDateRangeForm(forms.Form):
+class ReportDownloadForm(forms.Form):
     report_type = forms.ChoiceField(
         choices=[
             ('ppr', 'Протокол ППР'),

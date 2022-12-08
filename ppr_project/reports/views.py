@@ -14,7 +14,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from simple_history.utils import bulk_update_with_history
 
 from reports.forms import (CompleteScheduleForm, DateInputForm,
-                           ReportDateRangeForm, ScheduleForm,
+                           ReportDownloadForm, ScheduleForm,
                            ScheduleSearchForm, UncompleteReasonForm)
 from reports.models import MaintenanceCategory, Schedule
 from reports.services import (XlsxReportGenerator,
@@ -307,7 +307,7 @@ class SearchView(ScheduleListView):
 
 
 class XlsxReportDownloadView(LoginRequiredMixin, FormView):
-    form_class = ReportDateRangeForm
+    form_class = ReportDownloadForm
     template_name = 'reports/xlsx_report_download.html'
 
     def post(self, request, **kwargs):
