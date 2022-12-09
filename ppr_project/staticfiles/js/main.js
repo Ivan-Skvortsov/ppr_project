@@ -131,3 +131,53 @@ function markJournalCheckbox(source) {
     })
     .catch((error) => console.error("Error", error));
 }
+
+// -----create schedule-----
+const fetchOptionsList = async (url) => {
+  const fetchOptions = {
+    method: "GET",
+    credentials: "same-origin",
+    headers: {
+      "X-CSRFToken": getCookie("csrftoken"),
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  };
+  let optionsListData = await fetch(url, fetchOptions);
+  return await optionsListData.json();
+};
+
+const replaceOptions = (selectElement, optionsData) => {
+  selectElement.options.length = 0;
+  selectElement.disabled = false;
+  selectElement.options[0] = new Option("---------", "", false, true);
+  optionsData.forEach((element, idx) => {
+    selectElement.options[idx + 1] = new Option(
+      element["name"],
+      element["id"],
+      false,
+      false
+    );
+  });
+};
+
+const getNewOptionsInFacilityList = async (source) => {
+  if (!source.value) return;
+  const url = `/api/v1/facilities/?maintenance_category=${source.value}`;
+  let facilityEl = document.querySelector("#id_facility");
+  let jsonData = await fetchOptionsList(url);
+  replaceOptions(facilityEl, jsonData);
+
+  let equipmentTypeEl = document.querySelector("#id_equipment_type");
+  equipmentTypeEl.options.length = 0;
+  equipmentTypeEl.options[0] = new Option("---------", "", false, true);
+};
+
+const getNewOptionsInEquipmentTypeList = async (source) => {
+  if (!source.value) return;
+  const url = `/api/v1/equipment_types/?facility=${source.value}`;
+  let equipmentTypeEl = document.querySelector("#id_equipment_type");
+  let jsonData = await fetchOptionsList(url);
+  replaceOptions(equipmentTypeEl, jsonData);
+};
+// ----------

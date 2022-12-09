@@ -4,9 +4,10 @@ from django import forms
 from django.core.validators import MinValueValidator
 from django.forms.widgets import (CheckboxInput, ClearableFileInput, DateInput,
                                   Select)
+from django.shortcuts import get_object_or_404
 
-from reports.models import (Employee, MaintenanceCategory, MaintenanceType,
-                            Schedule, UncompleteReasons)
+from reports.models import (Employee, EquipmentType, MaintenanceCategory,
+                            MaintenanceType, Schedule, UncompleteReasons)
 
 
 class CustomFileInput(ClearableFileInput):
@@ -180,16 +181,23 @@ class ScheduleSearchForm(forms.Form):
 class ScheduleCreateForm(forms.ModelForm):
     maintenance_category = forms.ModelChoiceField(
         queryset=MaintenanceCategory.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control form-select'}),
+        widget=forms.Select(attrs={
+            'class': 'form-control form-select',
+            'onchange': 'getNewOptionsInFacilityList(this);'
+        }),
         label='Категория',
         help_text='Выберите категорию',
     )
-    facility = forms.ChoiceField(
-        widget=forms.Select(attrs={'class': 'form-control form-select', 'disabled': 'true'}),
+    facility = forms.CharField(
+        widget=forms.Select(attrs={
+            'class': 'form-control form-select',
+            'disabled': 'true',
+            'onchange': 'getNewOptionsInEquipmentTypeList(this);'
+        }),
         label='Объект',
         help_text='Выберите объект',
     )
-    equipment_type = forms.ChoiceField(
+    equipment_type = forms.CharField(
         widget=forms.Select(attrs={'class': 'form-control form-select', 'disabled': 'true'}),
         label='Наименование оборудования',
         help_text='Выберите наименование оборудования'
@@ -209,3 +217,10 @@ class ScheduleCreateForm(forms.ModelForm):
     class Meta:
         model = Schedule
         fields = ['maintenance_category', 'facility', 'equipment_type', 'maintenance_type', 'date_sheduled']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        equipment_type_pk = cleaned_data.get('equipment_type')
+        equipment_type = get_object_or_404(EquipmentType, pk=equipment_type_pk)
+        cleaned_data['equipment_type'] = equipment_type
+        return cleaned_data
