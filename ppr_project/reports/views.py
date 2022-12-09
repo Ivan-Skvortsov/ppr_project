@@ -8,14 +8,15 @@ from django.urls import reverse_lazy
 from django.urls.base import resolve
 from django.views import View
 from django.views.generic import ListView, RedirectView
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import CreateView, FormView, UpdateView
 
 from openpyxl.writer.excel import save_virtual_workbook
 from simple_history.utils import bulk_update_with_history
 
 from reports.forms import (CompleteScheduleForm, DateInputForm,
-                           ReportDateRangeForm, ScheduleForm,
-                           ScheduleSearchForm, UncompleteReasonForm)
+                           ReportDownloadForm, ScheduleCreateForm,
+                           ScheduleForm, ScheduleSearchForm,
+                           UncompleteReasonForm)
 from reports.models import MaintenanceCategory, Schedule
 from reports.services import (XlsxReportGenerator,
                               distribute_next_month_works_by_dates,
@@ -307,7 +308,7 @@ class SearchView(ScheduleListView):
 
 
 class XlsxReportDownloadView(LoginRequiredMixin, FormView):
-    form_class = ReportDateRangeForm
+    form_class = ReportDownloadForm
     template_name = 'reports/xlsx_report_download.html'
 
     def post(self, request, **kwargs):
@@ -350,3 +351,16 @@ class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
         )
         response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'  # noqa
         return response
+
+
+class ScheduleCreateView(LoginRequiredMixin, CreateView):
+    form_class = ScheduleCreateForm
+    model = Schedule
+    template_name = 'reports/action_confirmation.html'
+    success_url = reverse_lazy('reports:day_schedule')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action_to_confirm'] = 'Добавить внеплановую работу'
+        context['return_url'] = self.success_url
+        return context
