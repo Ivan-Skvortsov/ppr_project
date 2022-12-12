@@ -1,9 +1,10 @@
 from django.contrib import admin
+
 from simple_history.admin import SimpleHistoryAdmin
 
 from reports.models import (Employee, EquipmentType, Facility,
-                            MaintenanceCategory, ReportTemplate, Schedule,
-                            MaintenanceType, UncompleteReasons)
+                            MaintenanceCategory, MaintenanceType,
+                            ReportTemplate, Schedule, UncompleteReasons)
 
 
 @admin.register(Employee)
@@ -14,6 +15,7 @@ class EmployeeAdmin(admin.ModelAdmin):
 @admin.register(Facility)
 class FacilityAdmin(admin.ModelAdmin):
     list_display = ('maintenance_category', 'facility_name')
+    list_filter = ('maintenance_category',)
 
 
 @admin.register(EquipmentType)
@@ -34,7 +36,12 @@ class ScheduleAdmin(SimpleHistoryAdmin):
         'date_sheduled',
         'date_completed',
     )
-    list_filter = ('maintenance_type', 'date_sheduled', 'date_completed')
+    list_filter = (
+        'maintenance_type',
+        'date_sheduled',
+        'date_completed',
+        'equipment_type__facility__maintenance_category'
+    )
     search_fields = (
         'equipment_type__eqipment_type_name',
         'equipment_type__facility__facility_name'
