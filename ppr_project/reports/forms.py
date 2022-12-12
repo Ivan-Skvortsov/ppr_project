@@ -108,7 +108,8 @@ class ReportDownloadForm(forms.Form):
         choices=[
             ('ppr', 'Протокол ППР'),
             ('ppz', 'Протокол проверки защит'),
-            ('asps', 'Отчет по АСПС для пожарных')
+            ('asps', 'Отчет по АСПС для пожарных'),
+            ('uncompletable', 'Протокол о невыполненных работах')
         ],
         initial='ppr',
         widget=forms.Select(attrs={'class': 'form-select'}),
