@@ -14,6 +14,21 @@ from reports.models import Schedule
 
 class XlsxReportGenerator:
 
+    FONT_BOLD = Font(name='Times New Roman', size=12, bold=True)
+    FONT_REGULAR = Font(name='Times New Roman', size=12)
+
+    ALIGNMENT_CENTER = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    ALIGNMENT_TOP_CENTER = Alignment(horizontal='center', vertical='top', wrap_text=True)
+    ALIGNMENT_TOP_LEFT = Alignment(horizontal='left', vertical='top', wrap_text=True)
+
+    BORDER_ALL_SIDES = Border(
+        bottom=Side(border_style='thin', color='FF000000'),
+        top=Side(border_style='thin', color='FF000000'),
+        left=Side(border_style='thin', color='FF000000'),
+        right=Side(border_style='thin', color='FF000000')
+    )
+    BORDER_BOTTOM = Border(bottom=Side(border_style='thin', color='FF000000'))
+
     def __init__(self, date_from: date, date_to: date, report_type: str):
         self.date_from = date_from
         self.date_to = date_to
@@ -108,19 +123,6 @@ class XlsxReportGenerator:
             ws.merge_cells(start_column=7, end_column=7, start_row=row - merge_count, end_row=row)
 
     def _style_ppr_ppz_report(self, ws: worksheet):
-        bold_font = Font(name='Times New Roman', size=12, bold=True)
-        regular_font = Font(name='Times New Roman', size=12)
-
-        alignment_center = Alignment(horizontal='center', vertical='center', wrap_text=True)
-        alignment_top_center = Alignment(horizontal='center', vertical='top', wrap_text=True)
-        alignment_top_left = Alignment(horizontal='left', vertical='top', wrap_text=True)
-        border_all_sides = Border(
-            bottom=Side(border_style='thin', color='FF000000'),
-            top=Side(border_style='thin', color='FF000000'),
-            left=Side(border_style='thin', color='FF000000'),
-            right=Side(border_style='thin', color='FF000000')
-        )
-        border_bottom = Border(bottom=Side(border_style='thin', color='FF000000'))
 
         # worksheet styling
         ws.column_dimensions['A'].width = 4
@@ -145,23 +147,23 @@ class XlsxReportGenerator:
 
         for row in ws.iter_rows(min_row=1, max_row=13):
             for cell in row:
-                cell.font = bold_font
-                cell.alignment = alignment_center
+                cell.font = self.FONT_BOLD
+                cell.alignment = self.ALIGNMENT_CENTER
         for cell in ws[13]:
-            cell.border = border_all_sides
+            cell.border = self.BORDER_ALL_SIDES
 
-        ws['G2'].border = ws['G3'].border = ws['G4'].border = border_bottom
+        ws['G2'].border = ws['G3'].border = ws['G4'].border = self.BORDER_BOTTOM
         ws['A11'].alignment = Alignment(horizontal='left')
-        ws['A11'].font = regular_font
+        ws['A11'].font = self.FONT_REGULAR
 
         for row in ws.iter_rows(min_row=14, max_row=ws.max_row):
             for cell in row:
-                cell.font = regular_font
-                cell.border = border_all_sides
+                cell.font = self.FONT_REGULAR
+                cell.border = self.BORDER_ALL_SIDES
                 if cell.column in [1, 4, 5, 6]:
-                    cell.alignment = alignment_top_center
+                    cell.alignment = self.ALIGNMENT_TOP_CENTER
                 else:
-                    cell.alignment = alignment_top_left
+                    cell.alignment = self.ALIGNMENT_TOP_LEFT
 
     def _render_ppr_ppz_report(self) -> Workbook:
         wb, ws = self._create_workbook_with_empty_worksheet()
@@ -215,18 +217,75 @@ class XlsxReportGenerator:
         ws.column_dimensions['E'].width = 40
         ws.column_dimensions['F'].width = 55
 
-        border_all = Border(
-            bottom=Side(border_style='thin', color='FF000000'),
-            top=Side(border_style='thin', color='FF000000'),
-            left=Side(border_style='thin', color='FF000000'),
-            right=Side(border_style='thin', color='FF000000')
-        )
-        alignment_center = Alignment(horizontal='center', vertical='center', wrap_text=True)
         for row in ws.iter_rows(min_row=1, max_row=ws.max_row):
             for cell in row:
-                cell.font = Font(name='Times New Roman', size=12)
-                cell.border = border_all
-                cell.alignment = alignment_center
+                cell.font = self.FONT_REGULAR
+                cell.border = self.BORDER_ALL_SIDES
+                cell.alignment = self.ALIGNMENT_CENTER
+        return wb
+
+    def _render_uncompletable_report(self) -> Workbook:
+        wb, ws = self._create_workbook_with_empty_worksheet()
+        queryset = self._get_queryset()
+        today_date = _date(date.today(), 'd E Y')
+        date_from = _date(datetime.strptime(self.date_from, '%Y-%m-%d'), 'd.m.Y')
+        date_to = _date(datetime.strptime(self.date_to, '%Y-%m-%d'), 'd.m.Y')
+        ws.append([today_date, '', '', '', '', 'КС-45 Усинская'])
+        ws['A3'] = 'Протокол\nвыполнения ППР службой АСУ, А и ТМ'
+        ws['A5'] = (
+            f'          Настоящий протокол составлен о том, что в период с {date_from} по {date_to}, согласно графика '
+            'ППР службы АСУ, А и ТМ КС-45 «Усинская» на КЦ-1,2 ПБ КС-45 Усинская проведены работы по техническому '
+            'обслуживанию оборудования автоматизации. Работы выполнены в полном объеме, с надлежащим качеством.'
+        )
+        if queryset:
+            ws['A7'] = '          Не проведены работы:'
+            ws.append(['№ п/п', 'Категория', 'Объект', 'Оборудование', 'Вид ТО', 'Причина невыполнения'])
+            for i, work in enumerate(queryset):
+                ws.append([
+                    i + 1,
+                    work.equipment_type.facility.maintenance_category.category_name,
+                    work.equipment_type.facility.facility_name,
+                    work.equipment_type.eqipment_type_name,
+                    work.maintenance_type.m_type,
+                    work.uncompleted.reason
+                ])
+        ws.append([''])
+        ws.append(['Инженер АСУ, А и ТМ КС-45 Усинская'])
+        ws.append([''])
+        ws.append(['Приборист АСУ, А и ТМ КС-45 Усинская'])
+
+        # styling
+        ws.column_dimensions['A'].width = 4
+        ws.column_dimensions['B'].width = 12
+        ws.column_dimensions['C'].width = 16
+        ws.column_dimensions['D'].width = 36
+        ws.column_dimensions['E'].width = 10
+        ws.column_dimensions['F'].width = 16
+        ws.row_dimensions[3].height = 31
+        ws.row_dimensions[5].height = 62
+        ws.page_margins.left = 0.5
+        ws.page_margins.right = 0.5
+        ws.page_margins.top = 0.5
+        ws.page_margins.bottom = 0.5
+        ws.page_margins.header = 0
+        ws.page_margins.footer = 0
+        ws.merge_cells(start_row=1, end_row=1, start_column=1, end_column=3)
+        ws.merge_cells(start_row=3, end_row=3, start_column=1, end_column=6)
+        ws.merge_cells(start_row=5, end_row=5, start_column=1, end_column=6)
+        ws.merge_cells(start_row=7, end_row=7, start_column=1, end_column=6)
+        ws.merge_cells(start_row=ws.max_row - 2, end_row=ws.max_row - 2, start_column=1, end_column=6)
+        ws.merge_cells(start_row=ws.max_row, end_row=ws.max_row, start_column=1, end_column=6)
+        for row in ws.iter_rows(1, ws.max_row):
+            for cell in row:
+                cell.font = self.FONT_REGULAR
+                cell.alignment = self.ALIGNMENT_TOP_LEFT
+                if queryset and (8 <= cell.row <= ws.max_row - 4):
+                    cell.border = self.BORDER_ALL_SIDES
+        ws['A3'].alignment = self.ALIGNMENT_CENTER
+        if queryset:
+            for cell in ws[8]:
+                cell.font = self.FONT_BOLD
+                cell.alignment = self.ALIGNMENT_CENTER
         return wb
 
     def render_report(self):
@@ -235,7 +294,7 @@ class XlsxReportGenerator:
             'ppr': self._render_ppr_ppz_report,
             'ppz': self._render_ppr_ppz_report,
             'asps': self._render_asps_report,
-            'uncompletable': None
+            'uncompletable': self._render_uncompletable_report
         }
         return render_report_methods[self.report_type]()
 
