@@ -318,17 +318,13 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
             date_to = self.form.data.get('date_to')
             report_type = self.form.data.get('report_type')
             try:
-                report_generator = XlsxReportGenerator(
-                    date_from, date_to, report_type
-                )
-                report = report_generator.render_styled_report()
+                report_generator = XlsxReportGenerator(date_from, date_to, report_type)
+                report = report_generator.render_report()
                 response = HttpResponse(
                     content=save_virtual_workbook(report),
-                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',  # noqa
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 )
-                response[
-                    'Content-Disposition'
-                ] = 'attachment; filename=protocol.xlsx'  # noqa
+                response['Content-Disposition'] = 'attachment; filename=protocol.xlsx'
                 return response
             except Exception as e:
                 print(f'Error rendering xlsx: {e}')  # FIXME: logging!
