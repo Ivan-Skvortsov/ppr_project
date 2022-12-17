@@ -36,15 +36,14 @@ class XlsxReportGenerator:
 
     def _get_queryset(self) -> QuerySet:
         qs_filter = {
-            'ppr': Q(maintenance_type__m_type__icontains='ТО'),
-            'ppz': Q(maintenance_type__m_type__icontains='Проверка'),
-            'asps': Q(equipment_type__eqipment_type_name__icontains='АСПС'),
-            'uncompletable': Q(uncompleted__isnull=False)
+            'ppr': Q(maintenance_type__m_type__icontains='ТО') & Q(date_completed__isnull=False),
+            'ppz': Q(maintenance_type__m_type__icontains='Проверка') & Q(date_completed__isnull=False),
+            'asps': Q(equipment_type__eqipment_type_name__icontains='АСПС') & Q(date_completed__isnull=False),
+            'uncompletable': Q(uncompleted__isnull=False),
         }
         qs = Schedule.objects.filter(
             date_sheduled__gte=self.date_from,
-            date_sheduled__lte=self.date_to,
-            date_completed__isnull=False
+            date_sheduled__lte=self.date_to
         ).order_by('date_completed', 'equipment_type__facility')
         return qs.filter(qs_filter[self.report_type])
 
