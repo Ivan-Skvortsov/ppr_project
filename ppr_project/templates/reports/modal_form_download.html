@@ -1,7 +1,7 @@
 <div class="modal-dialog">
   <div class="modal-content" id="modalWindowContent">
     <div class="modal-header">
-      <h5 class="modal-title" id="modalWindowLabel">Уточните параметры</h5>
+      <h5 class="modal-title" id="modalWindowLabel">{{ modal_window_title }}</h5>
       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body">
@@ -20,7 +20,7 @@
           </div>
         {% endfor %}
       {% endif %}
-      <form method="post" id="modalWindowForm" action="" enctype="multipart/form-data" onsubmit="submitModalForm(event, this);">
+      <form method="post" id="modalWindowForm" action="{{ submit_url }}" enctype="multipart/form-data" onsubmit="submitModalForm(event, this);">
         {% csrf_token %}
         {% comment %} form fields {% endcomment %}
         {% for field in form %}

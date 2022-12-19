@@ -331,6 +331,12 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
                 raise Http404
         return self.get(request, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['submit_url'] = reverse_lazy('reports:xlsx_report')
+        context['modal_window_title'] = 'Выберите тип протокола и период'
+        return context
+
 
 class DistributeNextMonthSchedules(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
@@ -365,6 +371,12 @@ class PhotoApprovalsDownloadView(LoginRequiredMixin, FormView):
                 print(f'Error rendering photos: {e}')  # FIXME: logging!
                 raise Http404
         return self.get(request, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['submit_url'] = reverse_lazy('reports:photo_apporvals')
+        context['modal_window_title'] = 'Выберите период для скачивания фото'
+        return context
 
 
 class ScheduleCreateView(LoginRequiredMixin, CreateView):
