@@ -50,7 +50,10 @@ function showModalForm(url) {
   modalWindow.show();
   fetch(url)
     .then((response) => response.text())
-    .then((html) => (modalWindowEl.innerHTML = html))
+    .then((html) => {
+      modalWindowEl.innerHTML = html;
+      document.querySelector("#modalWindowForm").action = url;
+    })
     .catch((error) => console.error("Error", error));
 }
 

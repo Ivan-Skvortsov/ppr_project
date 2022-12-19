@@ -353,3 +353,12 @@ def get_next_month_plans():
     ws.column_dimensions['B'].width = 55
     ws.column_dimensions['C'].width = 10
     return wb
+
+
+def download_photo_approvals(date_from: date, date_to: date):
+    queryset = (
+        Schedule.objects.filter(date_completed__gte=date_from, date_completed__lte=date_to)
+                        .order_by('date_completed', 'equipment_type__facility')
+    )
+    photos = [schedule.photo for schedule in queryset if schedule.photo]
+    print(photos)

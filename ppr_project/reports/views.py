@@ -13,14 +13,14 @@ from django.views.generic.edit import CreateView, FormView, UpdateView
 from openpyxl.writer.excel import save_virtual_workbook
 from simple_history.utils import bulk_update_with_history
 
-from reports.forms import (CompleteScheduleForm, DateInputForm,
+from reports.forms import (CompleteScheduleForm, DateInputForm, DatePeriodForm,
                            ReportDownloadForm, ScheduleCreateForm,
                            ScheduleForm, ScheduleSearchForm,
                            UncompleteReasonForm)
 from reports.models import MaintenanceCategory, Schedule
 from reports.services import (XlsxReportGenerator,
                               distribute_next_month_works_by_dates,
-                              get_next_month_plans)
+                              download_photo_approvals, get_next_month_plans)
 
 
 class ScheduleListView(LoginRequiredMixin, ListView):
@@ -309,7 +309,7 @@ class SearchView(ScheduleListView):
 
 class XlsxReportDownloadView(LoginRequiredMixin, FormView):
     form_class = ReportDownloadForm
-    template_name = 'reports/xlsx_report_download.html'
+    template_name = 'reports/modal_form_download.html'
 
     def post(self, request, **kwargs):
         self.form = self.get_form(self.form_class)
@@ -347,6 +347,24 @@ class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
         )
         response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'  # noqa
         return response
+
+
+class PhotoApprovalsDownloadView(LoginRequiredMixin, FormView):
+    form_class = DatePeriodForm
+    template_name = 'reports/modal_form_download.html'
+
+    def post(self, request, **kwargs):
+        self.form = self.get_form(self.form_class)
+        if self.form.is_valid():
+            date_from = self.form.data.get('date_from')
+            date_to = self.form.data.get('date_to')
+            try:
+                download_photo_approvals(date_from, date_to)
+                return HttpResponse('Hey!')
+            except Exception as e:
+                print(f'Error rendering photos: {e}')  # FIXME: logging!
+                raise Http404
+        return self.get(request, **kwargs)
 
 
 class ScheduleCreateView(LoginRequiredMixin, CreateView):
