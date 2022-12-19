@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.urls.base import resolve
@@ -13,14 +13,14 @@ from django.views.generic.edit import CreateView, FormView, UpdateView
 from openpyxl.writer.excel import save_virtual_workbook
 from simple_history.utils import bulk_update_with_history
 
-from reports.forms import (CompleteScheduleForm, DateInputForm,
+from reports.forms import (CompleteScheduleForm, DateInputForm, DatePeriodForm,
                            ReportDownloadForm, ScheduleCreateForm,
                            ScheduleForm, ScheduleSearchForm,
                            UncompleteReasonForm)
 from reports.models import MaintenanceCategory, Schedule
 from reports.services import (XlsxReportGenerator,
                               distribute_next_month_works_by_dates,
-                              get_next_month_plans)
+                              download_photo_approvals, get_next_month_plans)
 
 
 class ScheduleListView(LoginRequiredMixin, ListView):
@@ -30,7 +30,7 @@ class ScheduleListView(LoginRequiredMixin, ListView):
 
     def post(self, request, *args, **kwargs):
         selected_schedules = request.POST.getlist('selected_schedule')
-        selected_action = request.POST['selected_action']
+        selected_action = request.POST.get('selected_action')
         if not selected_schedules:
             messages.warning(self.request, 'Не выбрано ни одной работы!')
             return self.get(request, *args, **kwargs)
@@ -309,7 +309,7 @@ class SearchView(ScheduleListView):
 
 class XlsxReportDownloadView(LoginRequiredMixin, FormView):
     form_class = ReportDownloadForm
-    template_name = 'reports/xlsx_report_download.html'
+    template_name = 'reports/modal_form_download.html'
 
     def post(self, request, **kwargs):
         self.form = self.get_form(self.form_class)
@@ -331,6 +331,12 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
                 raise Http404
         return self.get(request, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['submit_url'] = reverse_lazy('reports:xlsx_report')
+        context['modal_window_title'] = 'Выберите тип протокола и период'
+        return context
+
 
 class DistributeNextMonthSchedules(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
@@ -347,6 +353,30 @@ class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
         )
         response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'  # noqa
         return response
+
+
+class PhotoApprovalsDownloadView(LoginRequiredMixin, FormView):
+    form_class = DatePeriodForm
+    template_name = 'reports/modal_form_download.html'
+
+    def post(self, request, **kwargs):
+        self.form = self.get_form(self.form_class)
+        if self.form.is_valid():
+            date_from = self.form.data.get('date_from')
+            date_to = self.form.data.get('date_to')
+            try:
+                zip_file_path = download_photo_approvals(date_from, date_to)
+                return FileResponse(open(zip_file_path, 'rb'), as_attachment=True)
+            except Exception as e:
+                print(f'Error rendering photos: {e}')  # FIXME: logging!
+                raise Http404
+        return self.get(request, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['submit_url'] = reverse_lazy('reports:photo_apporvals')
+        context['modal_window_title'] = 'Выберите период для скачивания фото'
+        return context
 
 
 class ScheduleCreateView(LoginRequiredMixin, CreateView):

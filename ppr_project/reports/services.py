@@ -1,7 +1,9 @@
+import zipfile
 from calendar import monthrange
 from collections import defaultdict
 from datetime import date, datetime
 
+from django.conf import settings
 from django.db.models import Q, QuerySet
 from django.template.defaultfilters import date as _date
 
@@ -353,3 +355,24 @@ def get_next_month_plans():
     ws.column_dimensions['B'].width = 55
     ws.column_dimensions['C'].width = 10
     return wb
+
+
+def download_photo_approvals(date_from: date, date_to: date):
+    queryset = (
+        Schedule.objects.filter(date_completed__gte=date_from, date_completed__lte=date_to)
+                        .order_by('date_completed', 'equipment_type__facility')
+    )
+    zip_file_path = settings.MEDIA_ROOT / 'tmp' / 'photo_approvals.zip'
+    with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for entry in queryset:
+            if entry.photo:
+                date_completed = _date(entry.date_completed, 'd.m.Y')
+                photo_path = entry.photo.path
+                photo_name = (
+                    f'[{entry.equipment_type.facility.facility_name}] '
+                    f'{entry.equipment_type.eqipment_type_name} '
+                    f'от {date_completed}'
+                    f'.{photo_path.split(".")[-1]}'
+                )
+                zipf.write(photo_path, photo_name)
+    return zip_file_path

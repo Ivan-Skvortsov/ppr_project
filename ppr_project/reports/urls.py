@@ -6,10 +6,10 @@ from reports.views import (ConfirmScheduleCannotBeComplete,
                            DistributeNextMonthSchedules, IndexView,
                            MonthScheduleView, NextMonthScheduleView,
                            NoPhotoScheduleView, OverDueScheduleView,
-                           ScheduleCreateView, ScheduleDetailInfoView,
-                           SearchView, UncompletableScheduleView,
-                           WeekScheduleView, XlsxNextMonthDownloadView,
-                           XlsxReportDownloadView)
+                           PhotoApprovalsDownloadView, ScheduleCreateView,
+                           ScheduleDetailInfoView, SearchView,
+                           UncompletableScheduleView, WeekScheduleView,
+                           XlsxNextMonthDownloadView, XlsxReportDownloadView)
 
 app_name = 'reports'
 
@@ -55,6 +55,7 @@ urlpatterns = [
         name='confirm_schedule_cant_complete',
     ),
     path('xlsx_report/', XlsxReportDownloadView.as_view(), name='xlsx_report'),
+    path('photo_approvals/', PhotoApprovalsDownloadView.as_view(), name='photo_apporvals'),
     path(
         'distribute_next_month/',
         DistributeNextMonthSchedules.as_view(),

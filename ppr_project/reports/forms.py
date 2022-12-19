@@ -103,19 +103,8 @@ class DateInputForm(forms.Form):
     )
 
 
-class ReportDownloadForm(forms.Form):
-    report_type = forms.ChoiceField(
-        choices=[
-            ('ppr', 'Протокол ППР'),
-            ('ppz', 'Протокол проверки защит'),
-            ('asps', 'Отчет по АСПС для пожарных'),
-            ('uncompletable', 'Протокол о невыполненных работах')
-        ],
-        initial='ppr',
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        label='Тип протокола',
-        help_text='Выберите тип протокола'
-    )
+class DatePeriodForm(forms.Form):
+
     date_from = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         label='Начало периода',
@@ -134,6 +123,24 @@ class ReportDownloadForm(forms.Form):
         if date_from > date_to:
             raise forms.ValidationError('Начало периода не может быть позже конца периода!')
         return cleaned_data
+
+
+class ReportDownloadForm(DatePeriodForm):
+
+    field_order = ['report_type', 'date_from', 'date_to']
+
+    report_type = forms.ChoiceField(
+        choices=[
+            ('ppr', 'Протокол ППР'),
+            ('ppz', 'Протокол проверки защит'),
+            ('asps', 'Отчет по АСПС для пожарных'),
+            ('uncompletable', 'Протокол о невыполненных работах')
+        ],
+        initial='ppr',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Тип протокола',
+        help_text='Выберите тип протокола'
+    )
 
 
 class ScheduleSearchForm(forms.Form):
