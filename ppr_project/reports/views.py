@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.urls.base import resolve
@@ -30,7 +30,7 @@ class ScheduleListView(LoginRequiredMixin, ListView):
 
     def post(self, request, *args, **kwargs):
         selected_schedules = request.POST.getlist('selected_schedule')
-        selected_action = request.POST['selected_action']
+        selected_action = request.POST.get('selected_action')
         if not selected_schedules:
             messages.warning(self.request, 'Не выбрано ни одной работы!')
             return self.get(request, *args, **kwargs)
@@ -359,8 +359,8 @@ class PhotoApprovalsDownloadView(LoginRequiredMixin, FormView):
             date_from = self.form.data.get('date_from')
             date_to = self.form.data.get('date_to')
             try:
-                download_photo_approvals(date_from, date_to)
-                return HttpResponse('Hey!')
+                zip_file_path = download_photo_approvals(date_from, date_to)
+                return FileResponse(open(zip_file_path, 'rb'), as_attachment=True)
             except Exception as e:
                 print(f'Error rendering photos: {e}')  # FIXME: logging!
                 raise Http404
