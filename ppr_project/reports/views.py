@@ -360,7 +360,7 @@ class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
 
 class PhotoApprovalsDownloadView(LoginRequiredMixin, FormView):
     form_class = DatePeriodForm
-    template_name = 'reports/modal_form_download.html'
+    template_name = 'reports/action_confirmation.html'
 
     def post(self, request, **kwargs):
         self.form = self.get_form(self.form_class)
@@ -368,19 +368,17 @@ class PhotoApprovalsDownloadView(LoginRequiredMixin, FormView):
             date_from = self.form.data.get('date_from')
             date_to = self.form.data.get('date_to')
             try:
-                logger.debug('Call "download_photo_approvals"')
                 zip_file_path = download_photo_approvals(date_from, date_to)
-                logger.debug('Got filepath from "download_photo_approvals"')
-                return FileResponse(open(zip_file_path, 'rb'), as_attachment=True)
+                return FileResponse(open(zip_file_path, 'rb'))
             except Exception as e:
-                logger.error(f'Error rendering photos: {e}')
+                logger.error(f'Error creating zip file with photos: {e}')
                 raise Http404
         return self.get(request, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['submit_url'] = reverse_lazy('reports:photo_apporvals')
-        context['modal_window_title'] = 'Выберите период для скачивания фото'
+        context['action_to_confirm'] = 'Выберите период для скачивания фото'
+        context['return_url'] = reverse_lazy('reports:day_schedule')
         return context
 
 
