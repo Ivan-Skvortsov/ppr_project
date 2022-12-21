@@ -1,3 +1,4 @@
+import logging
 from datetime import date, timedelta
 
 from django.contrib import messages
@@ -21,6 +22,8 @@ from reports.models import MaintenanceCategory, Schedule
 from reports.services import (XlsxReportGenerator,
                               distribute_next_month_works_by_dates,
                               download_photo_approvals, get_next_month_plans)
+
+logger = logging.getLogger(__name__)
 
 
 class ScheduleListView(LoginRequiredMixin, ListView):
@@ -297,7 +300,7 @@ class SearchView(ScheduleListView):
             try:
                 return qs.filter(**filter_params)
             except Exception as e:
-                print(f'Wrong filter params! Error: {e}')  # FIXME: logging!
+                logger.error(f'Wrong filter params! Error: {e}')
                 raise Http404
         return None
 
@@ -327,7 +330,7 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
                 response['Content-Disposition'] = 'attachment; filename=protocol.xlsx'
                 return response
             except Exception as e:
-                print(f'Error rendering xlsx: {e}')  # FIXME: logging!
+                logger.error(f'Error rendering xlsx: {e}')
                 raise Http404
         return self.get(request, **kwargs)
 
@@ -365,10 +368,12 @@ class PhotoApprovalsDownloadView(LoginRequiredMixin, FormView):
             date_from = self.form.data.get('date_from')
             date_to = self.form.data.get('date_to')
             try:
+                logger.debug('Call "download_photo_approvals"')
                 zip_file_path = download_photo_approvals(date_from, date_to)
+                logger.debug('Got filepath from "download_photo_approvals"')
                 return FileResponse(open(zip_file_path, 'rb'), as_attachment=True)
             except Exception as e:
-                print(f'Error rendering photos: {e}')  # FIXME: logging!
+                logger.error(f'Error rendering photos: {e}')
                 raise Http404
         return self.get(request, **kwargs)
 
