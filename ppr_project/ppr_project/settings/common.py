@@ -127,3 +127,27 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'basic': {'format': '%(asctime)s [%(name)s] %(levelname)s: %(message)s'}
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs',
+            'formatter': 'basic'
+        }
+    },
+    'loggers': {
+        'reports': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': False
+        }
+    }
+}
