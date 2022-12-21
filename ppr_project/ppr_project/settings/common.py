@@ -137,7 +137,7 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / 'logs',
             'formatter': 'basic'
@@ -146,7 +146,7 @@ LOGGING = {
     'loggers': {
         'reports': {
             'handlers': ['file'],
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'propagate': False
         }
     }
