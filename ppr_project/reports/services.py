@@ -55,12 +55,10 @@ class XlsxReportGenerator:
             'ppz': 'проверок защит'
         }
         date_from = datetime.strptime(self.date_from, '%Y-%m-%d')
-        date_to = datetime.strptime(self.date_to, '%Y-%m-%d')
         ws['G1'] = 'Утверждаю'
         ws['A7'] = f'Протокол проведения {report_header[self.report_type]}'
         ws['A8'] = 'объектов КС-45 Усинская'
-        ws['A9'] = (f'за период с {_date(date_from, "d E")} по '
-                    f'{_date(date_to, "d E Y")} г.')
+        ws['A9'] = f'за {_date(date_from, "F Y").lower()} г.'
         ws['A11'] = ('Основание проведения работ: График проведения ППР '
                      'оборудования АСУ, А и ТМ КС-45 Усинская на 2022 год.')
         ws['A12'] = ''
