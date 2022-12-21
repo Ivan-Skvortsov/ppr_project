@@ -54,12 +54,32 @@ function showModalForm(url) {
     .catch((error) => console.error("Error", error));
 }
 
+//download file
+const downloadFile = (data, filename) => {
+  try {
+    const blob = new Blob([data]);
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.setAttribute("download", filename);
+
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // submit form and download file
 function submitModalForm(evnt, form) {
   const submitButton = document.querySelector("#submitAndDownload");
   submitButton.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Загрузка`;
   submitButton.disabled = true;
   evnt.preventDefault();
+  let filename = "";
   const formData = new FormData(form);
   const url = form.getAttribute("action");
   const options = {
@@ -73,9 +93,14 @@ function submitModalForm(evnt, form) {
   fetch(url, options)
     .then((response) => {
       const contentType = response.headers.get("Content-Type");
-      return contentType.includes("text/html")
-        ? response.text()
-        : response.blob();
+      if (contentType.includes("text/html")) {
+        return response.text();
+      } else {
+        const contentDisposition = response.headers.get("Content-Disposition");
+        const parts = contentDisposition.split(";");
+        filename = parts[1].split("=")[1].replaceAll('"', "");
+      }
+      return response.blob();
     })
     .then((data) => {
       const modalWindowEl = document.querySelector("#modalWindow");
@@ -83,8 +108,7 @@ function submitModalForm(evnt, form) {
       if (typeof data === "string") {
         modalWindowEl.innerHTML = data;
       } else {
-        const downloadFile = window.URL.createObjectURL(data);
-        window.location.assign(downloadFile);
+        downloadFile(data, filename);
         modalWindow.hide();
       }
     })
