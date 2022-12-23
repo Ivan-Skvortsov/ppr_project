@@ -304,11 +304,14 @@ class XlsxReportGenerator:
 def distribute_next_month_works_by_dates():
     """Distributes next month schedules by dates."""
     current_date = date.today()
-    current_year = current_date.year
-    next_month = current_date.month + 1
-    last_day_of_month = monthrange(current_year, next_month)[1]
+    year = current_date.year
+    month = current_date.month + 1
+    if month > 12:
+        month = 1
+        year += 1
+    last_day_of_month = monthrange(year, month)[1]
     qs = (Schedule.objects.select_related('equipment_type__facility')
-                          .filter(date_sheduled__month=next_month)
+                          .filter(date_sheduled__month=month)
                           .order_by('equipment_type__facility'))
     regouped_schedules = defaultdict(list)
     for schedule in qs:
@@ -316,27 +319,22 @@ def distribute_next_month_works_by_dates():
     current_day = 1
     for group in regouped_schedules:
         for schedule in regouped_schedules[group]:
-            schedule.date_sheduled = date(
-                year=current_year, month=next_month, day=current_day
-            )
+            schedule.date_sheduled = date(year=year, month=month, day=current_day)
             schedule._change_reason = 'Distributed next month shedules by day'
         current_day += 1
         if current_day > last_day_of_month:
             current_day = 1
-    bulk_update_with_history(
-        qs, Schedule, ['date_sheduled'], batch_size=500
-    )
+    bulk_update_with_history(qs, Schedule, ['date_sheduled'], batch_size=500)
 
 
 def get_next_month_plans():
     current_date = date.today()
     next_month = current_date.month + 1
-    qs = (Schedule.objects.select_related('equipment_type__facility',
-                                          'maintenance_type',
-                                          'equipment_type')
-                          .order_by('date_sheduled',
-                                    'equipment_type__facility')
-                          .filter(date_sheduled__month=next_month))
+    qs = (
+        Schedule.objects.select_related('equipment_type__facility', 'maintenance_type', 'equipment_type')
+                        .order_by('date_sheduled', 'equipment_type__facility')
+                        .filter(date_sheduled__month=next_month)
+    )
     regrouped_schedules = defaultdict(list)
     for schedule in qs:
         regrouped_schedules[schedule.date_sheduled].append(schedule)
