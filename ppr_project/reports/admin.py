@@ -75,4 +75,6 @@ class UncompleteReasonsAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(MaintenanceCategory)
+@admin.register(MaintenanceCategory)
+class MaintenanceCategoryAdmin(admin.ModelAdmin):
+    pass

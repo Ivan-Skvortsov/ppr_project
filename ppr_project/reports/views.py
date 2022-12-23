@@ -6,7 +6,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.urls.base import resolve
 from django.views import View
 from django.views.generic import ListView, RedirectView
 from django.views.generic.edit import CreateView, FormView, UpdateView
@@ -31,46 +30,33 @@ class ScheduleListView(LoginRequiredMixin, ListView):
     template_name = 'reports/schedule_list.html'
     context_object_name = 'schedule_plan'
 
+    SCHEDULE_ACTION_URLS = {
+        'date_scheduled_changed': 'reports:confirm_date_changed',
+        'schedule_completed': 'reports:confirm_schedule_completed',
+        'schedule_cant_be_completed': 'reports:confirm_schedule_cant_complete'
+    }
+
     def post(self, request, *args, **kwargs):
         selected_schedules = request.POST.getlist('selected_schedule')
         selected_action = request.POST.get('selected_action')
         if not selected_schedules:
             messages.warning(self.request, 'Не выбрано ни одной работы!')
             return self.get(request, *args, **kwargs)
-        if selected_action == 'date_scheduled_changed':
-            return self._redirect_to_confirmation_page(
-                selected_schedules, 'reports:confirm_date_changed'
-            )
-        if selected_action == 'schedule_completed':
-            return self._redirect_to_confirmation_page(
-                selected_schedules, 'reports:confirm_schedule_completed'
-            )
-        if selected_action == 'schedule_cant_be_completed':
-            return self._redirect_to_confirmation_page(
-                selected_schedules, 'reports:confirm_schedule_cant_complete'
-            )
-        return self.get(request, *args, **kwargs)
+        action_confirmation_url = self.SCHEDULE_ACTION_URLS.get(selected_action)
+        if not action_confirmation_url:
+            return self.get(request, *args, **kwargs)
+        request.session['return_url'] = self.request.path_info
+        request.session['selected_schedules'] = selected_schedules
+        return redirect(action_confirmation_url)
 
     def get_queryset(self):
         category_id = self.kwargs.get('category_id', None)
-        qs = Schedule.objects.select_related(
-            'equipment_type__facility', 'report', 'maintenance_type'
-        ).order_by('date_sheduled', 'equipment_type__facility')
+        qs = (Schedule.objects.select_related('equipment_type__facility', 'report', 'maintenance_type')
+                              .order_by('date_sheduled', 'equipment_type__facility'))
         if category_id:
-            maintenance_category = get_object_or_404(
-                MaintenanceCategory, pk=category_id
-            )
-            return qs.filter(
-                equipment_type__maintenance_category=maintenance_category
-            )
+            maintenance_category = get_object_or_404(MaintenanceCategory, pk=category_id)
+            return qs.filter(equipment_type__maintenance_category=maintenance_category)
         return qs
-
-    def _redirect_to_confirmation_page(self, selected_schedules, page_url):
-        return_url = resolve(self.request.path_info).url_name
-        schedule_list = '_'.join(selected_schedules)
-        return redirect(
-            page_url, schedule_list=schedule_list, return_url=return_url
-        )
 
 
 class DayScheduleView(ScheduleListView):
@@ -133,11 +119,7 @@ class OverDueScheduleView(ScheduleListView):
     def get_queryset(self):
         qs = super().get_queryset()
         lte_date = date.today() - timedelta(days=1)
-        return qs.filter(
-            date_sheduled__lte=lte_date,
-            uncompleted__isnull=True,
-            date_completed__isnull=True,
-        )
+        return qs.filter(date_sheduled__lte=lte_date, uncompleted__isnull=True, date_completed__isnull=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -170,17 +152,11 @@ class NoPhotoScheduleView(ScheduleListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(
-            date_completed__isnull=False,
-            photo='',
-            maintenance_type__m_type__icontains='Проверка',
-        )
+        return qs.filter(date_completed__isnull=False, photo='', maintenance_type__m_type__icontains='Проверка')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = (
-            'Завершенные проверки защит, к которым не загружены фото'
-        )
+        context['plan_period'] = 'Завершенные проверки защит, к которым не загружены фото'
         context['plan_url'] = reverse_lazy('reports:no_photo_apporval')
         return context
 
@@ -207,31 +183,26 @@ class ConfirmScheduleCompletedView(LoginRequiredMixin, FormView):
     template_name = 'reports/action_confirmation.html'
 
     def post(self, request, **kwargs):
-        self.schedule_list = kwargs['schedule_list'].split('_')
-        self.return_url = f'reports:{kwargs["return_url"]}'
-        self.form = self.get_form(self.form_class)
-        if self.form.is_valid():
-            qs = Schedule.objects.filter(pk__in=self.schedule_list)
+        schedule_list = self.request.session.get('selected_schedules')
+        return_url = self.request.session.get('return_url')
+        form = self.get_form(self.form_class)
+        if form.is_valid():
+            qs = Schedule.objects.filter(pk__in=schedule_list)
             for entry in qs:
                 entry._change_reason = 'Confirmed work completed'
-                entry.date_completed = self.form.cleaned_data['date_completed']
-                entry.employee1 = self.form.cleaned_data['employee1']
-                entry.employee2 = self.form.cleaned_data['employee2']
-                entry.employee3 = self.form.cleaned_data['employee3']
+                entry.date_completed = form.cleaned_data.get('date_completed')
+                entry.employee1 = form.cleaned_data.get('employee1')
+                entry.employee2 = form.cleaned_data.get('employee2')
+                entry.employee3 = form.cleaned_data.get('employee3')
                 entry.uncompleted = None
             bulk_update_with_history(
-                qs,
-                Schedule,
-                ['date_completed', 'employee1', 'employee2', 'employee3'],
-                batch_size=500,
-            )
-            return redirect(self.return_url)
+                qs, Schedule, ['date_completed', 'employee1', 'employee2', 'employee3'], batch_size=500)
+            return redirect(return_url)
         return self.get(request, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        return_url = f'reports:{self.kwargs["return_url"]}'
-        context['return_url'] = reverse_lazy(return_url)
+        context['return_url'] = self.request.session.get('return_url')
         context['action_to_confirm'] = 'Выберите дату и исполнителей'
         return context
 
@@ -241,24 +212,21 @@ class ConfirmScheduleDateChangedView(LoginRequiredMixin, FormView):
     template_name = 'reports/action_confirmation.html'
 
     def post(self, request, **kwargs):
-        self.schedule_list = kwargs['schedule_list'].split('_')
-        self.return_url = f'reports:{kwargs["return_url"]}'
-        self.form = self.get_form(self.form_class)
-        if self.form.is_valid():
-            qs = Schedule.objects.filter(pk__in=self.schedule_list)
+        schedule_list = self.request.session.get('selected_schedules')
+        return_url = self.request.session.get('return_url')
+        form = self.get_form(self.form_class)
+        if form.is_valid():
+            qs = Schedule.objects.filter(pk__in=schedule_list)
             for entry in qs:
                 entry._change_reason = 'Changed schedule date'
-                entry.date_sheduled = self.form.cleaned_data['input_date']
-            bulk_update_with_history(
-                qs, Schedule, ['date_sheduled'], batch_size=500
-            )
-            return redirect(self.return_url)
+                entry.date_sheduled = form.cleaned_data.get('input_date')
+            bulk_update_with_history(qs, Schedule, ['date_sheduled'], batch_size=500)
+            return redirect(return_url)
         return self.get(request, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        return_url = f'reports:{self.kwargs["return_url"]}'
-        context['return_url'] = reverse_lazy(return_url)
+        context['return_url'] = self.request.session.get('return_url')
         context['action_to_confirm'] = 'Выберите дату'
         return context
 
@@ -268,24 +236,21 @@ class ConfirmScheduleCannotBeComplete(LoginRequiredMixin, FormView):
     template_name = 'reports/action_confirmation.html'
 
     def post(self, request, **kwargs):
-        self.schedule_list = kwargs['schedule_list'].split('_')
-        self.return_url = f'reports:{kwargs["return_url"]}'
-        self.form = self.get_form(self.form_class)
-        if self.form.is_valid():
-            qs = Schedule.objects.filter(pk__in=self.schedule_list)
+        schedule_list = self.request.session.get('selected_schedules')
+        return_url = self.request.session.get('return_url')
+        form = self.get_form(self.form_class)
+        if form.is_valid():
+            qs = Schedule.objects.filter(pk__in=schedule_list)
             for entry in qs:
                 entry._change_reason = 'Marked as can not be completed'
-                entry.uncompleted = self.form.cleaned_data['reason']
-            bulk_update_with_history(
-                qs, Schedule, ['uncompleted'], batch_size=500
-            )
-            return redirect(self.return_url)
+                entry.uncompleted = form.cleaned_data.get('reason')
+            bulk_update_with_history(qs, Schedule, ['uncompleted'], batch_size=500)
+            return redirect(return_url)
         return self.get(request, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        return_url = f'reports:{self.kwargs["return_url"]}'
-        context['return_url'] = reverse_lazy(return_url)
+        context['return_url'] = self.request.session.get('return_url')
         context['action_to_confirm'] = 'Выберите дату'
         return context
 
@@ -315,11 +280,11 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
     template_name = 'reports/modal_form_download.html'
 
     def post(self, request, **kwargs):
-        self.form = self.get_form(self.form_class)
-        if self.form.is_valid():
-            date_from = self.form.data.get('date_from')
-            date_to = self.form.data.get('date_to')
-            report_type = self.form.data.get('report_type')
+        form = self.get_form(self.form_class)
+        if form.is_valid():
+            date_from = form.data.get('date_from')
+            date_to = form.data.get('date_to')
+            report_type = form.data.get('report_type')
             try:
                 report_generator = XlsxReportGenerator(date_from, date_to, report_type)
                 report = report_generator.render_report()
@@ -343,7 +308,11 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
 
 class DistributeNextMonthSchedules(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
-        distribute_next_month_works_by_dates()
+        try:
+            distribute_next_month_works_by_dates()
+        except Exception as e:
+            logger.error(f'Error when trying to distribute next month schedules: {e}')
+            raise Http404
         return redirect('reports:next_month_schedule')
 
 
@@ -352,9 +321,9 @@ class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
         xlsx_file = get_next_month_plans()
         response = HttpResponse(
             content=save_virtual_workbook(xlsx_file),
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',  # noqa
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         )
-        response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'  # noqa
+        response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'
         return response
 
 
@@ -363,10 +332,10 @@ class PhotoApprovalsDownloadView(LoginRequiredMixin, FormView):
     template_name = 'reports/action_confirmation.html'
 
     def post(self, request, **kwargs):
-        self.form = self.get_form(self.form_class)
-        if self.form.is_valid():
-            date_from = self.form.data.get('date_from')
-            date_to = self.form.data.get('date_to')
+        form = self.get_form(self.form_class)
+        if form.is_valid():
+            date_from = form.data.get('date_from')
+            date_to = form.data.get('date_to')
             try:
                 zip_file_path = download_photo_approvals(date_from, date_to)
                 return FileResponse(open(zip_file_path, 'rb'))
