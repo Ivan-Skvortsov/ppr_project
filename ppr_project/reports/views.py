@@ -24,6 +24,8 @@ from reports.services import (XlsxReportGenerator,
 
 logger = logging.getLogger(__name__)
 
+CURRENT_YEAR = date.today().year
+
 
 class ScheduleListView(LoginRequiredMixin, ListView):
     model = Schedule
@@ -75,7 +77,7 @@ class MonthScheduleView(ScheduleListView):
     def get_queryset(self):
         qs = super().get_queryset()
         month = date.today().month
-        return qs.filter(date_sheduled__month=month)
+        return qs.filter(date_sheduled__month=month, date_sheduled__year=CURRENT_YEAR)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -87,8 +89,10 @@ class MonthScheduleView(ScheduleListView):
 class WeekScheduleView(ScheduleListView):
     def get_queryset(self):
         qs = super().get_queryset()
-        week = date.today().isocalendar()[1]  # Get week number
-        return qs.filter(date_sheduled__week=week)
+        today = date.today()
+        start_date = today - timedelta(days=today.weekday())
+        end_date = start_date + timedelta(days=6)
+        return qs.filter(date_sheduled__range=[start_date, end_date])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -101,7 +105,11 @@ class NextMonthScheduleView(ScheduleListView):
     def get_queryset(self):
         qs = super().get_queryset()
         next_month = date.today().month + 1
-        return qs.filter(date_sheduled__month=next_month)
+        year = CURRENT_YEAR
+        if next_month > 12:
+            next_month = 1
+            year = CURRENT_YEAR + 1
+        return qs.filter(date_sheduled__month=next_month, date_sheduled__year=year)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -133,11 +141,11 @@ class UncompletableScheduleView(ScheduleListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        previous_month = date.today().month - 2
+        date_gte = date.today() - timedelta(days=60)
         return qs.filter(
             uncompleted__reason__icontains='магистраль',
             date_completed__isnull=True,
-            date_sheduled__month__gte=previous_month,
+            date_sheduled__gte=date_gte,
         )
 
     def get_context_data(self, **kwargs):

@@ -329,11 +329,15 @@ def distribute_next_month_works_by_dates():
 
 def get_next_month_plans():
     current_date = date.today()
+    year = current_date.year
     next_month = current_date.month + 1
+    if next_month > 12:
+        next_month = 1
+        year += 1
     qs = (
         Schedule.objects.select_related('equipment_type__facility', 'maintenance_type', 'equipment_type')
                         .order_by('date_sheduled', 'equipment_type__facility')
-                        .filter(date_sheduled__month=next_month)
+                        .filter(date_sheduled__month=next_month, date_sheduled__year=year)
     )
     regrouped_schedules = defaultdict(list)
     for schedule in qs:

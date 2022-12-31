@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+
 from django import template
 
 from reports.models import Schedule
@@ -22,9 +23,9 @@ def count_overdue_schedules():
 @register.simple_tag
 def count_uncompletable_schedules():
     """Template tag to count uncompletable schedules for last three months."""
-    previous_month = date.today().month - 2
+    date_gte = date.today() - timedelta(days=60)
     return Schedule.objects.filter(
-        date_sheduled__month__gte=previous_month,
+        date_sheduled__gte=date_gte,
         date_completed__isnull=True,
         uncompleted__reason__icontains='магистраль').count()
 
