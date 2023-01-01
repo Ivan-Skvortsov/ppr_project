@@ -27,7 +27,7 @@ class ScheduleForm(forms.ModelForm):
                 'Нельзя указать, что работа завершена без исполнителей! '
                 'Выберите как минимум двух исполнителей работы!'
             )
-        if len(set([employee1, employee2, employee3])) != 3:
+        if len(set([employee1, employee2, employee3])) != 3 and employee1:
             raise forms.ValidationError('Нельзя указать одинаковых исполнителей!')
         return cleaned_data
 
