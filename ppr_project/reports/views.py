@@ -24,8 +24,6 @@ from reports.services import (XlsxReportGenerator,
 
 logger = logging.getLogger(__name__)
 
-CURRENT_YEAR = date.today().year
-
 
 class ScheduleListView(LoginRequiredMixin, ListView):
     model = Schedule
@@ -77,7 +75,8 @@ class MonthScheduleView(ScheduleListView):
     def get_queryset(self):
         qs = super().get_queryset()
         month = date.today().month
-        return qs.filter(date_sheduled__month=month, date_sheduled__year=CURRENT_YEAR)
+        year = date.today().year
+        return qs.filter(date_sheduled__month=month, date_sheduled__year=year)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -105,10 +104,10 @@ class NextMonthScheduleView(ScheduleListView):
     def get_queryset(self):
         qs = super().get_queryset()
         next_month = date.today().month + 1
-        year = CURRENT_YEAR
+        year = date.today().year
         if next_month > 12:
             next_month = 1
-            year = CURRENT_YEAR + 1
+            year += 1
         return qs.filter(date_sheduled__month=next_month, date_sheduled__year=year)
 
     def get_context_data(self, **kwargs):
