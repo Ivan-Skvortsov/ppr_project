@@ -1,33 +1,12 @@
-{% comment %} categories never changes, so it seems that hardcode is ok here {% endcomment %}
+{% load user_filters %}
+{% get_maintenance_categories as category_list %}
 <ul class="nav nav-tabs card-header-tabs">
-    <li class="nav-item">
-      <a class="nav-link {% if not view.kwargs.category_id %}active{% endif %}" href="{{ plan_url }}">Все объекты</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link {% if view.kwargs.category_id == 3 %}active{% endif %}" href="{{ plan_url }}3/">ППР КЦ-1</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link {% if view.kwargs.category_id == 4 %}active{% endif %}" href="{{ plan_url }}4/">ППР КЦ-2</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link {% if view.kwargs.category_id == 5 %}active{% endif %}" href="{{ plan_url }}5/">ППР ПБ</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link {% if view.kwargs.category_id == 6 %}active{% endif %}" href="{{ plan_url }}6/">ППР защит КЦ-1</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link {% if view.kwargs.category_id == 7 %}active{% endif %}" href="{{ plan_url }}7/">ППР защит КЦ-2</a>
-    </li>
-      <a class="nav-link {% if view.kwargs.category_id == 8 %}active{% endif %}" href="{{ plan_url }}8/">АСПС, ПТ и КЗ КЦ-1</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link {% if view.kwargs.category_id == 9 %}active{% endif %}" href="{{ plan_url }}9/">АСПС, ПТ и КЗ КЦ-2</a>
-    </li>          
-    <li class="nav-item">
-      <a class="nav-link {% if view.kwargs.category_id == 10 %}active{% endif %}" href="{{ plan_url }}10/">СВТ</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link {% if view.kwargs.category_id == 11 %}active{% endif %}" href="{{ plan_url }}11/">АСУ ПТК</a>
-    </li>
-
+  <li class="nav-item">
+    <a class="nav-link {% if not request.GET.category %}active{% endif %}" href="?">Все объекты</a>
+  </li>
+  {% for cat in category_list %}
+  <li class="nav-item">
+    <a class="nav-link {% if request.GET.category == cat.category_name %}active{% endif %}" href="{{ request.get_path }}?category={{ cat.category_name }}">{{ cat.category_name }}</a>
+  </li>
+  {% endfor %}
 </ul>

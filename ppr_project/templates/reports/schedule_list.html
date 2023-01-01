@@ -5,11 +5,15 @@
 <div class="my-3 p-2 text-left text-muted">
   <h5>
     {{ plan_period }}
-    {% if plan_period == 'План на следующий месяц' %} - 
-    <a class="text-decoration-none" href="{% url 'reports:distribute_next_month' %}"> распределить работы по дням (beta)</a>
-    {% endif %}
   </h5>
 </div>
+
+{# messages #}
+{% if messages %}
+  {% for message in messages %}
+      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+  {% endfor %}
+{% endif %}
 
   <div class="card my-3">
     <div class="card-header">

@@ -1,5 +1,5 @@
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -25,6 +25,11 @@ from reports.services import (XlsxReportGenerator,
 logger = logging.getLogger(__name__)
 
 
+class IndexView(LoginRequiredMixin, RedirectView):
+
+    url = reverse_lazy('reports:date_range', kwargs={'start_date': date.today(), 'end_date': date.today()})
+
+
 class ScheduleListView(LoginRequiredMixin, ListView):
     model = Schedule
     template_name = 'reports/schedule_list.html'
@@ -36,90 +41,86 @@ class ScheduleListView(LoginRequiredMixin, ListView):
         'schedule_cant_be_completed': 'reports:confirm_schedule_cant_complete'
     }
 
+    def get(self, request, *args, **kwargs):
+        request.session['return_url'] = self.request.get_full_path_info()
+        return super().get(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         selected_schedules = request.POST.getlist('selected_schedule')
-        selected_action = request.POST.get('selected_action')
         if not selected_schedules:
             messages.warning(self.request, 'Не выбрано ни одной работы!')
             return self.get(request, *args, **kwargs)
+        selected_action = request.POST.get('selected_action')
         action_confirmation_url = self.SCHEDULE_ACTION_URLS.get(selected_action)
         if not action_confirmation_url:
             return self.get(request, *args, **kwargs)
-        request.session['return_url'] = self.request.path_info
         request.session['selected_schedules'] = selected_schedules
         return redirect(action_confirmation_url)
 
     def get_queryset(self):
-        category_id = self.kwargs.get('category_id', None)
         qs = (Schedule.objects.select_related('equipment_type__facility', 'report', 'maintenance_type')
                               .order_by('date_sheduled', 'equipment_type__facility'))
-        if category_id:
-            maintenance_category = get_object_or_404(MaintenanceCategory, pk=category_id)
+        category = self.request.GET.get('category', None)
+        if category:
+            maintenance_category = get_object_or_404(MaintenanceCategory, category_name=category)
             return qs.filter(equipment_type__maintenance_category=maintenance_category)
         return qs
 
 
-class DayScheduleView(ScheduleListView):
-    def get_queryset(self):
+class DateRangeScheduleView(ScheduleListView):
+    def get_queryset(self, **kwargs):
         qs = super().get_queryset()
-        return qs.filter(date_sheduled=date.today())
+        date_format = '%Y-%m-%d'
+        try:
+            start_date_str = self.kwargs.get('start_date')
+            self.start_date = datetime.strptime(start_date_str, date_format)
+            end_date_str = self.kwargs.get('end_date')
+            self.end_date = datetime.strptime(end_date_str, date_format)
+            return qs.filter(date_sheduled__range=[self.start_date, self.end_date])
+        except ValueError:
+            raise Http404
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = 'План на сегодня'
-        context['plan_url'] = reverse_lazy('reports:day_schedule')
+        date_format = '%d.%m.%Y'
+        start_date = datetime.strftime(self.start_date, date_format)
+        end_date = datetime.strftime(self.end_date, date_format)
+        context['plan_period'] = f'План на период с {start_date} по {end_date}'
         return context
 
 
-class MonthScheduleView(ScheduleListView):
-    def get_queryset(self):
-        qs = super().get_queryset()
-        month = date.today().month
-        year = date.today().year
-        return qs.filter(date_sheduled__month=month, date_sheduled__year=year)
+class SelectDateRangeForScheduleView(LoginRequiredMixin, FormView):
+    form_class = DatePeriodForm
+    template_name = 'reports/action_confirmation.html'
+
+    def post(self, request, **kwargs):
+        form = self.get_form(self.form_class)
+        if form.is_valid():
+            date_from = form.data.get('date_from')
+            date_to = form.data.get('date_to')
+            return redirect('reports:date_range', date_from, date_to)
+        return self.get(request, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = 'План на этот месяц'
-        context['plan_url'] = reverse_lazy('reports:month_schedule')
+        context['action_to_confirm'] = 'Выберите период'
+        context['return_url'] = self.request.session.get('return_url')
         return context
 
 
-class WeekScheduleView(ScheduleListView):
-    def get_queryset(self):
-        qs = super().get_queryset()
-        today = date.today()
-        start_date = today - timedelta(days=today.weekday())
-        end_date = start_date + timedelta(days=6)
-        return qs.filter(date_sheduled__range=[start_date, end_date])
+class ScheduleDetailInfoView(LoginRequiredMixin, UpdateView):
+    template_name = 'reports/schedule_detail.html'
+    model = Schedule
+    form_class = ScheduleForm
+    context_object_name = 'schedule_entry'
+
+    def get_success_url(self):
+        return self.request.session.get('return_url')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plan_period'] = 'План на эту неделю'
-        context['plan_url'] = reverse_lazy('reports:week_schedule')
+        context['return_url'] = self.get_success_url()
         return context
-
-
-class NextMonthScheduleView(ScheduleListView):
-    def get_queryset(self):
-        qs = super().get_queryset()
-        next_month = date.today().month + 1
-        year = date.today().year
-        if next_month > 12:
-            next_month = 1
-            year += 1
-        return qs.filter(date_sheduled__month=next_month, date_sheduled__year=year)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['plan_period'] = 'План на следующий месяц'
-        context['plan_url'] = reverse_lazy('reports:next_month_schedule')
-        return context
-
-
-class IndexView(LoginRequiredMixin, RedirectView):
-
-    url = reverse_lazy('reports:day_schedule')
 
 
 class OverDueScheduleView(ScheduleListView):
@@ -131,7 +132,6 @@ class OverDueScheduleView(ScheduleListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['plan_period'] = 'Просроченные работы'
-        context['plan_url'] = reverse_lazy('reports:overdue')
         return context
 
 
@@ -150,7 +150,6 @@ class UncompletableScheduleView(ScheduleListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['plan_period'] = 'Невыполнимые работы (последние три месяца)'
-        context['plan_url'] = reverse_lazy('reports:uncompletable')
         return context
 
 
@@ -164,24 +163,6 @@ class NoPhotoScheduleView(ScheduleListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['plan_period'] = 'Завершенные проверки защит, к которым не загружены фото'
-        context['plan_url'] = reverse_lazy('reports:no_photo_apporval')
-        return context
-
-
-class ScheduleDetailInfoView(LoginRequiredMixin, UpdateView):
-    template_name = 'reports/schedule_detail.html'
-    model = Schedule
-    form_class = ScheduleForm
-    context_object_name = 'schedule_entry'
-
-    def get_success_url(self):
-        return_url = f'reports:{self.kwargs["return_url"]}'
-        return reverse_lazy(return_url)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return_url = f'reports:{self.kwargs["return_url"]}'
-        context['return_url'] = reverse_lazy(return_url)
         return context
 
 
@@ -302,6 +283,7 @@ class XlsxReportDownloadView(LoginRequiredMixin, FormView):
                 response['Content-Disposition'] = 'attachment; filename=protocol.xlsx'
                 return response
             except Exception as e:
+                messages.error(self.request, 'Произошла ошибка! Обратитесь к администратору.', extra_tags='danger')
                 logger.error(f'Error rendering xlsx: {e}')
                 raise Http404
         return self.get(request, **kwargs)
@@ -317,21 +299,27 @@ class DistributeNextMonthSchedules(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
         try:
             distribute_next_month_works_by_dates()
+            messages.success(self.request, 'Распределение работ по дням выполнено!')
         except Exception as e:
             logger.error(f'Error when trying to distribute next month schedules: {e}')
-            raise Http404
-        return redirect('reports:next_month_schedule')
+            messages.error(self.request, 'Произошла ошибка при попытке распределения работ!', extra_tags='danger')
+        return redirect(self.request.session.get('return_url'))
 
 
 class XlsxNextMonthDownloadView(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
-        xlsx_file = get_next_month_plans()
-        response = HttpResponse(
-            content=save_virtual_workbook(xlsx_file),
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        )
-        response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'
-        return response
+        try:
+            xlsx_file = get_next_month_plans()
+            response = HttpResponse(
+                content=save_virtual_workbook(xlsx_file),
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            )
+            response['Content-Disposition'] = 'attachment; filename=next_month.xlsx'
+            return response
+        except Exception as e:
+            messages.error(self.request, 'Произошла ошибка! Обратитесь к администратору.', extra_tags='danger')
+            logger.error(f'Error creating zip file with photos: {e}')
+            return redirect(self.request.session.get('return_url'))
 
 
 class PhotoApprovalsDownloadView(LoginRequiredMixin, FormView):
@@ -347,14 +335,14 @@ class PhotoApprovalsDownloadView(LoginRequiredMixin, FormView):
                 zip_file_path = download_photo_approvals(date_from, date_to)
                 return FileResponse(open(zip_file_path, 'rb'))
             except Exception as e:
+                messages.error(self.request, 'Произошла ошибка! Обратитесь к администратору.', extra_tags='danger')
                 logger.error(f'Error creating zip file with photos: {e}')
-                raise Http404
-        return self.get(request, **kwargs)
+                return redirect(self.request.session.get('return_url'))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action_to_confirm'] = 'Выберите период для скачивания фото'
-        context['return_url'] = reverse_lazy('reports:day_schedule')
+        context['return_url'] = self.request.session.get('return_url')
         return context
 
 
@@ -362,10 +350,12 @@ class ScheduleCreateView(LoginRequiredMixin, CreateView):
     form_class = ScheduleCreateForm
     model = Schedule
     template_name = 'reports/action_confirmation.html'
-    success_url = reverse_lazy('reports:day_schedule')
+
+    def get_success_url(self):
+        return self.request.session.get('return_url')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action_to_confirm'] = 'Добавить внеплановую работу'
-        context['return_url'] = self.success_url
+        context['return_url'] = self.get_success_url()
         return context

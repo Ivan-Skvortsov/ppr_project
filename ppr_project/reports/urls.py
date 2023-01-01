@@ -2,39 +2,26 @@ from django.urls import path
 
 from reports.views import (ConfirmScheduleCannotBeComplete,
                            ConfirmScheduleCompletedView,
-                           ConfirmScheduleDateChangedView, DayScheduleView,
-                           DistributeNextMonthSchedules, IndexView,
-                           MonthScheduleView, NextMonthScheduleView,
-                           NoPhotoScheduleView, OverDueScheduleView,
+                           ConfirmScheduleDateChangedView,
+                           DateRangeScheduleView, DistributeNextMonthSchedules,
+                           IndexView, NoPhotoScheduleView, OverDueScheduleView,
                            PhotoApprovalsDownloadView, ScheduleCreateView,
                            ScheduleDetailInfoView, SearchView,
-                           UncompletableScheduleView, WeekScheduleView,
+                           SelectDateRangeForScheduleView,
+                           UncompletableScheduleView,
                            XlsxNextMonthDownloadView, XlsxReportDownloadView)
 
 app_name = 'reports'
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
-    path(
-        'next_month/<int:category_id>/',
-        NextMonthScheduleView.as_view(),
-        name='next_month_schedule',
-    ),
-    path('next_month/', NextMonthScheduleView.as_view(), name='next_month_schedule'),
-    path(
-        'month/<int:category_id>/', MonthScheduleView.as_view(), name='month_schedule'
-    ),
-    path('month/', MonthScheduleView.as_view(), name='month_schedule'),
-    path('week/<int:category_id>/', WeekScheduleView.as_view(), name='week_schedule'),
-    path('week/', WeekScheduleView.as_view(), name='week_schedule'),
-    path('day/<int:category_id>/', DayScheduleView.as_view(), name='day_schedule'),
-    path('day/', DayScheduleView.as_view(), name='day_schedule'),
     path('overdue/<int:category_id>/', OverDueScheduleView.as_view(), name='overdue'),
     path('overdue/', OverDueScheduleView.as_view(), name='overdue'),
     path('uncompletable/', UncompletableScheduleView.as_view(), name='uncompletable'),
     path('no_photo_apporval/', NoPhotoScheduleView.as_view(), name='no_photo_apporval'),
     path('search/', SearchView.as_view(), name='search'),
-    path('schedule/<int:pk>/<str:return_url>/', ScheduleDetailInfoView.as_view(), name='schedule_detail'),
+    path('select_date_range/', SelectDateRangeForScheduleView.as_view(), name='select_date_range'),
+    path('schedule/<int:pk>/', ScheduleDetailInfoView.as_view(), name='schedule_detail'),
     path('schedule/confirm_completed/', ConfirmScheduleCompletedView.as_view(), name='confirm_schedule_completed'),
     path('schedule/confirm_date_changed/', ConfirmScheduleDateChangedView.as_view(), name='confirm_date_changed'),
     path(
@@ -54,5 +41,6 @@ urlpatterns = [
         XlsxNextMonthDownloadView.as_view(),
         name='next_month_plan_xlsx',
     ),
-    path('create/', ScheduleCreateView.as_view(), name='create_schedule')
+    path('create/', ScheduleCreateView.as_view(), name='create_schedule'),
+    path('<slug:start_date>/<slug:end_date>/', DateRangeScheduleView.as_view(), name='date_range'),
 ]

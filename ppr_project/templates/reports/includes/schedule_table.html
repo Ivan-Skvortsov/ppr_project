@@ -2,12 +2,6 @@
   {% if not schedule_plan %}
     <div class="display-6 text-center">Работ не найдено!</div>
   {% else %}
-    {# messages #}
-    {% if messages %}
-      {% for message in messages %}
-          <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
     <form method="post" action="">
       {% csrf_token %}
       {# table header #}
@@ -25,12 +19,12 @@
               </div>
             </div>
             <div class="col-12 col-lg-6 text-muted">Наименование оборудования</div>
-            <div class="col-6 col-lg-1 text-muted">Дата по плану</div>
+            <div class="col-6 col-lg-1 text-muted">План</div>
             <div class="col-12 col-lg-3">
               <div class="row align-items-center">
                 <div class="col-6 col-lg-4 text-muted"><small>Допуск</small></div>
                 <div class="col-12 col-lg-4 text-muted"><small>Журнал ТО</small></div>
-                <div class="col-12 col-lg-4 text-muted"><small>Дата выполнения</small></div>
+                <div class="col-12 col-lg-4 text-muted"><small>Факт</small></div>
               </div>
             </div>
           </div>
@@ -73,7 +67,7 @@
                     </div>
                   </div>
                   <div class="col-12 col-lg-6">
-                    <a class="text-decoration-none text-reset my_custom_text" href="{% url 'reports:schedule_detail' pk=entry.pk return_url=request.resolver_match.url_name %}" title="Редактировать работу">
+                    <a class="text-decoration-none text-reset my_custom_text" href="{% url 'reports:schedule_detail' pk=entry.pk %}" title="Редактировать работу">
                       {{ entry.equipment_type }}
                     </a>
                   </div>

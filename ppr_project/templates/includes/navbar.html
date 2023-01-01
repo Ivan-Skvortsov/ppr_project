@@ -3,6 +3,9 @@
 {% count_overdue_schedules as count_overdue %}
 {% count_uncompletable_schedules as count_uncomletable %}
 {% count_schedules_without_photo_approvals as count_no_photo %}
+{% current_week_date_range as current_week_dates %}
+{% current_month_date_range as current_month_dates %}
+{% next_month_date_range as next_month_dates %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-xxl">
     <a class="navbar-brand" href="{% url 'reports:index' %}">
@@ -14,14 +17,12 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
             <i class="fas fa-download"></i> Загрузки
           </a>
           <ul class="dropdown-menu">
             <li>
-              {% now "n" as current_month %}
               <a class="dropdown-item" style="cursor:pointer" onclick="showModalForm({% url 'reports:xlsx_report' %});"><i class="fas fa-file"></i> Протокол выполнения</a>
             </li>
             <li><a class="dropdown-item" href="{% url 'reports:next_month_plan_xlsx' %}"><i class="fas fa-table"></i> План на следующий месяц</a></li>
@@ -30,16 +31,19 @@
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-            <i class="fas fa-screwdriver"></i> Посмотреть план
+            <i class="fas fa-wrench"></i> Посмотреть план
             {% if count_overdue or count_no_photo%}
               <span class="badge badge-pill bg-danger">{{ count_overdue|add:count_no_photo }}</span>
             {% endif %}
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'reports:day_schedule' %}">Сегодня</a></li>
-            <li><a class="dropdown-item" href="{% url 'reports:week_schedule' %}">Эта неделя</a></li>
-            <li><a class="dropdown-item" href="{% url 'reports:month_schedule' %}">Этот месяц</a></li>
-            <li><a class="dropdown-item" href="{% url 'reports:next_month_schedule' %}">Следующий месяц</a></li>
+            {% now 'Y-m-d' as current_day %}
+            <li><a class="dropdown-item" href="{% url 'reports:date_range' current_day current_day %}">Сегодня</a></li>
+            <li><a class="dropdown-item" href="{% url 'reports:date_range' current_week_dates.0 current_week_dates.1 %}">Эта неделя</a></li>
+            <li><a class="dropdown-item" href="{% url 'reports:date_range' current_month_dates.0 current_month_dates.1 %}">Этот месяц</a></li>
+            <li><a class="dropdown-item" href="{% url 'reports:date_range' next_month_dates.0 next_month_dates.1 %}">Следующий месяц</a></li>
+            <li><a class="dropdown-item" href="{% url 'reports:select_date_range' %}">Выбрать период</a></li>
+            <li><hr class="dropdown-divider"></li>
             <li>
               <a class="dropdown-item" href="{% url 'reports:overdue' %}">
                 Просроченные
@@ -58,10 +62,23 @@
                 <span class="badge badge-pill {% if count_no_photo %}bg-danger{% else %}bg-secondary{% endif %}">{{ count_no_photo }}</span>
               </a>
             </li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{% url 'reports:create_schedule' %}"><i class="far fa-calendar-plus"></i> Добавить работу</a></li>
           </ul>
         </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-edit"></i> Редактировать план
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'reports:create_schedule' %}"><i class="far fa-calendar-plus"></i> Добавить работу</a></li>
+            <li><a class="dropdown-item" href="{% url 'reports:distribute_next_month' %}"><i class="fas fa-random"></i> Распределить следующий месяц</a></li>
+          </ul>
+        </li>
+
+
+
+
+
         <li class="nav-item">
           <a class="nav-link" href="{% url 'reports:search' %}"><i class="fas fa-search"></i> Поиск работ</a>
         </li>
