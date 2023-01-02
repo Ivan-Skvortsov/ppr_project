@@ -10,11 +10,7 @@
           <div class="row border-bottom my-3 align-items-center">
             <div class="col-12 col-lg-2 text-muted">
               <div class="row">
-                <div class="col-4">
-                  <div class="form-check form-switch">
-                    <input type="checkbox" onclick="toggle(this);" class="form-check-input" title="Выбрать все работы">
-                  </div>
-                </div>
+                <div class="col-4">#</div>
                 <div class="col-8">Тип ТО</div>
               </div>
             </div>
@@ -30,13 +26,6 @@
           </div>
         </div>
         {# table body #}
-        {# checkbox "select_all" visible only on smaller screens #}
-        <div class="d-block d-lg-none form-check form-switch">
-          <input type="checkbox" onclick="toggle(this);" class="form-check-input" title="Выбрать все работы" id="SelectAllCheckbox">
-          <label class="form-check-label" for="SelectAllCheckbox">
-            Выбрать все работы на странице
-          </label>
-        </div>
         {% regroup schedule_plan by date_sheduled as plan_by_date %}
         {% for schedule_date in plan_by_date %}
         {# date scheduled #}
@@ -45,9 +34,27 @@
           </div>
           {% regroup schedule_date.list by equipment_type.facility as facility_list %}
           {% for facility in facility_list %}
-              {# facility name #}
+              {# facility name with popover #}
               <div class="row text-center border-bottom">
-                <div class="col-12"><h5 class="p-1">{{ facility.grouper }}</h5></div>
+                <div class="col-12 m-2">
+                  <a tabindex="0"
+                     class="h5 text-decoration-none link-dark"
+                     data-bs-toggle="popover"
+                     id="popover-{{ facility.grouper.pk }}"
+                     >
+                    {{ facility.grouper }}
+                    {# popover body #}
+                    <div hidden>
+                      <div class="text-center" id="popover-{{ facility.grouper.pk }}-body">
+                        <div class="btn-group-sm btn-group-vertical" role="group">
+                          <button type="button" class="btn btn-outline-secondary" onclick="popoverSelectSchedules({{ facility.grouper.pk }});">Выбрать/снять все</button>
+                          <button type="button" class="btn btn-outline-secondary" onclick="popoverMarkJournalsFilled({{ facility.grouper.pk }}, 'access_journal');">Журналы допуска</button>
+                          <button type="button" class="btn btn-outline-secondary" onclick="popoverMarkJournalsFilled({{ facility.grouper.pk }}, 'result_journal');">Журналы ТО</button>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
               </div>
               {% for entry in facility.list %}
               {# table rows #}
@@ -60,7 +67,7 @@
                     <div class="row">
                       <div class="col-2 col-lg-4">
                         <div class="form-check form-switch">
-                          <input type="checkbox" name="selected_schedule" value="{{ entry.pk }}" class="form-check-input" title="Выбрать работу">
+                          <input type="checkbox" name="selected_schedule" value="{{ entry.pk }}" class="form-check-input" title="Выбрать работу" data-popover="select-{{ facility.grouper.pk }}">
                         </div>
                       </div>
                       <div class="col-10 col-lg-8">{{ entry.maintenance_type }}</div>
@@ -77,11 +84,23 @@
                     <div class="row">
                       <div class="col-6 d-lg-none"><small>Журнал допуска:</small></div>
                       <div class="col-6 col-lg-4">
-                        <input type="checkbox" class="form-check-input" name="access_journal_filled" value="{{ entry.pk }}" onclick="markJournalCheckbox(this);" {% if entry.access_journal_filled %} checked {% endif %}>
+                        <input type="checkbox"
+                               class="form-check-input"
+                               name="access_journal_filled"
+                               value="{{ entry.pk }}"
+                               onclick="markJournalCheckbox(this);"
+                               {% if entry.access_journal_filled %} checked {% endif %}
+                               data-popover="access_journal-{{ facility.grouper.pk }}">
                       </div>
                       <div class="col-6 d-lg-none"><small>Журнал ТО:</small></div>
                       <div class="col-6 col-lg-4">
-                        <input type="checkbox" class="form-check-input" name="result_journal_filled" value="{{ entry.pk }}" onclick="markJournalCheckbox(this);" {% if entry.result_journal_filled %} checked {% endif %}>
+                        <input type="checkbox"
+                              class="form-check-input"
+                              name="result_journal_filled"
+                              value="{{ entry.pk }}"
+                              onclick="markJournalCheckbox(this);"
+                              {% if entry.result_journal_filled %} checked {% endif %}
+                              data-popover="result_journal-{{ facility.grouper.pk }}">
                       </div>
                       <div class="col-6 d-lg-none"><small>Дата выполнения:</small></div>
                       <div class="col-6 col-lg-4">

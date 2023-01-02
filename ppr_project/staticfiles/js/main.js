@@ -1,13 +1,5 @@
-// select/deselect all checkboxes
-function toggle(source) {
-  var checkboxes = document.querySelectorAll('input[name="selected_schedule"]');
-  for (var i = 0; i < checkboxes.length; i++) {
-    if (checkboxes[i] != source) checkboxes[i].checked = source.checked;
-  }
-}
-
 // get coockie for csrf token
-function getCookie(name) {
+const getCookie = (name) => {
   let cookieValue = null;
   if (document.cookie && document.cookie !== "") {
     const cookies = document.cookie.split(";");
@@ -23,7 +15,7 @@ function getCookie(name) {
   return cookieValue;
 }
 
-let emptyModalHTML = `
+const emptyModalHTML = `
   <div class="modal-dialog">
     <div class="modal-content" id="modalWindowContent">
       <div class="modal-header">
@@ -43,7 +35,7 @@ let emptyModalHTML = `
   `;
 
 // show modal form
-function showModalForm(url) {
+const showModalForm = (url) => {
   const modalWindowEl = document.querySelector("#modalWindow");
   const modalWindow = new bootstrap.Modal(modalWindowEl);
   modalWindowEl.innerHTML = emptyModalHTML;
@@ -55,7 +47,7 @@ function showModalForm(url) {
 }
 
 // submit form and download file
-function submitModalForm(evnt, form) {
+const submitModalForm = (evnt, form) => {
   const submitButton = document.querySelector("#submitAndDownload");
   submitButton.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Загрузка`;
   submitButton.disabled = true;
@@ -92,7 +84,7 @@ function submitModalForm(evnt, form) {
 }
 
 // mark journal checked
-function markJournalCheckbox(source) {
+const markJournalCheckbox = async (source) => {
   const url = `/api/v1/schedules/${source.value}/`;
   let payload = {};
   payload[source.name] = source.checked;
