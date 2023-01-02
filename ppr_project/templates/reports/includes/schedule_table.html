@@ -45,9 +45,28 @@
           </div>
           {% regroup schedule_date.list by equipment_type.facility as facility_list %}
           {% for facility in facility_list %}
-              {# facility name #}
+              {# facility name with popover #}
               <div class="row text-center border-bottom">
-                <div class="col-12"><h5 class="p-1">{{ facility.grouper }}</h5></div>
+                <div class="col-12 m-2">
+                  <a tabindex="0"
+                     class="h5 text-decoration-none link-dark"
+                     data-bs-toggle="popover"
+                     id="popover-{{ facility.grouper.pk }}"
+                     >
+                    {{ facility.grouper }}
+                    {# popover body #}
+                    <div hidden>
+                      <div class="text-center" id="popover-{{ facility.grouper.pk }}-body">
+                        <div class="btn-group-sm btn-group-vertical" role="group">
+                          <button type="button" class="btn btn-outline-secondary">Выбрать все</button>
+                          <button type="button" class="btn btn-outline-secondary">Журнал допуска</button>
+                          <button type="button" class="btn btn-outline-secondary">Журнал ТО</button>
+                        </div>
+                      </div>
+                    </div>
+
+                  </a>
+                </div>
               </div>
               {% for entry in facility.list %}
               {# table rows #}
