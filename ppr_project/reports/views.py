@@ -26,8 +26,11 @@ logger = logging.getLogger(__name__)
 
 
 class IndexView(LoginRequiredMixin, RedirectView):
+    """Redirect to today's schedules."""
 
-    url = reverse_lazy('reports:date_range', kwargs={'start_date': date.today(), 'end_date': date.today()})
+    def get_redirect_url(self, *args, **kwargs):
+        today = date.today()
+        return reverse_lazy('reports:date_range', kwargs={'start_date': today, 'end_date': today})
 
 
 class ScheduleListView(LoginRequiredMixin, ListView):

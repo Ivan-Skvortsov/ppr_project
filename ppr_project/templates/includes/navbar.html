@@ -3,6 +3,7 @@
 {% count_overdue_schedules as count_overdue %}
 {% count_uncompletable_schedules as count_uncomletable %}
 {% count_schedules_without_photo_approvals as count_no_photo %}
+{% current_day_date_range as current_day_dates %}
 {% current_week_date_range as current_week_dates %}
 {% current_month_date_range as current_month_dates %}
 {% next_month_date_range as next_month_dates %}
@@ -37,8 +38,7 @@
             {% endif %}
           </a>
           <ul class="dropdown-menu">
-            {% now 'Y-m-d' as current_day %}
-            <li><a class="dropdown-item" href="{% url 'reports:date_range' current_day current_day %}">Сегодня</a></li>
+            <li><a class="dropdown-item" href="{% url 'reports:date_range' current_day_dates.0 current_day_dates.1 %}">Сегодня</a></li>
             <li><a class="dropdown-item" href="{% url 'reports:date_range' current_week_dates.0 current_week_dates.1 %}">Эта неделя</a></li>
             <li><a class="dropdown-item" href="{% url 'reports:date_range' current_month_dates.0 current_month_dates.1 %}">Этот месяц</a></li>
             <li><a class="dropdown-item" href="{% url 'reports:date_range' next_month_dates.0 next_month_dates.1 %}">Следующий месяц</a></li>

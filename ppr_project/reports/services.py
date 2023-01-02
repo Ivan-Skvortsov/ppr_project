@@ -311,7 +311,7 @@ def distribute_next_month_works_by_dates():
         year += 1
     last_day_of_month = monthrange(year, month)[1]
     qs = (Schedule.objects.select_related('equipment_type__facility')
-                          .filter(date_sheduled__month=month)
+                          .filter(date_sheduled__month=month, date_sheduled__year=year)
                           .order_by('equipment_type__facility'))
     regouped_schedules = defaultdict(list)
     for schedule in qs:

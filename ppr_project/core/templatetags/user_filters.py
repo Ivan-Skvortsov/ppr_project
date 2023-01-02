@@ -42,6 +42,13 @@ def count_schedules_without_photo_approvals():
 
 
 @register.simple_tag
+def current_day_date_range():
+    """Gets todays dates."""
+    today = date.today()
+    return today, today
+
+
+@register.simple_tag
 def current_week_date_range():
     """Gets dates for start and end of the week."""
     today = date.today()
