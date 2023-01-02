@@ -12,3 +12,20 @@ popoverTriggerList.map((popoverTriggerEl) => {
   };
   return new bootstrap.Popover(popoverTriggerEl, options);
 });
+
+const popoverSelectSchedules = (facilityId) => {
+  let checkboxes = document.querySelectorAll(
+    `input[data-popover="select-${facilityId}"]`
+  );
+  checkboxes.forEach((checkbox) => (checkbox.checked = !checkbox.checked));
+};
+
+const popoverMarkJournalsFilled = async (facilityId, journalType) => {
+  let checkboxes = document.querySelectorAll(
+    `input[data-popover="${journalType}-${facilityId}"]`
+  );
+  for (const checkbox of checkboxes) {
+    checkbox.checked = !checkbox.checked;
+    await markJournalCheckbox(checkbox);
+  }
+};

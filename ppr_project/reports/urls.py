@@ -42,5 +42,5 @@ urlpatterns = [
         name='next_month_plan_xlsx',
     ),
     path('create/', ScheduleCreateView.as_view(), name='create_schedule'),
-    path('<slug:start_date>/<slug:end_date>/', DateRangeScheduleView.as_view(), name='date_range'),
+    path('schedules/<slug:start_date>/<slug:end_date>/', DateRangeScheduleView.as_view(), name='date_range'),
 ]
