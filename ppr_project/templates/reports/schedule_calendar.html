@@ -1,0 +1,9 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<script src="{% static 'js/fullcalendar-6.0.2/dist/index.global.min.js' %}"></script>
+<script src="{% static 'js/fullcalendar-6.0.2/packages/bootstrap5/index.global.js' %}"></script>
+<script src="{% static 'js/schedule_calendar.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", loadCalendar);
+</script>
+<div class="my-2" id="calendar"></div>
+{% endblock content %}

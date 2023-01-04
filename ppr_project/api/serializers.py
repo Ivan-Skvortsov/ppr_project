@@ -3,12 +3,6 @@ from rest_framework import serializers
 from reports.models import EquipmentType, Facility, Schedule
 
 
-class ScheduleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Schedule
-        fields = '__all__'
-
-
 class ScheduleWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
@@ -23,6 +17,17 @@ class ScheduleWriteSerializer(serializers.ModelSerializer):
             'photo',
             'uncompleted',
         ]
+
+
+class ScheduleIDSerializer(serializers.Serializer):
+
+    id = serializers.IntegerField()
+
+
+class CalendarUpdateSerializer(serializers.Serializer):
+
+    date_sheduled = serializers.DateField(format='%Y-%m%d')
+    schedules = ScheduleIDSerializer(many=True)
 
 
 class FacilitySerializer(serializers.ModelSerializer):

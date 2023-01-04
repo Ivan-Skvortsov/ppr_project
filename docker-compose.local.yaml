@@ -1,0 +1,16 @@
+version: '3.3'
+
+volumes:
+  ppr_project_postgres_local:
+
+services:
+  ppr_project_db-local:
+    image: postgres:13.2
+    restart: always
+    container_name: ppr_project_db-local
+    volumes:
+      - ppr_project_postgres_local:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./.env

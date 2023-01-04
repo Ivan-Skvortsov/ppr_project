@@ -7,7 +7,7 @@ from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, RedirectView
+from django.views.generic import ListView, RedirectView, TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 
 from openpyxl.writer.excel import save_virtual_workbook
@@ -362,3 +362,7 @@ class ScheduleCreateView(LoginRequiredMixin, CreateView):
         context['action_to_confirm'] = 'Добавить внеплановую работу'
         context['return_url'] = self.get_success_url()
         return context
+
+
+class ScheduleCalendarView(TemplateView):
+    template_name = 'reports/schedule_calendar.html'
