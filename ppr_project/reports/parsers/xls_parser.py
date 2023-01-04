@@ -12,7 +12,7 @@ def import_objects_from_xls(filename, category_name):
     try:
         category = MaintenanceCategory.objects.get(category_name=category_name)
     except Exception as err:
-        print(f'Неверная категория {category}: {err}')
+        print(f'Неверная категория {category_name}: {err}')
         raise
     wb = load_workbook(filename=filename, read_only=True, data_only=True)
     worksheet = wb.active

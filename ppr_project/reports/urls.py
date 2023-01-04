@@ -5,9 +5,9 @@ from reports.views import (ConfirmScheduleCannotBeComplete,
                            ConfirmScheduleDateChangedView,
                            DateRangeScheduleView, DistributeNextMonthSchedules,
                            IndexView, NoPhotoScheduleView, OverDueScheduleView,
-                           PhotoApprovalsDownloadView, ScheduleCreateView,
-                           ScheduleDetailInfoView, SearchView,
-                           SelectDateRangeForScheduleView,
+                           PhotoApprovalsDownloadView, ScheduleCalendarView,
+                           ScheduleCreateView, ScheduleDetailInfoView,
+                           SearchView, SelectDateRangeForScheduleView,
                            UncompletableScheduleView,
                            XlsxNextMonthDownloadView, XlsxReportDownloadView)
 
@@ -43,4 +43,5 @@ urlpatterns = [
     ),
     path('create/', ScheduleCreateView.as_view(), name='create_schedule'),
     path('schedules/<slug:start_date>/<slug:end_date>/', DateRangeScheduleView.as_view(), name='date_range'),
+    path('calendar/', ScheduleCalendarView.as_view(), name='schedule_calendar'),
 ]
