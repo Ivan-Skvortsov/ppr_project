@@ -21,12 +21,15 @@ class ScheduleViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.G
 
     def get_queryset(self):
         queryset = Schedule.objects.all()
-        start = self.request.query_params.get('start').split('T')[0]
-        end = self.request.query_params.get('end').split('T')[0]
+        start = self.request.query_params.get('start')
+        end = self.request.query_params.get('end')
         if start and end:
-            start_date = datetime.strptime(start, self.DATE_FORMAT)
-            end_date = datetime.strptime(end, self.DATE_FORMAT)
-            queryset = queryset.filter(date_sheduled__range=[start_date, end_date])
+            try:
+                start_date = datetime.strptime(start.split('T')[0], self.DATE_FORMAT)
+                end_date = datetime.strptime(end.split('T')[0], self.DATE_FORMAT)
+                queryset = queryset.filter(date_sheduled__range=[start_date, end_date])
+            except Exception:
+                raise exceptions.APIException('Wrong query parameters.')
         return queryset
 
     @action(methods=['GET'], detail=False, url_path='get_calendar')
