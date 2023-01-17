@@ -58,10 +58,10 @@ jobs:
             echo CELERY_BROKER_URL=$'${{ secrets.CELERY_BROKER_URL }}' >> .env
             echo SENTRY_DSN=$'${{ secrets.SENTRY_DSN }}' >> .env
             sudo docker image prune -f
-            sudo docker-compose stop
-            sudo docker-compose rm web
-            sudo docker-compose pull web
-            sudo docker-compose up -d
+            sudo docker compose stop
+            sudo docker compose rm web
+            sudo docker compose pull web
+            sudo docker compose up -d
 
   send_message:
     name: Sends info to telegram
