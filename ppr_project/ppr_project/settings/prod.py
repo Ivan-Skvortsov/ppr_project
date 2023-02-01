@@ -1,12 +1,12 @@
-from .common import *  # noqa
-
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from .common import *  # noqa
+
 DEBUG = False
 
-ALLOWED_HOSTS = ['ks45.online', 'www.ks45.online', 'localhost', 'web']
-CSRF_TRUSTED_ORIGINS = ['https://*.ks45.online']
+ALLOWED_HOSTS = ['ks-45.ru', 'www.ks-45.ru', 'localhost', 'web']
+CSRF_TRUSTED_ORIGINS = ['https://*.ks-45.ru']
 
 DATABASES = {
     'default': {

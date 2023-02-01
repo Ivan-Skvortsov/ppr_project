@@ -1,11 +1,10 @@
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import signals
-from django.contrib.auth import get_user_model
 from django.dispatch import receiver
-from django.conf import settings
 
 from users.tasks import send_email_task
-
 
 User = get_user_model()
 
@@ -94,12 +93,12 @@ class Comment(models.Model):
 def notify_admins_bug_entry_created(sender, instance, created, **kwargs):
     if created:
         subject = 'New bug/feature submitted!'
-        message = ('Hello! We have got a new bug entry at ks45.online: \n'
+        message = ('Hello! We have got a new bug entry at ks-45.ru: \n'
                    f'Pub date: {instance.pub_date}\n'
                    f'Type: {instance.get_type_display()}\n'
                    f'Author: {instance.author.username}\n'
                    f'Description: {instance.bug_description}\n'
-                   f'Check it out here: https://ks45.online/bugs/')
+                   f'Check it out here: https://ks-45.ru/bugs/')
         admin_mailboxes = [a[1] for a in settings.ADMINS]
         send_email_task.delay(subject, message, admin_mailboxes)
 
@@ -114,7 +113,7 @@ def notify_user_bug_entry_commented(sender, instance, created, **kwargs):
             f'Твое {instance.bug.get_type_display()} прокомментировали.\n'
             f'Автор комментария: {instance.author.username}\n'
             f'Текст комментария: {instance.text}\n'
-            f'Подробнее тут: https://ks45.online/bugs/{instance.bug.pk}/')
+            f'Подробнее тут: https://ks-45.ru/bugs/{instance.bug.pk}/')
         send_email_task.delay(subject, message, [bug_author.email])
 
 
@@ -126,5 +125,5 @@ def notify_user_bug_closed(sender, instance, created, **kwargs):
                    'Отличные новости!\n'
                    f'{instance.get_type_display()}, которое ты оставлял в '
                    'системе управления ППР КС-45, отмечено как выполненное.\n'
-                   f'Подробнее тут: https://ks45.online/bugs/{instance.pk}/')
+                   f'Подробнее тут: https://ks-45.ru/bugs/{instance.pk}/')
         send_email_task.delay(subject, message, [instance.author.email])
