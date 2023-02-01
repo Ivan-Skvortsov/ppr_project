@@ -19,7 +19,7 @@ services:
       - db
     env_file:
       - ./.env
-    
+
   db:
     image: postgres:13.0-alpine
     env_file:
@@ -38,7 +38,7 @@ services:
       - media_volume:/var/html/media/
     depends_on:
       - web
-    
+
   certbot:
     profiles: ["certbot"]
     image: certbot/certbot
@@ -46,7 +46,7 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt/
       - ./certbot/www:/var/www/certbot/
-    command: certonly --webroot -w /var/www/certbot --force-renewal --email pprofcheg@gmail.com -d ks45.online -d www.ks45.online --agree-tos --staging
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email pprofcheg@gmail.com -d ks-45.ru -d www.ks-45.ru --agree-tos --staging
     depends_on:
       - nginx
 
