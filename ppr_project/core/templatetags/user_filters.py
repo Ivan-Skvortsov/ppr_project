@@ -71,7 +71,7 @@ def current_month_date_range():
 def next_month_date_range():
     """Gets dates for start and end of the next month."""
     current_month = date.today().month
-    next_month = current_month % 12 + current_month
+    next_month = 1 if current_month == 12 else current_month + 1
     next_month_year = int(date.today().year + (current_month / 12))
     days_in_month = monthrange(next_month_year, next_month)[1]
     start_date = date(next_month_year, next_month, 1)
