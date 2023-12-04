@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update \
-    && apt install -y netcat
+    && apt install -y netcat-traditional
 
 COPY requirements.txt .
 
