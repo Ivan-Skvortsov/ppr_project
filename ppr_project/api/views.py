@@ -34,7 +34,7 @@ class ScheduleViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.G
 
     @action(methods=['GET'], detail=False, url_path='get_calendar')
     def get_calendar_data(self, request):
-        colors = {  # FIXME - вынести в настроки
+        colors = {  # FIXME - вынести в настроки (а лучше в БД)
             'АСУ ПТК': '#0e432a',
             'СВТ': '#198754',
             'ППР АСПСиКЗ КЦ-2': '#dc3545',
@@ -43,7 +43,10 @@ class ScheduleViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.G
             'ППР защит КЦ-1': '#6610f2',
             'ППР ПБ': '#044ab2',
             'ППР КЦ-2': '#0d6efd',
-            'ППР КЦ-1': '#0d6efd'
+            'ППР КЦ-1': '#0d6efd',
+            'ППР оборудования ПБ': '#0d6efd',
+            'ППР АСПС, ПТ и КЗ ПБ': '#dc3545',
+            'Проверка защит': '#6610f2'
         }
         queryset = self.get_queryset().values(
             'equipment_type__facility__maintenance_category__category_name',
