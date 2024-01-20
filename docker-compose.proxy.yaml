@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  swag:
+    image: linuxserver/swag:2.8.0
+    container_name: swag
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TZ=Europe/Moscow
+      - URL=ks-45.ru
+      - SUBDOMAINS=www,pb
+      - VALIDATION=http
+    volumes:
+      - ./nginx/default.conf:/config/nginx/site-confs/default.conf
+    ports:
+      - 443:443
+      - 80:80
+    networks:
+      - proxy_network
+
+networks:
+  proxy_network:
+    external: true

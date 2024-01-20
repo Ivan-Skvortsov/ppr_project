@@ -4,6 +4,12 @@ volumes:
   static_volume:
   media_volume:
 
+networks:
+  proxy_network:
+    external: true
+  default:
+    driver: bridge
+
 services:
   web:
     image: profcheg/ppr_project:latest
@@ -26,29 +32,17 @@ services:
       - ./.env
 
   nginx:
+    container_name: kc
     image: nginx:1.21.6-alpine
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
-      - ./certbot/conf:/etc/letsencrypt/
-      - ./certbot/www:/var/www/certbot/
       - static_volume:/var/html/static/
       - media_volume:/var/html/media/
     depends_on:
       - web
-
-  certbot:
-    profiles: ["certbot"]
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt/
-      - ./certbot/www:/var/www/certbot/
-    command: certonly --webroot -w /var/www/certbot --force-renewal --email pprofcheg@gmail.com -d ks-45.ru -d www.ks-45.ru --agree-tos --staging
-    depends_on:
-      - nginx
+    networks:
+      - proxy_network
+      - default
 
   redis:
     image: redis:7.0.4-alpine
