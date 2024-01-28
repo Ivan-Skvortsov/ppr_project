@@ -24,7 +24,15 @@
           </a>
           <ul class="dropdown-menu">
             <li>
-              <a class="dropdown-item" style="cursor:pointer" onclick="showModalForm({% url 'reports:xlsx_report' %});"><i class="fas fa-file"></i> Протокол выполнения</a>
+              <button
+                class="dropdown-item btn btn-link"
+                {% if count_overdue or count_no_photo%}
+                  disabled
+                {% endif %}
+                style="cursor:pointer"
+                onclick="showModalForm({% url 'reports:xlsx_report' %});">
+                  <i class="fas fa-file"></i> Протокол выполнения
+              </buitton>
             </li>
             <li><a class="dropdown-item" href="{% url 'reports:next_month_plan_xlsx' %}"><i class="fas fa-table"></i> План на следующий месяц</a></li>
             <li><a class="dropdown-item" style="cursor:pointer" href="{% url 'reports:photo_apporvals' %}"><i class="fas fa-images"></i> Подтверждающие фото</a></li>
