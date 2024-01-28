@@ -54,16 +54,16 @@ class XlsxReportGenerator:
 
     def _render_ppr_ppz_report_header(self, ws: worksheet) -> None:
         report_header = {
-            'ppr': 'ППР оборудования АСУ, А и ТМ',
+            'ppr': 'ППР оборудования службы автоматизации',
             'ppz': 'проверок защит'
         }
         date_from = datetime.strptime(self.date_from, '%Y-%m-%d')
         ws['G1'] = 'Утверждаю'
         ws['A7'] = f'Протокол проведения {report_header[self.report_type]}'
-        ws['A8'] = 'объектов КС-45 Усинская'
+        ws['A8'] = 'объектов ПП «Усинская»'
         ws['A9'] = f'за {_date(date_from, "F Y").lower()} г.'
         ws['A11'] = ('Основание проведения работ: График проведения ППР '
-                     f'оборудования АСУ, А и ТМ КС-45 Усинская на {date_from.year} год.')
+                     f'оборудования службы автоматизации ПП «Усинская» на {date_from.year} год.')
         ws['A12'] = ''
         ws.append(['№ п/п',
                    'Объект',
@@ -232,11 +232,11 @@ class XlsxReportGenerator:
         today_date = _date(date.today(), 'd E Y')
         date_from = _date(datetime.strptime(self.date_from, '%Y-%m-%d'), 'd.m.Y')
         date_to = _date(datetime.strptime(self.date_to, '%Y-%m-%d'), 'd.m.Y')
-        ws.append([today_date, '', '', '', '', 'КС-45 Усинская'])
-        ws['A3'] = 'Протокол\nвыполнения ППР службой АСУ, А и ТМ'
+        ws.append([today_date, '', '', '', '', 'ПП «Усинская»'])
+        ws['A3'] = 'Протокол\nвыполнения ППР службой автоматизации'
         ws['A5'] = (
             f'          Настоящий протокол составлен о том, что в период с {date_from} по {date_to}, согласно графика '
-            'ППР службы АСУ, А и ТМ КС-45 «Усинская» на КЦ-1,2 ПБ КС-45 Усинская проведены работы по техническому '
+            'ППР службы автоматизации УАОПП «Усинская» на объектах ПП «Усинская» проведены работы по техническому '
             'обслуживанию оборудования автоматизации. Работы выполнены в полном объеме, с надлежащим качеством.'
         )
         if queryset:
@@ -252,9 +252,9 @@ class XlsxReportGenerator:
                     work.uncompleted.reason
                 ])
         ws.append([''])
-        ws.append(['Инженер АСУ, А и ТМ КС-45 Усинская'])
+        ws.append(['Инженер СА ПП «Усинская»'])
         ws.append([''])
-        ws.append(['Приборист АСУ, А и ТМ КС-45 Усинская'])
+        ws.append(['Приборист СА ПП «Усинская»'])
 
         # styling
         ws.column_dimensions['A'].width = 4
