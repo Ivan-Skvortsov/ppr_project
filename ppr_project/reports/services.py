@@ -47,8 +47,8 @@ class XlsxReportGenerator:
             'uncompletable': Q(uncompleted__isnull=False),
         }
         qs = Schedule.objects.filter(
-            date_completed__gte=self.date_from,
-            date_completed__lte=self.date_to
+            date_sheduled__gte=self.date_from,
+            date_sheduled__lte=self.date_to
         ).order_by('date_completed', 'equipment_type__facility')
         return qs.filter(qs_filter[self.report_type])
 
