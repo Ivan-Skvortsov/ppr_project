@@ -44,7 +44,7 @@ class XlsxReportGenerator:
             'ppr': Q(maintenance_type__m_type__icontains='ТО') & Q(date_completed__isnull=False),
             'ppz': Q(maintenance_type__m_type__icontains='Проверка') & Q(date_completed__isnull=False),
             'asps': Q(equipment_type__eqipment_type_name__icontains='АСПС') & Q(date_completed__isnull=False),
-            'uncompletable': Q(uncompleted__isnull=False),
+            'uncompletable': Q(uncompleted__isnull=False) & Q(date_completed__isnull=True),
         }
         qs = Schedule.objects.filter(
             date_sheduled__gte=self.date_from,
